@@ -1,0 +1,9 @@
+
+############################ MPIR Start ############################
+prompt_technique_name: "heuristic"
+# Number of validation rounds
+validation_round: 7
+answer_format : 'Wrap the final answer between <ANS_START> and <ANS_END>'
+seen_set_size: 25
+few_shot_count: 3
+############################ MPIR End ############################

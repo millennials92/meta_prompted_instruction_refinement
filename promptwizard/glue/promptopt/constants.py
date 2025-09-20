@@ -8,6 +8,8 @@ from ..common.base_classes import UniversalBaseClass
 # Hyperparameters defined in promptopt_config.yaml
 class SupportedPromptOpt(Enum):
     CRITIQUE_N_REFINE = "critique_n_refine"
+    HEURISTIC = "heuristic"
+
 
     @classmethod
     def all_values(cls):

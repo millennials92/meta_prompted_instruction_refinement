@@ -206,12 +206,12 @@ class CritiqueNRefine(PromptOptimizer, UniversalBaseClass):
                     questions_pool = [example[DatasetSpecificProcessing.QUESTION_LITERAL] for example in dataset_subset]
                     correct_count += 1
                 # 
-                print("critique_example_set, correct_count")
-                print(critique_example_set, correct_count)
-            print("Loop completed")
+                #print("critique_example_set, correct_count")
+                #print(critique_example_set, correct_count)
+            #print("Loop completed")
             prompt_score_list.append([instruction, correct_count/count, dataset_subset])
 
-        self.logger.info(f"prompt_score_list {prompt_score_list}")
+        #self.logger.info(f"prompt_score_list {prompt_score_list}")
         return prompt_score_list
 
     @iolog.log_io_params
@@ -252,7 +252,7 @@ class CritiqueNRefine(PromptOptimizer, UniversalBaseClass):
  
         # answer_matches = [self.chat_completion(FINAL_ANSWER_EXTRACTION_PROMPT.format(text=generated_text), "You are an AI assistant. Please follow the users requests.")]
         answer_matches = [generated_text]
-        # 
+        #print([generated_text])
         answers_len, dataset_len = len(answer_matches), len(dataset_subset)
         if answers_len != dataset_len:
             self.logger.info(f"Answers extracted from LLM output={answers_len}, Questions asked to LLM {dataset_len}")
@@ -262,9 +262,11 @@ class CritiqueNRefine(PromptOptimizer, UniversalBaseClass):
 
         wrong_examples = []
         for i in range(min(answers_len, dataset_len)):
-            print("dataset_subset", dataset_subset)
+            #print("dataset_subset", dataset_subset)
             actual_answer = dataset_subset[i][DatasetSpecificProcessing.FINAL_ANSWER_LITERAL]
+            #print("1" + str(actual_answer))
             question = dataset_subset[i][DatasetSpecificProcessing.QUESTION_LITERAL]
+            #print("2" + str(question))
             is_correct, _ = self.data_processor.access_answer(answer_matches[i], actual_answer)
             if not is_correct:
                 wrong_examples.append(dataset_subset[i])

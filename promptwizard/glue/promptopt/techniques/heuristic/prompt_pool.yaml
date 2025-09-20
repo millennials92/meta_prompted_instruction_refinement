@@ -1,0 +1,96 @@
+
+final_prompt: |
+  {instruction}
+  {few_shot_examples}
+
+  {answer_format}
+
+ans_delimiter_instruction: ""
+
+  
+eval_prompt: |
+  {instruction}
+  
+  [Question] {question}
+  [Answer] 
+
+
+system_prompt: You are a helpful assistant developed by OpenAI that can efficiently perform tasks as per instruction
+
+
+prompt_evaluation: |
+  ### Task Overview   
+  You are a **Senior Prompt Engineer** with two main tasks:  
+  1. **Evaluate prompts** using a 7-criteria rubric.
+  2. **Refine prompts** by applying evaluation feedback  
+  Always remain objective, precise, and helpful.
+ 
+  ### Prompt Under Evaluation  
+  [Prompt]: {prompt}
+  
+  ### Instructions   
+  1. **Review Prompt**: Read the prompt to understand its purpose and structure.  
+  2. **Apply Rubric**: Assess the prompt against the five defined criteria.  
+  3. **Score & Justify**: For each criterion, assign a score (1–5), state one strength, one weakness, and provide a brief rationale.  
+  4. **Calculate Total**: Sum all ratings to produce a cumulative score out of 35.  
+  5. **Recommend Improvements**: Provide 7-10 actionable suggestions to strengthen the prompt globally.  
+  6. **Report Findings**: Present the evaluation strictly in the standardized output format.    
+ 
+  ### Seven-Criteria Evaluation Rubric  
+  1. **Role Prompting – Assign a task-relevant role to guide tone, accuracy, and perspective.**
+  2. **Step Back – Extract and state the key concepts or underlying principles related to the task by learning pattern in provided examples.**  
+  3. **Guided Chain of Thought – Begin by understand these concepts and principles, then outline the instructions as sequential, numbered steps.**
+  4. **Instruction & Separation – Use ### to separate context and instruction**
+  5. **Output Format Specification via 3 Examples – Show a desired output format examples to guide the model’s response. It has 2 components with markdown: **[Question]**,**[Answer].**
+  6. **Show step by step reasoning in via Ouput Format Examples - It must follow the instruction.**
+  7. **Conclusion – Conclude with a concise summary or restatement of the task.**
+ 
+  ### Output Format  
+  1. Role Prompting – X/5  
+  - Strength: …  
+  - Improvement: …  
+  - Rationale: …  
+  ... (continue for all 6 criteria)
+  
+  **Total Score: X/25** ---
+  **Refinement Summary (7–10 Actionable Suggestions):**  
+  - [Suggestion 1]  
+  - [Suggestion 2]  
+  - [Suggestion 3]  
+  ...
+ 
+
+prompt_generic_rubric: |
+  You are an expert prompt evaluator. Your task is to analyze the given prompt and provide structured feedback on its overall quality for guiding a large language model (LLM) to perform the specified task effectively.
+
+  Here is the prompt to evaluate: {prompt}
+
+  Assess the prompt based on general aspects of good prompt design, such as clarity, structure, completeness, and effectiveness in eliciting the desired LLM behavior. For each aspect you identify (aim for 5-7 key aspects), provide:
+  - A score from 1 to 5 (1 = very poor, 5 = excellent).
+  - A brief justification explaining why you gave that score.
+  - Strengths: What works well in this aspect.
+  - Weaknesses: What could be improved in this aspect.
+
+  Finally, based on your assessment, suggest 7-10 actionable improvements to make the prompt better overall. Keep suggestions practical and focused on enhancing task performance without overcomplicating the prompt.
+
+  Output your response in this exact format:
+  Aspect 1: [Name of aspect]
+  Score: [Score]/10
+  Justification: [Brief explanation]
+  Strengths: [Bullet points]
+  Weaknesses: [Bullet points]
+
+  [Repeat for each aspect]
+
+  Actionable Improvements:
+  1. [Suggestion 1]
+  2. [Suggestion 2]
+  ...
+
+prompt_refinement: |
+  Refine the prompt by applying all suggestions from the evaluation. 
+  Make sure to wrap the refined prompt with <START> and <END>
+
+improved_prompt: |
+  {instruction}
+

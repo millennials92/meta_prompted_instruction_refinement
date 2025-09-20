@@ -12,6 +12,8 @@ from ..paramlogger import ParamLogger
 from ..promptopt.constants import PromptOptimizationLiterals
 from ..promptopt.techniques.common_logic import DatasetSpecificProcessing
 from ..promptopt.utils import get_promptopt_class
+import random
+import re
 
 
 class GluePromptOpt:
@@ -116,7 +118,6 @@ class GluePromptOpt:
         """
         start_time = time.time()
         self.BEST_PROMPT, self.EXPERT_PROFILE = self.prompt_opt.get_best_prompt(self.prompt_opt_param,use_examples=use_examples,run_without_train_examples=run_without_train_examples,generate_synthetic_examples=generate_synthetic_examples,resolve_tie_criteria=resolve_tie_criteria)
-
         self.logger.info(f"Time taken to find best prompt: {(time.time() - start_time)} sec")
         return self.BEST_PROMPT, self.EXPERT_PROFILE
 
@@ -145,7 +146,9 @@ class GluePromptOpt:
             total_count += 1
             result = {"accuracy": f"{total_correct}/{total_count} : {total_correct/total_count*100.0}%",
                       "predicted": answer[self.EvalLiterals.PREDICTED_ANS],
-                      "actual": json_obj[DatasetSpecificProcessing.FINAL_ANSWER_LITERAL]}
+                      "actual": json_obj[DatasetSpecificProcessing.FINAL_ANSWER_LITERAL],
+                      "llm_output": answer[self.EvalLiterals.LLM_OUTPUT],
+                      "question": json_obj[DatasetSpecificProcessing.QUESTION_LITERAL],}
             self.iolog.append_dict_to_chained_logs(result)
             self.logger.info(result)
 
@@ -169,9 +172,22 @@ class GluePromptOpt:
         """
         final_prompt = self.prompt_pool.eval_prompt.format(instruction=self.BEST_PROMPT,
                                                            question=question)
+        #print(final_prompt)
         llm_output = self.prompt_opt.chat_completion(user_prompt=final_prompt, system_prompt=self.EXPERT_PROFILE)
+        #print(llm_output)
         
         is_correct, predicted_ans = self.data_processor.access_answer(llm_output, gt_answer)
         return {self.EvalLiterals.IS_CORRECT: is_correct,
                 self.EvalLiterals.PREDICTED_ANS: predicted_ans,
                 self.EvalLiterals.LLM_OUTPUT: llm_output}
+
+    def evaluate_promt(self, current_prompt: str) -> (str, str):
+        self.score = self.prompt_opt.evaluate_promt(current_prompt)
+        return self.score
+
+    def improve_prompt(self, current_prompt: str) -> (str, str):
+        self.improved_prompt = self.prompt_opt.improve_prompt_with_score_check(current_prompt,self.prompt_opt_param)
+        return self.improved_prompt
+
+
+

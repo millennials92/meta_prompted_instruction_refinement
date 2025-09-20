@@ -1,12 +1,15 @@
+from typing import Type
 from ..common.exceptions import GlueValidaionException
 from .constants import PromptOptimizationParams, PromptPool, SupportedPromptOpt
 from .techniques.common_logic import PromptOptimizer
 from .techniques.critique_n_refine.core_logic import CritiqueNRefine
 from .techniques.critique_n_refine.base_classes import CritiqueNRefineParams, \
     CritiqueNRefinePromptPool
+from .techniques.heuristic.core_logic import Heuristic
+from .techniques.heuristic.base_classes import HeuristicParams, HeuristicPromptPool
 
 
-def get_promptopt_class(prompt_technique_name: str) -> (PromptOptimizer, PromptOptimizationParams, PromptPool):
+def get_promptopt_class(prompt_technique_name: str) -> tuple[Type[PromptOptimizer], Type[PromptOptimizationParams], Type[PromptPool]]:
     """
     :params prompt_technique_name: Name of prompt optimization technique
     :return: Instance of class PromptRefinements, which is super class for all Prompt Optimization classes,
@@ -16,6 +19,8 @@ def get_promptopt_class(prompt_technique_name: str) -> (PromptOptimizer, PromptO
     prompt_technique_name = prompt_technique_name.lower()
     if prompt_technique_name == SupportedPromptOpt.CRITIQUE_N_REFINE.value:
         return CritiqueNRefine, CritiqueNRefineParams, CritiqueNRefinePromptPool
+    elif prompt_technique_name == SupportedPromptOpt.HEURISTIC.value:
+        return Heuristic, HeuristicParams, HeuristicPromptPool
     else:
         raise GlueValidaionException(f"Value provided for `prompt_technique_name` field in config yaml of "
                                      f"prompt manager is `{prompt_technique_name}`, which is not a valid name for "

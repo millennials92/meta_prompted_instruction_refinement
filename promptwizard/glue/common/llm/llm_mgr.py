@@ -14,19 +14,18 @@ from ..utils.runtime_tasks import str_to_class
 import os
 logger = get_glue_logger(__name__)
 
-def call_api(messages):
-
+def call_api(messages, model_name=None):
     from openai import OpenAI
     from azure.identity import get_bearer_token_provider, AzureCliCredential
     from openai import AzureOpenAI
 
     if os.environ['USE_OPENAI_API_KEY'] == "True":
         client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
-
+        model = model_name if model_name is not None else os.environ["OPENAI_MODEL_NAME"]
         response = client.chat.completions.create(
-        model=os.environ["OPENAI_MODEL_NAME"],
-        messages=messages,
-        temperature=0.0,
+            model=model,
+            messages=messages,
+            temperature=0.0,
         )
     else:
         token_provider = get_bearer_token_provider(
@@ -37,8 +36,9 @@ def call_api(messages):
             azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],
             azure_ad_token_provider=token_provider
             )
+        model = model_name if model_name is not None else os.environ["AZURE_OPENAI_DEPLOYMENT_NAME"]
         response = client.chat.completions.create(
-            model=os.environ["AZURE_OPENAI_DEPLOYMENT_NAME"],
+            model=model,
             messages=messages,
             temperature=0.0,
         )
@@ -49,12 +49,12 @@ def call_api(messages):
 
 class LLMMgr:
     @staticmethod
-    def chat_completion(messages: Dict):
+    def chat_completion(messages: Dict, model_name: str = None):
         llm_handle = os.environ.get("MODEL_TYPE", "AzureOpenAI")
         try:
             if(llm_handle == "AzureOpenAI"): 
                 # Code to for calling LLMs
-                return call_api(messages)
+                return call_api(messages, model_name=model_name)
             elif(llm_handle == "LLamaAML"):
                 # Code to for calling SLMs
                 return 0
