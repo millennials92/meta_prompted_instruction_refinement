@@ -36,7 +36,7 @@ MPIR/
 │   ├── prompt_wizard.ipynb
 │   └── MPIR.ipynb
 │   
-├── thesis_results/
+├── results/
 │    ├── Big_bench_hard
 │    └── Albation
 ├── requirements.txt
