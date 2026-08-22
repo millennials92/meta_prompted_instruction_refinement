@@ -67,7 +67,8 @@ pip install -r requirements.txt
 
 ### Environment Variables
 
-Create a `.env` file in the project root with your API credentials:
+Copy `demos/.env.example` to `demos/.env` and fill in your own API credentials. Never commit the
+resulting `.env` file.
 
 ```env
 # OpenAI Configuration
@@ -93,3 +94,8 @@ Each subfolder contains configs for a specific technique:
 
 - `demos/promptwizard.ipynb`: Promptwizard techniques with hyberbaton task
 - `demos/MPIR.ipynb`: MPIR integration on the Hyperbaton dataset using PromptWizard prompts
+
+## 📄 License
+
+This project is licensed under the MIT License (see `LICENSE`). It vendors `BIG-Bench-Hard/` and
+code adapted from Microsoft's `PromptWizard`, each under its own MIT License.
