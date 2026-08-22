@@ -99,7 +99,7 @@ P("Two broad strategies dominate current approaches to prompt design: manual pro
   "prompt optimization (APO) ‹2›. Manual prompting relies on heuristics drawn from human "
   "intuition and experience, such as chain-of-thought reasoning ‹7›, role assignment "
   "‹12›, and few-shot demonstration ‹4›. These techniques are often effective and "
-  "interpretable, but require domain expertise ‹31,32› and substantial trial-and-error "
+  "interpretable, but require domain expertise ‹3,32› and substantial trial-and-error "
   "‹26›, and are difficult to scale across the growing range of LLM applications. APO instead "
   "automates prompt generation and refinement through iterative search or model feedback ‹20,21›, "
   "improving efficiency and scalability but often forfeiting the structured guidance that makes "
@@ -212,7 +212,16 @@ P("Important gaps remain, however. When heuristics are used at all, they are typ
   "independent stage, so their contribution is difficult to attribute to measurable gains. Current "
   "approaches also rarely address LLMs' sensitivity to subtle phrasing differences ‹33›, so "
   "reported improvements may not consistently transfer to task outcomes. Meta-prompting thus expands "
-  "automation but still lacks a structured integration of heuristic knowledge.")
+  "automation but still lacks a structured integration of heuristic knowledge. MPIR differs from its two "
+  "closest relatives in this respect. PE2 is itself a complete, self-contained optimizer that formalizes "
+  "one evaluation-refinement loop; it does not layer onto an already-optimized prompt from another APO "
+  "system, nor does it select among candidates using a held-out validation score. PROPEL instead bakes a "
+  "large set of expert-derived principles into a single refinement pass as implicit priors, rather than "
+  "scoring a prompt against each principle explicitly and iterating multiple evaluation-refinement-"
+  "validation cycles until an empirically best candidate is found. MPIR's contribution is precisely this "
+  "combination—an explicit, criterion-by-criterion rubric, applied as a separate stage on top of an "
+  "existing APO output, with iterative empirical validation deciding which candidate survives—rather than "
+  "any single component in isolation.")
 
 P("The literature reveals a persistent tension: manual prompting offers interpretability and "
   "effectiveness but does not scale, while automatic optimization offers efficiency and scalability but "
@@ -486,12 +495,16 @@ P("GPT-3.5-turbo ‹48› serves as the target model for all benchmark tasks, bo
 P("PromptWizard randomly selects 25 training examples for prompt optimization and in-context example "
   "construction, with the remainder reserved for testing; MPIR uses the same 25 examples during "
   "validation to keep the comparison fair, with the remaining data again serving as the test set. "
-  "Refinement runs for 7 rounds, balancing improvement opportunity against computational cost. All "
+  "Refinement runs for 7 rounds, balancing improvement opportunity against computational cost: each round "
+  "issues 2 meta-prompting calls (evaluation and refinement, on GPT-4o) plus one validation call per "
+  "held-out example (on GPT-3.5-turbo), so MPIR adds on the order of 200 additional API calls per task on "
+  "top of the underlying APO method's own optimization cost—a real overhead that should be weighed "
+  "against its per-task accuracy gains in latency- or cost-sensitive deployments. All "
   "models are accessed via API with temperature fixed at 0. Full PromptWizard hyperparameters are "
-  "reported in Table 6 to support reproducibility. The implementation of MPIR is publicly available at "
+  "reported in Table 1 to support reproducibility. The implementation of MPIR is publicly available at "
   "https://github.com/millennials92/meta_prompted_instruction_refinement.")
 
-TABLE("Table 6. Hyperparameter settings of PromptWizard.",
+TABLE("Table 1. Hyperparameter settings of PromptWizard.",
       header=["Hyperparameter", "Description", "Default"],
       rows=[
           ["mutate_refine_rounds", "Rounds of MutateComponent followed by refinement over the best prompt generated so far.", "3"],
@@ -507,14 +520,14 @@ TABLE("Table 6. Hyperparameter settings of PromptWizard.",
 H1("5. Results and Analysis")
 
 H2("5.1. Results")
-P("Table 1 reports accuracy on the full test sets of the 23 BBH tasks (Section 4.1).")
+P("Table 2 reports accuracy on the full test sets of the 23 BBH tasks (Section 4.1).")
 
-TABLE("Table 1. Accuracy (%) across 23 BBH tasks.",
+TABLE("Table 2. Accuracy (%) across 23 BBH tasks.",
       header=["Task", "Manual", "PromptWizard", "Free Rewrite", "MPIR", "Expert-crafted"],
       rows=[
           ["hyperbaton", "74.6", "62.2", "68.44", "84.0", "84.4"],
           ["disambiguation_qa", "55.1", "61.7", "44.44", "62.2", "69.3"],
-          ["causal_judgment", "53.7", "59.3", "59.88", "56.8", "59.9"],
+          ["causal_judgement", "53.7", "59.3", "59.88", "56.8", "59.9"],
           ["date_understanding", "55.6", "71.1", "73.33", "74.2", "80.0"],
           ["penguins_in_a_table", "45.5", "75.0", "75.21", "82.6", "74.4"],
           ["boolean_expression", "81.8", "92.0", "89.78", "94.2", "91.6"],
@@ -538,19 +551,22 @@ TABLE("Table 1. Accuracy (%) across 23 BBH tasks.",
           ["Average", "50.7", "62.39", "57.15", "64.37", "69.5"],
       ], full=True, colw=[0.30, 0.14, 0.16, 0.14, 0.12, 0.14], note="bold_last_row")
 
-P("Table 2 summarizes accuracy before and after MPIR refinement across two further APO methods, "
-  "Iterative APE and ProTeGi, on the average over all 23 tasks and on the tasks that best illustrate the "
-  "pattern of gains and regressions; full per-task results for all three APO methods are provided in the "
-  "project repository (Section 4.5).")
+P("Table 3 summarizes accuracy before and after MPIR refinement across two further APO methods, "
+  "Iterative APE and ProTeGi. To keep the paper within its page limit, we report the average over all 23 "
+  "tasks together with the two tasks where MPIR moves accuracy in the same direction under all three "
+  "methods most strongly—hyperbaton and ruin_names (consistently positive)—and the two where it moves "
+  "in the same direction most strongly the other way—geometric_shapes and tracking_shuffled_objects "
+  "(consistently negative); full per-task results for all three APO methods are provided in the project "
+  "repository (Section 4.5).")
 
-TABLE("Table 2. Accuracy (%) before and after MPIR refinement, for three APO methods (average over all "
-      "23 BBH tasks, plus representative tasks).",
+TABLE("Table 3. Accuracy (%) before and after MPIR refinement, for three APO methods (average over all "
+      "23 BBH tasks, plus the tasks with the most consistent gains and regressions across all three "
+      "methods).",
       header=["Task", "APE (before)", "ProTeGi (before)", "PromptWizard (before)",
               "APE (after)", "ProTeGi (after)", "PromptWizard (after)"],
       rows=[
           ["hyperbaton", "82.67", "80.89", "62.2", "85.78", "88.89", "84.0"],
-          ["temporal_sequences", "26.67", "84.00", "44.4", "86.67", "86.22", "38.2"],
-          ["dyck_languages", "24.44", "20.89", "14.2", "34.22", "32.44", "12.9"],
+          ["ruin_names", "58.67", "58.67", "66.2", "68.44", "77.78", "72.0"],
           ["geometric_shapes", "62.67", "61.78", "57.8", "61.33", "60.89", "49.3"],
           ["tracking_shuffled_objects", "62.96", "61.63", "69.8", "58.22", "60.89", "65.5"],
           ["Average (23 tasks)", "70.16", "72.81", "62.39", "74.02", "74.26", "64.37"],
@@ -571,17 +587,21 @@ FIG("case.png",
 H2("5.2. Analysis")
 
 H3("5.2.1. Overall Performance Improvements of MPIR")
-P("Table 1 shows that MPIR generally improves on PromptWizard by systematically integrating manual "
-  "prompting heuristics: MPIR reaches an average accuracy of 64.37%, versus 62.39% for PromptWizard, an "
-  "average improvement of 1.97 percentage points. A bootstrap resampling analysis across BBH tasks "
-  "(10,000 iterations) gives a 95% confidence interval of [−0.46, 4.70] for this improvement; although "
-  "the interval includes zero, the overall trend is positive, with MPIR outperforming PromptWizard on 16 "
-  "of 23 tasks. The free rewrite baseline reaches only 57.15% on average—well below both PromptWizard "
-  "and MPIR—indicating that MPIR's gains stem from its structured seven-criteria rubric rather than "
-  "simply from GPT-4o's general rewriting ability.")
+P("Table 2 shows a directionally positive but not statistically significant improvement over "
+  "PromptWizard: MPIR reaches an average accuracy of 64.37%, versus 62.39% for PromptWizard, a difference "
+  "of 1.97 percentage points. A bootstrap resampling analysis across BBH tasks (10,000 iterations) gives "
+  "a 95% confidence interval of [−0.46, 4.70] for this difference; because the interval includes zero, "
+  "this task-level average improvement cannot be considered statistically significant at conventional "
+  "thresholds, and we report it as such rather than as an established effect. The more robust evidence for "
+  "MPIR comes from its consistency across individual tasks—it outperforms PromptWizard on 16 of 23 "
+  "tasks, with several gains of 10-20 points—and from the free rewrite baseline, which reaches only "
+  "57.15% on average, well below both PromptWizard and MPIR. Together, these results indicate that "
+  "MPIR's per-task gains are attributable to its structured seven-criteria rubric rather than simply to "
+  "GPT-4o's general rewriting ability, even though the pooled average improvement should be read as a "
+  "promising trend rather than a confirmed effect; Section 6 revisits this as a limitation.")
 
 H3("5.2.2. Evaluating MPIR Across Multiple APO Frameworks")
-P("Table 2 shows that MPIR consistently improves average accuracy across APO frameworks: Iterative APE "
+P("Table 3 shows that MPIR consistently improves average accuracy across APO frameworks: Iterative APE "
   "from 70.16% to 74.02%, ProTeGi from 72.81% to 74.26%, and PromptWizard from 62.39% to 64.37%. Although "
   "the magnitude of improvement varies across methods and tasks, the consistently positive trend supports "
   "MPIR functioning as a refinement layer across different APO frameworks rather than one tailored to "
@@ -589,7 +609,7 @@ P("Table 2 shows that MPIR consistently improves average accuracy across APO fra
 
 H3("5.2.3. Cross-Model Generalization")
 P("To test MPIR under a different model family, we repeated the experiment with Gemini 3.5 Flash-Lite "
-  "‹50› as both the target model and the meta-prompting model (Table 3). The baseline already "
+  "‹50› as both the target model and the meta-prompting model (Table 4). The baseline already "
   "achieves a high average accuracy of 92%, leaving limited room for improvement, and MPIR maintains the "
   "same rounded average after refinement. The most noticeable gains occur where baseline accuracy was "
   "around 70%: causal_judgement improves from 70% to 75%, disambiguation_qa from 77% to 80%, and "
@@ -598,7 +618,7 @@ P("To test MPIR under a different model family, we repeated the experiment with 
   "a slight decline—suggesting MPIR is most effective when the baseline prompt still has meaningful "
   "reasoning weaknesses to correct.")
 
-TABLE("Table 3. Cross-model evaluation of MPIR on Gemini 3.5 Flash-Lite (average over all 23 BBH tasks, "
+TABLE("Table 4. Cross-model evaluation of MPIR on Gemini 3.5 Flash-Lite (average over all 23 BBH tasks, "
       "plus the tasks with the largest movement); full per-task results are in the project repository.",
       header=["Task", "PromptWizard (%)", "MPIR (%)", "Change (%)"],
       rows=[
@@ -622,7 +642,7 @@ P("MPIR also improves interpretability by embedding human-inspired structure, cl
   "made by individuals in a given scenario...”), and similar edits elsewhere removed distracting, "
   "task-irrelevant instructions that had been reducing output quality.")
 
-P("Across Tables 1-3, MPIR's strongest and most consistent gains occur on tasks governed by explicit "
+P("Across Tables 2-4, MPIR's strongest and most consistent gains occur on tasks governed by explicit "
   "structural or rule-based reasoning—hyperbaton, object_counting, boolean_expression, and "
   "temporal_sequences all improve repeatedly across APO frameworks and model families (e.g., hyperbaton "
   "rises from 62.2% to 84.0% under PromptWizard). This is consistent with prior evidence that CoT "
@@ -638,13 +658,13 @@ P("Across Tables 1-3, MPIR's strongest and most consistent gains occur on tasks 
 H3("5.2.5. Remaining Gap to Expert-Crafted Prompting")
 P("Despite strong gains over automated baselines, MPIR still falls short of expert-crafted prompting on "
   "average (64.4% versus 69.5%). The gap concentrates in a small set of tasks—navigate, "
-  "reasoning_about_colored_objects, web_of_lies, and multistep_arithmetic_two (Table 4)—where expert "
+  "reasoning_about_colored_objects, web_of_lies, and multistep_arithmetic_two (Table 5)—where expert "
   "examples provide richer reasoning traces and more explicit state tracking. Because MPIR's examples are "
   "inherited from the PromptWizard baseline rather than newly generated, they reflect the same "
   "limitations present in PromptWizard's own outputs: MPIR's refinements are structurally consistent but "
   "tend to oversimplify example reasoning relative to expert-written traces.")
 
-TABLE("Table 4. Tasks where MPIR underperforms expert-crafted prompting.",
+TABLE("Table 5. Tasks where MPIR underperforms expert-crafted prompting.",
       header=["Task", "MPIR (%)", "Expert (%)"],
       rows=[
           ["navigate", "68.0", "93.8"],
@@ -657,7 +677,7 @@ H2("5.3. Ablation Studies")
 
 H3("5.3.1. Which Rubric Criteria Matter Most")
 P("To assess each rubric criterion's contribution, we ran an ablation on five representative BBH tasks, "
-  "removing one criterion at a time (Table 5). Removing any single criterion reduces average accuracy "
+  "removing one criterion at a time (Table 6). Removing any single criterion reduces average accuracy "
   "from the full rubric's 80.0% to between 66.0% and 75.0%, so every criterion plays a meaningful role, "
   "though to different degrees. Four criteria prove particularly critical—Instruction & Separation "
   "(C4), Role Prompting (C1), Guided Chain of Thought (C3), and Step Back (C2)—each reducing average "
@@ -668,7 +688,7 @@ P("To assess each rubric criterion's contribution, we ran an ablation on five re
   "mainly enhance clarity rather than drive task accuracy. Overall, heuristics that organize reasoning and "
   "contextual framing appear to contribute most to refinement performance on these benchmark tasks.")
 
-TABLE("Table 5. Effect of removing individual rubric criteria across five BBH tasks (accuracy, %). "
+TABLE("Table 6. Effect of removing individual rubric criteria across five BBH tasks (accuracy, %). "
       "C1=Role Prompting, C2=Step Back, C3=Guided CoT, C4=Instruction & Separation, C5=Output Format, "
       "C6=Worked Reasoning, C7=Conclusion.",
       header=["Task", "ALL", "C1", "C2", "C3", "C4", "C5", "C6", "C7"],
@@ -684,7 +704,7 @@ TABLE("Table 5. Effect of removing individual rubric criteria across five BBH ta
 H3("5.3.2. Heuristic Rubric vs. Generic Rubric")
 P("To test whether the rubric's specificity matters, we compared the full seven-criteria rubric against "
   "a generic rubric using broad criteria such as clarity, structure, and effectiveness, on the same five "
-  "tasks, holding refinement and validation fixed (Table 6). The full rubric outperforms the generic one "
+  "tasks, holding refinement and validation fixed (Table 7). The full rubric outperforms the generic one "
   "on four of five tasks, with average accuracy dropping from 79.9% to 72.2% under the generic rubric—"
   "an 8-point gap confirming that the seven-criteria rubric's specificity, not just the act of evaluation "
   "and refinement, drives MPIR's effectiveness. The heuristic rubric enforces step-by-step reasoning, "
@@ -695,23 +715,23 @@ H3("5.3.3. Importance of Prompt Effectiveness Validation")
 P("Finally, we tested whether the validation stage itself is necessary by comparing the full framework "
   "(seven evaluation-refinement-validation cycles) against a validation-ablated variant that selects a "
   "prompt after a single evaluation-refinement cycle with no empirical testing, again on five "
-  "representative tasks (Table 7). Removing validation drops average accuracy from 75.4% to 61.9%, a "
-  "substantial decline showing that rubric alignment alone does not guarantee performance: an "
+  "representative tasks (Table 7). Removing validation drops average accuracy from 79.9% to 61.9%, an "
+  "18-point decline showing that rubric alignment alone does not guarantee performance: an "
   "unvalidated prompt may look well structured yet perform worse empirically. Validation anchors MPIR's "
   "refinements in measured accuracy, ensuring gains are both real and task-oriented rather than purely "
   "heuristic.")
 
-TABLE("Table 6. Comparison of the full rubric with a generic rubric, and the effect of removing "
-      "prompt-effectiveness validation, across five BBH tasks (accuracy, %).",
-      header=["Task", "MPIR (full rubric)", "Generic rubric", "MPIR (with validation)", "Without validation"],
+TABLE("Table 7. Effect of the generic rubric and of removing prompt-effectiveness validation, each "
+      "measured against the same full-MPIR baseline, across five BBH tasks (accuracy, %).",
+      header=["Task", "MPIR (full)", "Generic rubric", "No validation"],
       rows=[
-          ["hyperbaton", "84.0", "66.2", "84.0", "37.8"],
-          ["penguins_in_a_table", "82.6", "78.5", "82.6", "67.8"],
-          ["ruin_names", "72.0", "66.2", "72.0", "52.0"],
-          ["object_counting", "92.4", "92.9", "92.4", "91.6"],
-          ["reasoning_about_colored_objects", "68.4", "57.3", "68.4", "60.4"],
-          ["Average", "79.9", "72.2", "75.4", "61.9"],
-      ], full=True, note="bold_col_pairs")
+          ["hyperbaton", "84.0", "66.2", "37.8"],
+          ["penguins_in_a_table", "82.6", "78.5", "67.8"],
+          ["ruin_names", "72.0", "66.2", "52.0"],
+          ["object_counting", "92.4", "92.9", "91.6"],
+          ["reasoning_about_colored_objects", "68.4", "57.3", "60.4"],
+          ["Average", "79.9", "72.2", "61.9"],
+      ], full=False, note="bold_last_row")
 
 # ===========================================================================
 H1("6. Conclusion")
@@ -725,14 +745,22 @@ P("This paper introduced Meta-Prompted Instruction Refinement (MPIR), a framewor
   "effective for structured, rule-based reasoning tasks, where heuristic-guided refinement yields clearer "
   "and more reliable reasoning.")
 
-P("This study also has limitations. Although MPIR improved performance on most benchmark tasks, its "
-  "average gain over baseline APO systems is relatively modest, suggesting the benefit of heuristic-guided "
-  "refinement depends on task and baseline-prompt characteristics. To keep the comparison fair, MPIR "
-  "reuses PromptWizard's optimization examples during validation, which may introduce evaluation bias. "
-  "The seven-criteria rubric was also developed in close proximity to the BBH tasks themselves, which may "
-  "introduce construct dependence and limit generalizability to other benchmark families. Finally, the "
-  "quality of MPIR's refined prompts remains partially bounded by the quality of the prompts and examples "
-  "produced by the underlying APO framework.")
+P("This study also has limitations. Most importantly, the average gain over the PromptWizard baseline is "
+  "modest and, at the task-population level, not statistically significant: its 95% bootstrap confidence "
+  "interval spans zero (Section 5.2.1). We therefore treat that pooled result as a promising trend rather "
+  "than a confirmed effect, and rely more heavily on the per-task win rate (16 of 23 tasks) and on the "
+  "consistent, replicated pattern across three APO frameworks and two model families as the stronger "
+  "evidence for MPIR's contribution. Relatedly, all reported results come from a single run per condition "
+  "at temperature 0 rather than repeated trials with varying seeds, so our confidence intervals capture "
+  "variance across BBH tasks but not run-to-run variance in the optimization process itself; repeated-trial "
+  "estimates of that variance are an important direction for follow-up work. To keep the comparison fair, "
+  "MPIR also reuses PromptWizard's optimization examples during validation, which may introduce evaluation "
+  "bias, and the seven-criteria rubric was developed in close proximity to the BBH tasks themselves, which "
+  "may introduce construct dependence and limit generalizability to other benchmark families. The quality "
+  "of MPIR's refined prompts remains partially bounded by the quality of the prompts and examples produced "
+  "by the underlying APO framework. Finally, because MPIR depends on versioned commercial APIs "
+  "(GPT-3.5-turbo, GPT-4o, Gemini 3.5 Flash-Lite), exact reproducibility is subject to provider-side model "
+  "updates and deprecations outside the authors' control.")
 
 P("Future work could extend MPIR along several directions: broader evaluation across additional datasets "
   "and reasoning domains; adaptive, task-specific rubrics; independent construct validation, by deriving "

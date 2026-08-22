@@ -1,0 +1,309 @@
+[paper title] Received: 22 August 2026 | Revised: TBD | Accepted: TBD | Published online: TBD
+[paper title] RESEARCH ARTICLE
+[paper title] Meta-Prompted Instruction Refinement: Bridging Manual Prompting Techniques and Automatic Prompt Optimization
+[paper title] Artificial Intelligence and Applications
+[paper title] 2026, Vol. XX(XX) 1-12
+[paper title] DOI: 10.47852/bonviewAIAXXXXXXXX
+[Author] Linh Nguyen1, Quang-Vinh Dang2*, Minh Ngoc Dinh3, and Thuy Nguyen1
+[Affiliation] 1 School of Science, Engineering & Technology, RMIT University Vietnam, 702 Nguyen Van Linh Boulevard, Ho Chi Minh City 700000, Vietnam.
+[Affiliation] 2 British University Vietnam, Hung Yen, Vietnam.
+[Affiliation] 3 School of Computing Technologies, RMIT University, Melbourne, Australia.
+[Normal] *Corresponding author: Quang-Vinh Dang, British University Vietnam, Hung Yen, Vietnam. Email: [corresponding author email to be provided]
+[AbstractText] Abstract: Large language models (LLMs) are transforming artificial intelligence by enabling systems that can reason, write, and assist with complex tasks, capabilities that are increasingly important for science, education, and everyday applications. Yet these models remain critically dependent on the quality of their input prompts, making prompt design a central bottleneck. Manual prompt engineering, using techniques such as chain-of-thought reasoning and role assignment, can yield high performance but requires expert knowledge and does not scale. Automatic prompt optimization (APO) offers efficiency, but its outputs often lack the structured guidance that makes human-crafted prompts effective. This paper introduces Meta-Prompted Instruction Refinement (MPIR), a framework that refines APO-generated prompts through a seven-criteria rubric, meta-prompted evaluation and refinement, and empirical validation. Extensive experiments on the Big-Bench Hard (BBH) benchmark show that MPIR outperforms its PromptWizard baseline on 16 of 23 tasks, with gains of up to 20 percentage points on individual tasks, and that the same refinement layer improves two further APO methods (Iterative APE and ProTeGi) as well as a different underlying LLM family. These results demonstrate that MPIR bridges human heuristics with automation, making prompt optimization more effective, interpretable, and scalable, while reducing reliance on expert prompt engineering.
+[Keywords] Keywords: Prompt engineering, meta-prompting, prompt optimization, large language models, automatic prompt optimization, Big-Bench Hard
+[Heading 1] 1. Introduction
+[Normal] Large language models (LLMs) have rapidly advanced natural language processing, achieving strong performance on tasks such as translation [1], summarization [2], and question answering [3], and are increasingly central to applied domains ranging from law to healthcare and decision support [4, 5]. Their effectiveness, however, depends critically on the design of the input prompt: even small changes in phrasing can produce large differences in output accuracy, consistency, and reliability [6]. Prompt design has therefore become a major bottleneck to using LLMs reliably at scale.
+[Normal] Two broad strategies dominate current approaches to prompt design: manual prompting and automatic prompt optimization (APO) [7]. Manual prompting relies on heuristics drawn from human intuition and experience, such as chain-of-thought reasoning [8], role assignment [9], and few-shot demonstration [10]. These techniques are often effective and interpretable, but require domain expertise [11, 12] and substantial trial-and-error [13], and are difficult to scale across the growing range of LLM applications. APO instead automates prompt generation and refinement through iterative search or model feedback [14, 15], improving efficiency and scalability but often forfeiting the structured guidance that makes human-crafted prompts effective. The trade-off between the effectiveness and interpretability of manual prompting and the efficiency and scalability of APO remains unresolved.
+[Normal] Recent work on meta-prompting suggests a path forward: meta-prompts guide an LLM in generating, critiquing, or refining prompts, effectively adding a higher-order layer of reasoning to prompt optimization [16, 13]. Yet most existing approaches integrate heuristics only loosely, either as initial seeds or as informal guidance during optimization, without systematic evaluation or explicit accounting for LLMs' sensitivity to subtle phrasing differences [6]. As a result, their effects are difficult to quantify and to generalize. What is missing is a principled framework that embeds human heuristics into APO in a structured, repeatable, and empirically validated way.
+[Normal] This paper addresses that gap with Meta-Prompted Instruction Refinement (MPIR), a framework that integrates manual prompting heuristics into APO through a structured three-stage cycle of evaluation, refinement, and validation. MPIR functions as a modular layer on top of an existing APO system: it translates heuristics into explicit evaluation criteria, applies meta-prompted revision, and empirically validates each candidate prompt, thereby embedding human-guided design principles into APO-generated prompts without additional human intervention.
+[Normal] Specifically, this study pursues four objectives:
+[List Bullet] To develop a structured rubric for prompt evaluation. We formalize established manual prompting heuristics into a seven-criteria framework for systematically evaluating APO-generated prompts.
+[List Bullet] To evaluate whether meta-prompted refinement improves APO-generated prompts. MPIR applies rubric-guided feedback to iteratively refine prompts and empirically measures the resulting effectiveness on benchmark tasks.
+[List Bullet] To investigate the generalizability and modularity of heuristic-guided refinement. We examine whether MPIR functions as a modular refinement layer across different APO frameworks and across different underlying LLMs, while maintaining consistent gains.
+[List Bullet] To investigate how individual prompting heuristics contribute to performance. Through targeted ablations on representative BBH tasks, we quantify how each rubric criterion contributes to refinement outcomes.
+[Normal] The remainder of this paper is organized as follows. Section 2 reviews related work on prompt engineering and automatic prompt optimization. Section 3 introduces the MPIR framework. Section 4 describes the implementation. Section 5 reports results and analysis. Section 6 concludes the paper.
+[Heading 1] 2. Related Work
+[Heading 2] 2.1. Prompting as Human-AI Interaction
+[Normal] Prompting is the primary mechanism for steering LLM behavior, leveraging in-context learning to shape outputs without updating model parameters [7]. It has been described as a form of natural language programming [17], emphasizing scalability and efficiency. As a direct channel of user control, however, its effectiveness often depends on extensive trial and error, which has given rise to a wide range of heuristic techniques whose potential and limitations we review next.
+[Heading 2] 2.2. Manual Prompting Heuristics
+[Normal] Manual prompt engineering improves LLM performance through deliberate prompt design without modifying model parameters. Zero-shot prompting relies solely on task instructions [10], while few-shot prompting introduces demonstrations that improve generalization and output consistency [18]; example formatting and label consistency further shape performance, underscoring the importance of prompt structure in activating latent model capabilities [19].
+[Normal] More advanced heuristics target reasoning structure and contextual alignment. Chain-of-thought (CoT) prompting improves multistep reasoning by decomposing problems into intermediate steps [8, 20], and coherent, relevant reasoning steps matter more than reasoning length alone [21, 22]. Role prompting introduces contextual identities, such as “Act as a math teacher,” to guide reasoning behavior and domain alignment [23, 9], although poorly aligned personas can degrade reasoning quality [24]. Step-back prompting further improves knowledge-intensive reasoning by encouraging the model to first abstract key principles before solving a task [25, 26].
+[Normal] Prompt organization matters as well: because LLMs attend disproportionately to information placed near the beginning or end of a prompt [27, 28], strategically ordering instructions and constraints can improve reasoning accuracy and instruction-following. Collectively, these heuristics show that carefully designed instructions, reasoning structure, contextual framing, and exemplars can substantially improve LLM performance—but they remain labor-intensive, task-specific, and dependent on human expertise, which motivates automatic prompt optimization.
+[Heading 2] 2.3. Automatic Prompt Optimization
+[Normal] APO methods scale prompt refinement through iterative generation, evaluation, and selection [29]. Continuous approaches optimize embeddings but require access to model internals, whereas discrete approaches edit natural language directly and produce interpretable outputs [30]. Automatic Prompt Engineer (APE) uses an LLM to generate and refine instructions from input-output demonstrations [31]; ProTeGi mimics gradient descent with textual feedback to guide revisions [14]; EvoPrompt adapts evolutionary algorithms to mutate and recombine prompts [15]; and OPRO uses an LLM as a natural-language optimizer that iteratively generates and evaluates candidates conditioned on prior scores [32]. PromptWizard is a self-evolving, self-adapting framework that optimizes prompts through a feedback-driven critique and synthesis process [33].
+[Normal] Related frameworks pursue complementary strategies. DSPy treats LM pipelines as text-transformation graphs, compiling declarative modules into effective prompting, fine-tuning, and reasoning strategies [34]. TextGrad performs automatic optimization by propagating natural-language feedback through a system, analogous to how PyTorch propagates gradients [35]. Self-Refine has an LLM iteratively critique and revise its own output, echoing how humans improve writing through successive drafts [36]. Reflexion lets an agent verbally reflect on its mistakes and store these reflections in memory to improve future decisions, rather than updating model weights [37]. Because these frameworks treat optimization largely as black-box search, their outputs can be less robust and transparent, and by prioritizing automation they risk neglecting the structured heuristics that make manual prompting effective.
+[Heading 2] 2.4. Meta-Prompting and Heuristic-Guided Automatic Prompt Optimization
+[Normal] Meta-prompting guides an LLM to generate or refine prompts using performance feedback [30], and several studies combine manual heuristics with automatic optimization. PE2 formalizes refinement through step-by-step reasoning templates and structured analysis [38]; dual-phase strategies combine a meta-instruction-guided initialization phase with iterative sentence-level optimization to accelerate convergence on high-quality prompts [16]; and PROPEL integrates a large set of expert-derived prompting principles as priors to guide refinement [13]. PromptWizard itself adopts heuristic-driven strategies to initialize prompts and self-generated reasoning chains to construct few-shot examples [33].
+[Normal] Important gaps remain, however. When heuristics are used at all, they are typically injected at initialization [16] or loosely during optimization [13] rather than treated as an independent stage, so their contribution is difficult to attribute to measurable gains. Current approaches also rarely address LLMs' sensitivity to subtle phrasing differences [6], so reported improvements may not consistently transfer to task outcomes. Meta-prompting thus expands automation but still lacks a structured integration of heuristic knowledge.
+[Normal] The literature reveals a persistent tension: manual prompting offers interpretability and effectiveness but does not scale, while automatic optimization offers efficiency and scalability but often neglects heuristic grounding. Emerging meta-prompting methods attempt to bridge this divide but lack systematic integration and principled evaluation. MPIR is designed to close this gap by formalizing manual heuristics into explicit rubrics, applying them as an independent stage of the optimization pipeline after an APO prompt has already been produced, and validating the resulting prompt's effectiveness on held-out data—combining human insight with automated scalability.
+[Heading 1] 3. Meta-Prompted Instruction Refinement Framework
+[Normal] We propose Meta-Prompted Instruction Refinement (MPIR), a framework that extends APO by embedding manual prompting heuristics into a structured, iterative refinement process (Figure 1). MPIR uses meta-prompting to guide an LLM in systematically evaluating, refining, and validating APO-generated prompts, and consists of three components: (1) a heuristic rubric encoding principles such as role prompting and chain-of-thought reasoning; (2) an evaluation-refinement loop in which meta-prompts critique and revise candidate prompts; and (3) a validation stage that measures refined-prompt effectiveness on a held-out set using accuracy.
+[Normal] These three stages echo concepts that appear under different names elsewhere in the prompt-optimization literature: evaluation relates to the critique-based, feedback-driven assessment used in frameworks such as ProTeGi and PromptWizard [14, 33]; refinement aligns with the revision and self-improvement strategies common to meta-prompting [33, 38]; and validation relates to the empirical, performance-based candidate selection used across APO frameworks [31, 32, 33]. By organizing these components into one rubric-driven cycle, MPIR provides a more structured integration of heuristic-guided prompt refinement than prior work.
+[FigureCaption] Overview of the Meta-Prompted Instruction Refinement (MPIR) cycle. An APO-generated prompt P0 enters a three-stage loop—Evaluation, Refinement, and Validation—guided by heuristic criteria. Each iteration uses P0 as the base and generates an improved candidate prompt (P1, P2, ..., PN). After N iterations, the prompt with the highest validation score is selected as the final prompt.
+[Heading 2] 3.1. Problem Formulation
+[Normal] Let (Qv, Av) = {(qi, ai)}, i = 1..M, denote a validation set of M question-answer pairs, where qi is the i-th input question and ai its ground-truth answer. An LLM L generates outputs with probability pL(ai | qi, P), where P is the prompt under evaluation, and its performance is measured by a task-specific metric A(L, P) (accuracy) computed on the validation set. The goal of MPIR is to refine the APO-generated prompt P0 into a prompt Pfinal that maximizes this metric:
+[Normal] Pfinal = argmax over P' in R(P0) of A(L, P'),
+[Normal] where R(P0) denotes the space of candidate refinements derived from P0.
+[Heading 2] 3.2. MPIR Algorithm
+[Normal] Algorithm 1 details the iterative process of evaluation, refinement, and validation that produces the final refined prompt.
+[AlgorithmTitle] Algorithm 1. MPIR Algorithm
+[Algorithm] Require: L: target LLM; L′: LLM for evaluation and refinement; Meval: meta-prompt for rubric evaluation; Mrefine: meta-prompt for refinement; P0: APO-generated prompt; (Qv, Av) = {(qi, ai)}, i=1..M: validation set; R: seven-criteria rubric; N: refinement rounds
+[Algorithm] Ensure: Refined prompt Pfinal
+[Algorithm] 1: Initialize: Pfinal ← P0; Abest ← −∞
+[Algorithm] 2: for t = 1 to N do
+[Algorithm] 3:     S ← Evaluate(Meval, L′, P0, R)                    ▷ Rubric feedback
+[Algorithm] 4:     P′ ← Refine(Mrefine, L′, P0, S)                  ▷ Generate revised prompt
+[Algorithm] 5:     A′ ← Validate(L, P′, (Qv, Av))                    ▷ Performance of P′
+[Algorithm] 6:     if A′ ≥ Abest then
+[Algorithm] 7:         Pfinal ← P′; Abest ← A′
+[Algorithm] 8:     end if
+[Algorithm] 9: end for
+[Algorithm] Return: Pfinal
+[Normal] Notation: P0 is the initial APO prompt used as the base for every refinement round; Pfinal is the best-performing prompt found across all rounds; P′ is the candidate produced in the current round; S is the textual rubric feedback returned by Evaluate(); Abest is the best validation score observed so far (initialized to −∞); and A′ is the validation score of the current candidate P′.
+[Heading 2] 3.3. Seven-Criteria Evaluation Rubric
+[Normal] The rubric combines insights from academic research, industry practice, and iterative experimentation. Research provides a diverse catalog of prompting strategies [39, 40], while industry contributes large-scale validation from deployed systems and user bases [41, 42, 43, 44]; iterative testing then refined these insights into a form that generalizes across tasks. The resulting seven criteria are intentionally ordered as a coherent progression—from role framing and conceptual grounding, through structured reasoning and exemplification, to task closure—turning heuristics into a systematic framework for improving prompt quality:
+[List Bullet] Role Prompting Assign a task-relevant role to condition model behavior.
+[List Bullet] Step-Back Reasoning Encourage abstraction and articulation of core concepts.
+[List Bullet] Guided Chain of Thought Structure reasoning into clear, sequential steps.
+[List Bullet] Instruction and Separation Separate task instructions from context to reduce ambiguity.
+[List Bullet] Output Format with Examples Specify the response schema and provide illustrative examples.
+[List Bullet] Worked Reasoning in Examples Include step-by-step reasoning within exemplars.
+[List Bullet] Conclusion Restate the task at the end to reinforce intent and coherence.
+[Normal] Each criterion is grounded in an established prompting technique: Role Prompting in contextual role assignment [23, 9]; Step-Back Reasoning in evidence that abstracting key principles improves reasoning [25, 26]; Guided Chain-of-Thought in structured intermediate reasoning for complex tasks [8, 20]; and Output Format with Examples and Worked Reasoning in Examples in few-shot and demonstration-based learning [18, 19]. The Conclusion criterion follows from evidence of positional bias in LLMs, whereby information near the start or end of a prompt receives more attention [27, 28]. Consolidating these techniques operationalizes established manual heuristics into a systematic rubric that the next section applies to APO-generated prompts.
+[Heading 2] 3.4. Evaluation and Refinement
+[Normal] The evaluation-refinement stage extends manual prompting strategies into a systematic process for improving APO-generated prompts, mirroring how a human prompt engineer would diagnose a prompt's weaknesses and revise it using proven heuristics.
+[Normal] The evaluation stage uses a meta-prompt (Figure 2) that directs the LLM to apply the seven-criteria rubric to an APO-generated prompt, scoring each criterion and identifying strengths, weaknesses, and actionable improvements. This produces a structured critique that combines quantitative scoring with qualitative insight, closely approximating expert human review, and reveals where the prompt departs from established heuristics.
+[DispCompCode] ### Task Overview
+[DispCompCode] You are a Senior Prompt Engineer with two main tasks:
+[DispCompCode] 1. Evaluate prompts using a 7-criteria rubric.
+[DispCompCode] 2. Refine prompts by applying evaluation feedback.
+[DispCompCode] Always remain objective, precise, and helpful.
+[DispCompCode] ### Prompt Under Evaluation
+[DispCompCode] [Prompt]: {prompt}
+[DispCompCode] ### Instructions
+[DispCompCode] 1. Review Prompt: read the prompt to understand its purpose and structure.
+[DispCompCode] 2. Apply Rubric: assess the prompt against the seven criteria below.
+[DispCompCode] 3. Score & Justify: for each criterion, assign a score (1-5), state one
+[DispCompCode]    strength, one weakness, and a brief rationale.
+[DispCompCode] 4. Calculate Total: sum all ratings for a cumulative score out of 35.
+[DispCompCode] 5. Recommend Improvements: give 7-10 actionable suggestions.
+[DispCompCode] 6. Report Findings: use the standardized output format below.
+[DispCompCode] ### Seven-Criteria Evaluation Rubric
+[DispCompCode] 1. Role Prompting  2. Step Back  3. Guided Chain of Thought
+[DispCompCode] 4. Instruction & Separation  5. Output Format with Examples
+[DispCompCode] 6. Worked Reasoning in Examples  7. Conclusion
+[DispCompCode] ### Output Format
+[DispCompCode] 1. Role Prompting: X/5 - Strength: ... - Improvement: ... - Rationale: ...
+[DispCompCode] (continue for the remaining six criteria)
+[DispCompCode] Total Score: X/35
+[DispCompCode] Refinement Summary (7-10 actionable suggestions): [Suggestion 1] ...
+[FigureCaption] Figure 2. Structured meta-prompt for evaluating a candidate prompt: a task overview, evaluation instructions, the seven-criteria rubric, and a standardized output format for consistent scoring and improvement suggestions.
+[Normal] The refinement stage builds on this critique. A second meta-prompt (Figure 3) directs the LLM to revise the original prompt by systematically incorporating the evaluation's suggestions, with the evaluation itself preserved in the conversation history to keep the revision faithful to the rubric rather than an unconstrained rewrite.
+[DispCompCode] Refine the prompt by applying all suggestions from the evaluation.
+[DispCompCode] Make sure to wrap the refined prompt with <START> and <END>
+[FigureCaption] Figure 3. Meta-prompt used to refine a candidate prompt by applying all evaluation feedback.
+[Normal] Evaluation and refinement together form a feedback-driven process for improving prompts, but refinement alone does not guarantee performance gains; MPIR therefore adds a validation stage to confirm that improvements translate into measurable benefits.
+[Heading 2] 3.5. Prompt Effectiveness Validation
+[Normal] The validation stage ensures that rubric-guided refinements yield measurable performance gains. Because LLMs are sensitive to subtle phrasing variations, a rubric-aligned rewrite is not guaranteed to perform better; rather than treating this sensitivity as a limitation, MPIR treats it as a mechanism for iterative improvement by testing each refined candidate on a held-out subset of the target dataset and comparing model outputs against ground truth. This evaluate-refine-validate cycle repeats for N rounds, producing successive candidates with corresponding accuracy scores, and MPIR retains the prompt that achieves the highest accuracy—so the final prompt reflects both heuristic soundness and empirically verified effectiveness.
+[Heading 1] 4. Implementation
+[Heading 2] 4.1. Datasets
+[Normal] This paper uses Big-Bench Hard (BBH) as the evaluation benchmark [45]. BBH comprises 23 tasks (27 subtasks) spanning algorithmic and multistep arithmetic reasoning, natural language understanding, world knowledge, and multilingual reasoning, with about 6,511 examples in total (roughly 250 per task). Its tasks are instruction-following in nature and were selected specifically for their difficulty, making BBH well suited for measuring gains from prompt optimization.
+[Heading 2] 4.2. Workflow
+[Normal] The workflow has two stages (Figures 4 and 5). Stage 1 uses PromptWizard as the base APO to produce an initial optimized prompt together with few-shot examples and reasoning chains. Stage 2 applies MPIR to that optimized prompt, running N rounds of rubric-based evaluation, refinement, and validation to produce the final optimized prompt.
+[FigureCaption] Stage 1: workflow of the PromptWizard base APO, adapted from [33]. It performs iterative refinement of prompt instructions, diverse example selection, sequential optimization, and self-generated reasoning and validation to produce an optimized prompt with few-shot examples and reasoning chains.
+[FigureCaption] Stage 2: workflow of Meta-Prompted Instruction Refinement (MPIR). MPIR builds on the PromptWizard APO output and performs iterative evaluation, refinement, and validation over N rounds to further improve prompt quality.
+[Heading 3] 4.2.1. Stage 1: PromptWizard
+[Normal] PromptWizard is adopted as the base APO because it achieves strong performance across diverse benchmarks while remaining cost- and time-efficient [33]. It is primarily an APO framework —its core objective is iterative, automated prompt refinement and validation—but it also incorporates meta-prompting and heuristic-guided elements through self-generated reasoning chains, critique-based refinement, and heuristic-inspired prompt construction. Its modular design lets MPIR be layered on top without altering the underlying optimization process. Our implementation omits the synthesis components of the original framework [33], since BBH's difficulty prevents the LLM from reliably generating them (for example, it often fails to produce a coherent expert persona). Algorithm 2 details the resulting procedure.
+[AlgorithmTitle] Algorithm 2. PromptWizard Algorithm (adapted from [33])
+[Algorithm] Require: L: large language model; D: problem description; S = {(qi, ai)}, i=1..n: training samples; T: thinking styles; k: few-shot count; N1: max_seq_iter; N2: mutate_refine_rounds; Pbase: base instruction (zero-shot CoT)
+[Algorithm] Ensure: Optimized prompt P̂opt and validated few-shot examples {(qfi, afi)}, i=1..k
+[Algorithm] 1: Initialize: P ← Pbase
+[Algorithm] 2: P̂ ← RefineInstructions(L, D, S, T, N2)
+[Algorithm] 3: Ediverse ← DiverseExampleSelection(L, D, S, P̂)
+[Algorithm] 4: P̂opt, Eopt ← SequentialOptimization(L, P̂, Ediverse, N1)
+[Algorithm] 5: Eopt,r ← ReasoningComponent(Eopt)                 ▷ Generate reasoning chains
+[Algorithm] 6: {(qfi, afi)} ← ValidateComponent(Eopt,r)              ▷ Validate examples
+[Algorithm] Return: P̂opt, {(qfi, afi)}, i=1..k
+[Heading 3] 4.2.2. Stage 2: Meta-Prompted Instruction Refinement
+[Normal] MPIR extends PromptWizard by applying the rubric-driven evaluation-refinement-validation loop (Algorithm 1) to its optimized prompt. In each round, the PromptWizard-generated prompt is evaluated against the seven-criteria rubric, refined using the meta-prompt feedback, and validated on a held-out set using accuracy; after N rounds, the best-performing prompt is selected.
+[Heading 2] 4.3. Baselines
+[Normal] Because the goal is to assess whether meta-prompting can enhance existing APO methods, PromptWizard is the primary baseline; additional reference points provide further context.
+[Heading 3] 4.3.1. Main baseline
+[List Bullet] APO baseline (PromptWizard). PromptWizard serves as a strong automated baseline without human-crafted heuristics; each final prompt includes three automatically generated in-context examples.
+[List Bullet] Free rewrite baseline. To isolate the contribution of MPIR's rubric from the general rewriting capability of GPT-4o, GPT-4o freely rewrites PromptWizard-generated prompts without rubric-guided evaluation or refinement, and the rewritten prompts are evaluated under the same BBH conditions as MPIR.
+[Heading 3] 4.3.2. Extended APO baselines
+[Normal] To further evaluate generalization, MPIR is also applied to APE [31] and ProTeGi [14]. Since neither method generates few-shot reasoning examples the way PromptWizard does, both use the same three chain-of-thought exemplars written by the BBH benchmark authors [46]; the resulting prompts are refined with MPIR and evaluated under identical conditions.
+[Heading 3] 4.3.3. Reference points
+[List Bullet] Manual prompting (zero-shot CoT). A manual reference point using only the task description plus “Let's think step by step” [20].
+[List Bullet] Expert-crafted prompting (few-shot CoT). An expert-augmented ceiling using the task description, “Let's think step by step,” and three chain-of-thought exemplars written by the BBH benchmark authors [45]; unlike MPIR, this approach is not scalable and requires substantial human effort.
+[Heading 2] 4.4. Evaluation Metric
+[Normal] Performance is measured with accuracy: the proportion of model outputs matching ground-truth labels on the full test set. For Ntest examples with inputs xj, ground-truth labels yj, and predictions ŷj, accuracy is (1/Ntest) Σ 1[ŷj = yj], the average indicator of a correct prediction.
+[Heading 2] 4.5. Implementation Details
+[Normal] GPT-3.5-turbo [47] serves as the target model for all benchmark tasks, both as the backbone of the PromptWizard baseline and for MPIR's validation stage, ensuring a consistent evaluation environment. MPIR's meta-prompting stages—evaluation and refinement—use the more capable GPT-4o [48] to provide expert-level feedback.
+[Normal] PromptWizard randomly selects 25 training examples for prompt optimization and in-context example construction, with the remainder reserved for testing; MPIR uses the same 25 examples during validation to keep the comparison fair, with the remaining data again serving as the test set. Refinement runs for 7 rounds, balancing improvement opportunity against computational cost. All models are accessed via API with temperature fixed at 0. Full PromptWizard hyperparameters are reported in Table 6 to support reproducibility. The implementation of MPIR is publicly available at https://github.com/millennials92/meta_prompted_instruction_refinement.
+[TableTitle] Table 6. Hyperparameter settings of PromptWizard.
+[TABLE] Hyperparameter | Description | Default
+        mutate_refine_rounds | Rounds of MutateComponent followed by refinement over the best prompt generated so far. | 3
+        mutate_rounds | Number of times MutateComponent is called. | 3
+        style_variation | Variations MutateComponent generates per call (one per thinking style). | 5
+        min_example_correct_count | Minimum questions ScoringComponent must answer correctly to qualify a prompt. | 3
+        max_example_count | Maximum attempts/questions given to ScoringComponent. | 6
+        max_seq_iter | Rounds of calls to CritiqueComponent. | 3
+        few_shot_count | Total few-shot examples included in the prompt. | 3
+[Heading 1] 5. Results and Analysis
+[Heading 2] 5.1. Results
+[Normal] Table 1 reports accuracy on the full test sets of the 23 BBH tasks (Section 4.1).
+[TableTitle] Table 1. Accuracy (%) across 23 BBH tasks.
+[TABLE] Task | Manual | PromptWizard | Free Rewrite | MPIR | Expert-crafted
+        hyperbaton | 74.6 | 62.2 | 68.44 | 84.0 | 84.4
+        disambiguation_qa | 55.1 | 61.7 | 44.44 | 62.2 | 69.3
+        causal_judgment | 53.7 | 59.3 | 59.88 | 56.8 | 59.9
+        date_understanding | 55.6 | 71.1 | 73.33 | 74.2 | 80.0
+        penguins_in_a_table | 45.5 | 75.0 | 75.21 | 82.6 | 74.4
+        boolean_expression | 81.8 | 92.0 | 89.78 | 94.2 | 91.6
+        object_counting | 59.1 | 91.5 | 85.78 | 92.4 | 88.0
+        word_sorting | 82.6 | 80.0 | 81.78 | 81.3 | 65.3
+        logical_deduction | 45.3 | 44.9 | 39.11 | 50.8 | 59.4
+        salient_translation_error_detection | 44.0 | 50.7 | 49.78 | 52.0 | 54.7
+        geometric_shapes | 29.3 | 57.8 | 52.89 | 49.3 | 64.4
+        snarks | 45.0 | 63.3 | 59.48 | 65.4 | 72.5
+        temporal_sequences | 33.3 | 44.4 | 44.44 | 38.2 | 17.3
+        web_of_lies | 47.5 | 52.4 | 52.89 | 52.9 | 80.9
+        navigate | 49.3 | 65.3 | 74.67 | 68.0 | 93.8
+        reasoning_about_colored_objects | 54.2 | 56.0 | 53.33 | 68.4 | 83.1
+        sports_understanding | 78.2 | 79.6 | 89.33 | 86.2 | 93.8
+        multistep_arithmetic_two | 33.3 | 51.1 | 52.00 | 51.5 | 84.9
+        ruin_names | 54.7 | 66.2 | 56.00 | 72.0 | 69.3
+        movie_recommendation | 66.2 | 73.3 | 48.00 | 66.7 | 79.1
+        formal_fallacies | 53.8 | 53.3 | 31.11 | 53.3 | 51.6
+        dyck_languages | 1.7 | 14.2 | 14.67 | 12.9 | 16.9
+        tracking_shuffled_objects | 22.4 | 69.8 | 18.07 | 65.2 | 63.8
+        Average | 50.7 | 62.39 | 57.15 | 64.37 | 69.5
+[Normal] Table 2 summarizes accuracy before and after MPIR refinement across two further APO methods, Iterative APE and ProTeGi, on the average over all 23 tasks and on the tasks that best illustrate the pattern of gains and regressions; full per-task results for all three APO methods are provided in the project repository (Section 4.5).
+[TableTitle] Table 2. Accuracy (%) before and after MPIR refinement, for three APO methods (average over all 23 BBH tasks, plus representative tasks).
+[TABLE] Task | APE (before) | ProTeGi (before) | PromptWizard (before) | APE (after) | ProTeGi (after) | PromptWizard (after)
+        hyperbaton | 82.67 | 80.89 | 62.2 | 85.78 | 88.89 | 84.0
+        temporal_sequences | 26.67 | 84.00 | 44.4 | 86.67 | 86.22 | 38.2
+        dyck_languages | 24.44 | 20.89 | 14.2 | 34.22 | 32.44 | 12.9
+        geometric_shapes | 62.67 | 61.78 | 57.8 | 61.33 | 60.89 | 49.3
+        tracking_shuffled_objects | 62.96 | 61.63 | 69.8 | 58.22 | 60.89 | 65.5
+        Average (23 tasks) | 70.16 | 72.81 | 62.39 | 74.02 | 74.26 | 64.37
+[Normal] Beyond aggregate performance, concrete examples illustrate where MPIR improves on baseline APO methods. In one penguins_in_a_table case (Figure 6), PromptWizard incorrectly counts two penguins younger than 8 years old, mistakenly including an 8-year-old penguin, while MPIR's refinement produces a clearer reasoning chain that correctly counts only one qualifying penguin—illustrating how rubric-driven refinement can eliminate subtle reasoning errors by enforcing stricter interpretation of task rules.
+[FigureCaption] Figure 6. Case study comparing PromptWizard and MPIR on the penguins_in_a_table task. PromptWizard incorrectly identifies two penguins younger than eight years old, while MPIR correctly counts only one.
+[Heading 2] 5.2. Analysis
+[Heading 3] 5.2.1. Overall Performance Improvements of MPIR
+[Normal] Table 1 shows that MPIR generally improves on PromptWizard by systematically integrating manual prompting heuristics: MPIR reaches an average accuracy of 64.37%, versus 62.39% for PromptWizard, an average improvement of 1.97 percentage points. A bootstrap resampling analysis across BBH tasks (10,000 iterations) gives a 95% confidence interval of [−0.46, 4.70] for this improvement; although the interval includes zero, the overall trend is positive, with MPIR outperforming PromptWizard on 16 of 23 tasks. The free rewrite baseline reaches only 57.15% on average—well below both PromptWizard and MPIR—indicating that MPIR's gains stem from its structured seven-criteria rubric rather than simply from GPT-4o's general rewriting ability.
+[Heading 3] 5.2.2. Evaluating MPIR Across Multiple APO Frameworks
+[Normal] Table 2 shows that MPIR consistently improves average accuracy across APO frameworks: Iterative APE from 70.16% to 74.02%, ProTeGi from 72.81% to 74.26%, and PromptWizard from 62.39% to 64.37%. Although the magnitude of improvement varies across methods and tasks, the consistently positive trend supports MPIR functioning as a refinement layer across different APO frameworks rather than one tailored to PromptWizard-specific prompt structures.
+[Heading 3] 5.2.3. Cross-Model Generalization
+[Normal] To test MPIR under a different model family, we repeated the experiment with Gemini 3.5 Flash-Lite [49] as both the target model and the meta-prompting model (Table 3). The baseline already achieves a high average accuracy of 92%, leaving limited room for improvement, and MPIR maintains the same rounded average after refinement. The most noticeable gains occur where baseline accuracy was around 70%: causal_judgement improves from 70% to 75%, disambiguation_qa from 77% to 80%, and dyck_languages from 72% to 75%. Tasks already near-perfect before refinement, such as sports_understanding and multistep_arithmetic_two, show little room for further gains and occasionally a slight decline—suggesting MPIR is most effective when the baseline prompt still has meaningful reasoning weaknesses to correct.
+[TableTitle] Table 3. Cross-model evaluation of MPIR on Gemini 3.5 Flash-Lite (average over all 23 BBH tasks, plus the tasks with the largest movement); full per-task results are in the project repository.
+[TABLE] Task | PromptWizard (%) | MPIR (%) | Change (%)
+        causal_judgement | 70 | 75 | +5
+        disambiguation_qa | 77 | 80 | +3
+        dyck_languages | 72 | 75 | +3
+        sports_understanding | 91 | 86 | −5
+        multistep_arithmetic_two | 97 | 94 | −4
+        Average (23 tasks) | 92 | 92 | 0
+[Heading 3] 5.2.4. Clarity, Structure, and Task Difficulty
+[Normal] MPIR also improves interpretability by embedding human-inspired structure, clarifying reasoning context, and filtering out details that could distract the model. In hyperbaton, PromptWizard's baseline prompt mixed background explanation with task directives in a single block, whereas MPIR separated it into a context section defining the role and purpose and an instruction section with explicit, numbered steps, helping the model distinguish framing from required actions. In web_of_lies, PromptWizard's vague instruction (“How can we systematically analyze the statements to determine the truthfulness of each individual in the scenario?”) became, after MPIR, an explicit role and goal statement (“You are a logical analyst tasked with evaluating the truthfulness of statements made by individuals in a given scenario...”), and similar edits elsewhere removed distracting, task-irrelevant instructions that had been reducing output quality.
+[Normal] Across Tables 1-3, MPIR's strongest and most consistent gains occur on tasks governed by explicit structural or rule-based reasoning—hyperbaton, object_counting, boolean_expression, and temporal_sequences all improve repeatedly across APO frameworks and model families (e.g., hyperbaton rises from 62.2% to 84.0% under PromptWizard). This is consistent with prior evidence that CoT prompting helps models decompose complex problems into intermediate steps [8] and that step-back reasoning helps LLMs derive first principles before solving a task [25]. MPIR is comparatively less effective on tasks requiring precise symbolic manipulation, spatial abstraction, or extended sequential reasoning—geometric_shapes, tracking_shuffled_objects, and logical_deduction show smaller, less stable gains or occasional regressions (e.g., geometric_shapes falls from 57.8% to 49.3% under PromptWizard). This pattern matches prior findings that coherent, relevant reasoning steps matter more than reasoning length [22], and that LLMs remain highly sensitive to subtle prompt-phrasing changes [6], which can disrupt the precise consistency these tasks demand.
+[Heading 3] 5.2.5. Remaining Gap to Expert-Crafted Prompting
+[Normal] Despite strong gains over automated baselines, MPIR still falls short of expert-crafted prompting on average (64.4% versus 69.5%). The gap concentrates in a small set of tasks—navigate, reasoning_about_colored_objects, web_of_lies, and multistep_arithmetic_two (Table 4)—where expert examples provide richer reasoning traces and more explicit state tracking. Because MPIR's examples are inherited from the PromptWizard baseline rather than newly generated, they reflect the same limitations present in PromptWizard's own outputs: MPIR's refinements are structurally consistent but tend to oversimplify example reasoning relative to expert-written traces.
+[TableTitle] Table 4. Tasks where MPIR underperforms expert-crafted prompting.
+[TABLE] Task | MPIR (%) | Expert (%)
+        navigate | 68.0 | 93.8
+        reasoning_about_colored_objects | 68.4 | 83.1
+        web_of_lies | 52.9 | 80.9
+        multistep_arithmetic_two | 51.5 | 84.9
+[Heading 2] 5.3. Ablation Studies
+[Heading 3] 5.3.1. Which Rubric Criteria Matter Most
+[Normal] To assess each rubric criterion's contribution, we ran an ablation on five representative BBH tasks, removing one criterion at a time (Table 5). Removing any single criterion reduces average accuracy from the full rubric's 80.0% to between 66.0% and 75.0%, so every criterion plays a meaningful role, though to different degrees. Four criteria prove particularly critical—Instruction & Separation (C4), Role Prompting (C1), Guided Chain of Thought (C3), and Step Back (C2)—each reducing average accuracy by over 11 points when removed, underscoring their role in structuring reasoning and reducing ambiguity. Removing Worked Reasoning in Examples (C6) produces a moderate but consistent drop, suggesting that step-by-step demonstrations reinforce structured reasoning patterns, whereas removing Output Format Specification (C5) or Conclusion (C7) causes only minor drops, indicating these criteria mainly enhance clarity rather than drive task accuracy. Overall, heuristics that organize reasoning and contextual framing appear to contribute most to refinement performance on these benchmark tasks.
+[TableTitle] Table 5. Effect of removing individual rubric criteria across five BBH tasks (accuracy, %). C1=Role Prompting, C2=Step Back, C3=Guided CoT, C4=Instruction & Separation, C5=Output Format, C6=Worked Reasoning, C7=Conclusion.
+[TABLE] Task | ALL | C1 | C2 | C3 | C4 | C5 | C6 | C7
+        hyperbaton | 84.0 | 56.0 | 83.1 | 67.6 | 56.4 | 59.1 | 59.6 | 79.1
+        penguins_in_a_table | 82.6 | 76.0 | 67.8 | 70.2 | 45.5 | 73.6 | 79.3 | 75.2
+        ruin_names | 72.0 | 52.4 | 51.1 | 50.2 | 54.7 | 67.1 | 60.4 | 57.3
+        object_counting | 92.4 | 90.2 | 91.6 | 88.4 | 91.6 | 92.0 | 88.4 | 92.0
+        reasoning_about_colored_objects | 68.4 | 59.1 | 52.0 | 68.9 | 79.6 | 62.7 | 60.9 | 69.8
+        Average | 80.0 | 67.0 | 69.0 | 69.0 | 66.0 | 71.0 | 70.0 | 75.0
+[Heading 3] 5.3.2. Heuristic Rubric vs. Generic Rubric
+[Normal] To test whether the rubric's specificity matters, we compared the full seven-criteria rubric against a generic rubric using broad criteria such as clarity, structure, and effectiveness, on the same five tasks, holding refinement and validation fixed (Table 6). The full rubric outperforms the generic one on four of five tasks, with average accuracy dropping from 79.9% to 72.2% under the generic rubric—an 8-point gap confirming that the seven-criteria rubric's specificity, not just the act of evaluation and refinement, drives MPIR's effectiveness. The heuristic rubric enforces step-by-step reasoning, context separation, and structured outputs, whereas the generic rubric's vaguer feedback often fails to correct task-specific weaknesses.
+[Heading 3] 5.3.3. Importance of Prompt Effectiveness Validation
+[Normal] Finally, we tested whether the validation stage itself is necessary by comparing the full framework (seven evaluation-refinement-validation cycles) against a validation-ablated variant that selects a prompt after a single evaluation-refinement cycle with no empirical testing, again on five representative tasks (Table 7). Removing validation drops average accuracy from 75.4% to 61.9%, a substantial decline showing that rubric alignment alone does not guarantee performance: an unvalidated prompt may look well structured yet perform worse empirically. Validation anchors MPIR's refinements in measured accuracy, ensuring gains are both real and task-oriented rather than purely heuristic.
+[TableTitle] Table 6. Comparison of the full rubric with a generic rubric, and the effect of removing prompt-effectiveness validation, across five BBH tasks (accuracy, %).
+[TABLE] Task | MPIR (full rubric) | Generic rubric | MPIR (with validation) | Without validation
+        hyperbaton | 84.0 | 66.2 | 84.0 | 37.8
+        penguins_in_a_table | 82.6 | 78.5 | 82.6 | 67.8
+        ruin_names | 72.0 | 66.2 | 72.0 | 52.0
+        object_counting | 92.4 | 92.9 | 92.4 | 91.6
+        reasoning_about_colored_objects | 68.4 | 57.3 | 68.4 | 60.4
+        Average | 79.9 | 72.2 | 75.4 | 61.9
+[Heading 1] 6. Conclusion
+[Normal] This paper introduced Meta-Prompted Instruction Refinement (MPIR), a framework that integrates manual prompting heuristics into automatic prompt optimization through a structured cycle of evaluation, refinement, and validation. It asks whether human-inspired prompting heuristics can be systematically integrated into APO systems to improve prompt quality while preserving the scalability of automated optimization. Experiments on Big-Bench Hard show that rubric-guided meta-prompt refinement can improve APO-generated prompts across multiple tasks and APO frameworks, and that MPIR is particularly effective for structured, rule-based reasoning tasks, where heuristic-guided refinement yields clearer and more reliable reasoning.
+[Normal] This study also has limitations. Although MPIR improved performance on most benchmark tasks, its average gain over baseline APO systems is relatively modest, suggesting the benefit of heuristic-guided refinement depends on task and baseline-prompt characteristics. To keep the comparison fair, MPIR reuses PromptWizard's optimization examples during validation, which may introduce evaluation bias. The seven-criteria rubric was also developed in close proximity to the BBH tasks themselves, which may introduce construct dependence and limit generalizability to other benchmark families. Finally, the quality of MPIR's refined prompts remains partially bounded by the quality of the prompts and examples produced by the underlying APO framework.
+[Normal] Future work could extend MPIR along several directions: broader evaluation across additional datasets and reasoning domains; adaptive, task-specific rubrics; independent construct validation, by deriving a rubric on one benchmark family and evaluating it on a distinct one; and integration with complementary approaches such as symbolic reasoning modules, retrieval augmentation, or automated methods for learning prompting heuristics directly from empirical performance data.
+[Heading 1] Acknowledgement
+[Normal] The authors thank the reviewers for their constructive comments on earlier drafts of this manuscript.
+[Heading 1] Funding Support
+[Normal] This research received no specific grant from any funding agency in the public, commercial, or not-for-profit sectors.
+[Heading 1] Ethical Statement
+[Normal] This study did not involve human participants, human data, or animal subjects, and did not require ethical approval.
+[Heading 1] Conflicts of Interest
+[Normal] The authors declare that they have no conflicts of interest.
+[Heading 1] Data Availability Statement
+[Normal] The datasets used in this study are drawn from the publicly available Big-Bench Hard benchmark. Code, prompts, and experimental results are openly available at https://github.com/millennials92/meta_prompted_instruction_refinement.
+[Heading 1] Author Contribution Statement
+[Normal] Linh Nguyen: Conceptualization, Methodology, Software, Investigation, Formal analysis, Data curation, Writing - original draft, Visualization. Quang-Vinh Dang: Conceptualization, Methodology, Supervision, Writing - review & editing, Project administration. Minh Ngoc Dinh: Methodology, Validation, Writing - review & editing. Thuy Nguyen: Investigation, Validation, Writing - review & editing.
+[Heading 1] Declaration of Generative AI and AI-Assisted Technologies in the Writing Process
+[Normal] Generative AI tools were used solely to improve the grammar and readability of the text. All ideas, analyses, and conclusions are solely those of the authors. An AI-assisted coding tool was used to generate initial code snippets during development; all code was reviewed, verified, and adapted by the authors.
+[Heading 1] References
+[references] [1] Goyal, T., Li, J. J., & Durrett, G. (2023). News summarization and evaluation in the era of GPT-3. arXiv:2209.12356.
+[references] [2] Qin, L., Chen, Q., Feng, X., Wu, Y., Zhang, Y., Li, Y., Li, M., Che, W., & Yu, P. S. (2025). Large language models meet NLP: A survey. arXiv:2405.12819.
+[references] [3] Zhang, H., Liu, X., & Zhang, J. (2023). Extractive summarization via ChatGPT for faithful summary generation. In Findings of the 2023 Conference on Empirical Methods in Natural Language Processing.
+[references] [4] Colombo, P., Pires, T. P., Boudiaf, M., Culver, D., Melo, R., Corro, C., Martins, A. F. T., Esposito, F., Raposo, V. L., Morgado, S., & Desa, M. (2024). SaulLM-7B: A pioneering large language model for law. arXiv:2403.03883.
+[references] [5] Zhang, X., Tian, C., Yang, X., Chen, L., Li, Z., & Petzold, L. R. (2025). AlpaCare: Instruction-tuned large language models for medical application. arXiv:2310.14558.
+[references] [6] Errica, F., Sanvito, D., Siracusano, G., & Bifulco, R. (2025). What did I do wrong? Quantifying LLMs’ sensitivity and consistency to prompt engineering. In Proceedings of the 2025 Conference of the North American Chapter of the Association for Computational Linguistics (Volume 1: Long Papers) (pp. 1543-1558).
+[references] [7] Liu, P., Yuan, W., Fu, J., Jiang, Z., Hayashi, H., & Neubig, G. (2023). Pre-train, prompt, and predict: A systematic survey of prompting methods in natural language processing. ACM Computing Surveys, 55(9), Article 195.
+[references] [8] Wei, J., Wang, X., Schuurmans, D., Bosma, M., Ichter, B., Xia, F., Chi, E. H., Le, Q. V., & Zhou, D. (2022). Chain-of-thought prompting elicits reasoning in large language models. In Proceedings of the 36th International Conference on Neural Information Processing Systems (Article 1800).
+[references] [9] Kong, A., Zhao, S., Chen, H., Li, Q., Qin, Y., Sun, R., Zhou, X., Wang, E., & Dong, X. (2024). Better zero-shot reasoning with role-play prompting. In Proceedings of the 2024 Conference of the North American Chapter of the Association for Computational Linguistics (Volume 1: Long Papers) (pp. 4099-4113).
+[references] [10] Brown, T. B., Mann, B., Ryder, N., Subbiah, M., Kaplan, J., Dhariwal, P., Neelakantan, A., Shyam, P., Sastry, G., Askell, A., Agarwal, S., Herbert-Voss, A., Krueger, G., Henighan, T., Child, R., Ramesh, A., Ziegler, D. M., Wu, J., Winter, C., ... Amodei, D. (2020). Language models are few-shot learners. In Proceedings of the 34th International Conference on Neural Information Processing Systems (Article 159).
+[references] [11] Reynolds, L., & McDonell, K. (2021). Prompt programming for large language models: Beyond the few-shot paradigm. In Extended Abstracts of the 2021 CHI Conference on Human Factors in Computing Systems (Article 314).
+[references] [12] Zamfirescu-Pereira, J. D., Wong, R. Y., Hartmann, B., & Yang, Q. (2023). Why Johnny can't prompt: How non-AI experts try (and fail) to design LLM prompts. In Proceedings of the 2023 CHI Conference on Human Factors in Computing Systems.
+[references] [13] Mayilvaghanan, K., Nathan, V., & Kumar, A. (2025). PROPEL: Prompt optimization with expert priors for small and medium-sized LLMs. In Proceedings of the 4th Workshop on Knowledge-Augmented Methods for Natural Language Processing (pp. 272-302).
+[references] [14] Pryzant, R., Iter, D., Li, J., Lee, Y. T., Zhu, C., & Zeng, M. (2023). Automatic prompt optimization with "gradient descent" and beam search. In Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing.
+[references] [15] Guo, Q., Wang, R., Guo, J., Li, B., Song, K., Tan, X., Liu, G., Bian, J., & Yang, Y. (2024). Connecting large language models with evolutionary algorithms yields powerful prompt optimizers. In The Twelfth International Conference on Learning Representations.
+[references] [16] Yang, M., Li, M., Li, Y., Chen, Z., Gao, C., Zhang, J., Li, Y., & Feng, F. (2024). Dual-phase accelerated prompt optimization. In Findings of the Association for Computational Linguistics: EMNLP 2024 (pp. 12163-12173).
+[references] [17] Reynolds, L., & McDonell, K. (2021). Prompt programming for large language models: Beyond the few-shot paradigm. In Extended Abstracts of the 2021 CHI Conference on Human Factors in Computing Systems (Article 314).
+[references] [18] Winata, G. I., Huang, L.-K., Vadlamannati, S., & Chandarana, Y. (2023). Multilingual few-shot learning via language model retrieval. arXiv:2306.10964.
+[references] [19] Min, S., Lyu, X., Holtzman, A., Artetxe, M., Lewis, M., Hajishirzi, H., & Zettlemoyer, L. (2022). Rethinking the role of demonstrations: What makes in-context learning work? In Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing (pp. 11048-11064).
+[references] [20] Kojima, T., Gu, S. S., Reid, M., Matsuo, Y., & Iwasawa, Y. (2022). Large language models are zero-shot reasoners. In Proceedings of the 36th International Conference on Neural Information Processing Systems (Article 1613).
+[references] [21] Wang, X., & Zhou, D. (2024). Chain-of-thought reasoning without prompting. In Proceedings of the 38th International Conference on Neural Information Processing Systems.
+[references] [22] Wang, B., Min, S., Deng, X., Shen, J., Wu, Y., Zettlemoyer, L., & Sun, H. (2023). Towards understanding chain-of-thought prompting: An empirical study of what matters. In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) (pp. 2717-2739).
+[references] [23] Wang, R., Mi, F., Chen, Y., Xue, B., Wang, H., Zhu, Q., Wong, K.-F., & Xu, R. (2024). Role prompting guided domain adaptation with general capability preserve for large language models. In Findings of the Association for Computational Linguistics: NAACL 2024 (pp. 2243-2255).
+[references] [24] Kim, J., Yang, N., & Jung, K. (2024). Persona is a double-edged sword: Mitigating the negative impact of role-playing prompts in zero-shot reasoning tasks. arXiv:2408.08631.
+[references] [25] Zheng, H. S., Mishra, S., Chen, X., Cheng, H.-T., Chi, E. H., Le, Q. V., & Zhou, D. (2024). Take a step back: Evoking reasoning via abstraction in large language models. In The Twelfth International Conference on Learning Representations.
+[references] [26] Coda-Forno, J., Binz, M., Wang, J. X., & Schulz, E. (2024). CogBench: A large language model walks into a psychology lab. In Proceedings of the 41st International Conference on Machine Learning.
+[references] [27] Yu, Y., Jiang, H., Luo, X., Wu, Q., Lin, C.-Y., Li, D., Yang, Y., Huang, Y., & Qiu, L. (2025). Mitigate position bias in LLMs via scaling a single hidden states channel. In Findings of the Association for Computational Linguistics: ACL 2025 (pp. 6092-6111).
+[references] [28] Liu, N. F., Lin, K., Hewitt, J., Paranjape, A., Bevilacqua, M., Petroni, F., & Liang, P. (2024). Lost in the middle: How language models use long contexts. Transactions of the Association for Computational Linguistics, 12, 157-173.
+[references] [29] Ramnath, K., Zhou, K., Guan, S., Mishra, S. S., Qi, X., Shen, Z., Wang, S., Woo, S., Jeoung, S., Wang, Y., Wang, H., Ding, H., Lu, Y., Xu, Z., Zhou, Y., Srinivasan, B., Yan, Q., Chen, Y., Ding, H., Xu, P., & Cheong, L. L. (2025). A systematic survey of automatic prompt optimization techniques. arXiv:2502.16923.
+[references] [30] Cui, W., Zhang, J., Li, Z., Sun, H., Lopez, D., Das, K., Malin, B. A., & Kumar, S. (2025). Heuristic-based search algorithm in automatic instruction-focused prompt optimization: A survey. In Findings of the Association for Computational Linguistics: ACL 2025 (pp. 22093-22111).
+[references] [31] Zhou, Y., Muresanu, A. I., Han, Z., Paster, K., Pitis, S., Chan, H., & Ba, J. (2023). Large language models are human-level prompt engineers. In The Eleventh International Conference on Learning Representations.
+[references] [32] Yang, C., Wang, X., Lu, Y., Liu, H., Le, Q. V., Zhou, D., & Chen, X. (2024). Large language models as optimizers. In The Twelfth International Conference on Learning Representations.
+[references] [33] Agarwal, E., Magazine, R., Singh, J., Dani, V., Ganu, T., & Nambi, A. (2025). PromptWizard: Optimizing prompts via task-aware, feedback-driven self-evolution. In Findings of the Association for Computational Linguistics: ACL 2025 (pp. 19974-20003).
+[references] [34] Khattab, O., Singhvi, A., Maheshwari, P., Zhang, Z., Santhanam, K., Vardhamanan, S., Haq, S., Sharma, A., Joshi, T. T., Moazam, H., Miller, H., Zaharia, M., & Potts, C. (2024). DSPy: Compiling declarative language model calls into state-of-the-art pipelines. In The Twelfth International Conference on Learning Representations.
+[references] [35] Yuksekgonul, M., Bianchi, F., Boen, J., Liu, S., Lu, P., Huang, Z., Guestrin, C., & Zou, J. (2025). Optimizing generative AI by backpropagating language model feedback. Nature, 639, 609-616.
+[references] [36] Madaan, A., Tandon, N., Gupta, P., Hallinan, S., Gao, L., Wiegreffe, S., Alon, U., Dziri, N., Prabhumoye, S., Yang, Y., Gupta, S., Majumder, B. P., Hermann, K., Welleck, S., Yazdanbakhsh, A., & Clark, P. (2023). Self-Refine: Iterative refinement with self-feedback. In Thirty-seventh Conference on Neural Information Processing Systems.
+[references] [37] Shinn, N., Cassano, F., Gopinath, A., Narasimhan, K. R., & Yao, S. (2023). Reflexion: Language agents with verbal reinforcement learning. In Thirty-seventh Conference on Neural Information Processing Systems.
+[references] [38] Ye, Q., Ahmed, M., Pryzant, R., & Khani, F. (2024). Prompt engineering a prompt engineer. In Findings of the Association for Computational Linguistics: ACL 2024 (pp. 355-385).
+[references] [39] Schulhoff, S., Ilie, M., Balepur, N., Kahadze, K., Liu, A., Si, C., Li, Y., Gupta, A., Han, H., Schulhoff, S., Dulepet, P. S., Vidyadhara, S., Ki, D., Agrawal, S., Pham, C., Kroiz, G. C., Li, F., Tao, H., ... Resnik, P. (2024). The prompt report: A systematic survey of prompting techniques. arXiv:2406.06608.
+[references] [40] Sahoo, P., Singh, A. K., Saha, S., Jain, V., Mondal, S., & Chadha, A. (2024). A systematic survey of prompt engineering in large language models: Techniques and applications. arXiv:2402.07927.
+[references] [41] Boonstra, L. (2025). Prompt engineering (Kaggle whitepaper). Google.
+[references] [42] Anthropic. (2025). Prompt engineering overview. Anthropic Documentation.
+[references] [43] OpenAI. (2025). Best practices for prompt engineering with the OpenAI API. OpenAI Help Center.
+[references] [44] Microsoft. (2025). Prompt engineering techniques. Azure AI Foundry Documentation.
+[references] [45] Suzgun, M., Scales, N., Schärli, N., Gehrmann, S., Tay, Y., Chung, H. W., Chowdhery, A., Le, Q., Chi, E., Zhou, D., & Wei, J. (2023). Challenging BIG-Bench tasks and whether chain-of-thought can solve them. In Findings of the Association for Computational Linguistics: ACL 2023 (pp. 13003-13051).
+[references] [46] Cobbe, K., Kosaraju, V., Bavarian, M., Chen, M., Jun, H., Kaiser, L., Plappert, M., Tworek, J., Hilton, J., Nakano, R., Hesse, C., & Schulman, J. (2021). Training verifiers to solve math word problems. arXiv:2110.14168.
+[references] [47] OpenAI. (2025). GPT-3.5 Turbo (model documentation).
+[references] [48] OpenAI. (2025). GPT-4o (model documentation).
+[references] [49] Google DeepMind. (2026). Gemini 3.5 Flash-Lite (model documentation).
