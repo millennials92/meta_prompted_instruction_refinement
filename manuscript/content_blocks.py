@@ -30,14 +30,16 @@ ABSTRACT = (
     "using techniques such as chain-of-thought reasoning and role assignment, can yield high performance "
     "but requires expert knowledge and does not scale. Automatic prompt optimization (APO) offers "
     "efficiency, but its outputs often lack the structured guidance that makes human-crafted prompts "
-    "effective. This paper introduces Meta-Prompted Instruction Refinement (MPIR), a framework that "
-    "refines APO-generated prompts through a seven-criteria rubric, meta-prompted evaluation and "
-    "refinement, and empirical validation. Extensive experiments on the Big-Bench Hard (BBH) benchmark "
-    "show that MPIR outperforms its PromptWizard baseline on 16 of 23 tasks, with gains of up to 20 "
-    "percentage points on individual tasks, and that the same refinement layer improves two further APO "
-    "methods (Iterative APE and ProTeGi) as well as a different underlying LLM family. These results "
-    "demonstrate that MPIR bridges human heuristics with automation, making prompt optimization more "
-    "effective, interpretable, and scalable, while reducing reliance on expert prompt engineering."
+    "effective. This paper introduces Meta-Prompted Instruction Refinement (MPIR), a lightweight, "
+    "model-agnostic framework that refines APO-generated prompts through a seven-criteria rubric, "
+    "meta-prompted evaluation and refinement, and empirical validation—without any additional training, "
+    "search infrastructure, or access to model internals. Extensive experiments on the Big-Bench Hard "
+    "(BBH) benchmark show that MPIR outperforms its PromptWizard baseline on 16 of 23 tasks, with gains "
+    "of up to 20 percentage points on individual tasks, and that the same refinement layer improves two "
+    "further APO methods (Iterative APE and ProTeGi) as well as a different underlying LLM family. These "
+    "results demonstrate that a simple, interpretable, post-hoc heuristic layer can meaningfully improve "
+    "prompts already optimized by heavier automated methods, bridging human heuristics with automation "
+    "at a fraction of the engineering cost of learned or evolutionary alternatives."
 )
 
 KEYWORDS = "Prompt engineering, meta-prompting, prompt optimization, large language models, automatic prompt optimization, Big-Bench Hard"
@@ -119,22 +121,22 @@ P("This paper addresses that gap with Meta-Prompted Instruction Refinement (MPIR
   "refinement, and validation. MPIR functions as a modular layer on top of an existing APO system: it "
   "translates heuristics into explicit evaluation criteria, applies meta-prompted revision, and "
   "empirically validates each candidate prompt, thereby embedding human-guided design principles into "
-  "APO-generated prompts without additional human intervention.")
+  "APO-generated prompts without additional human intervention. Unlike the increasingly elaborate "
+  "evolutionary, reinforcement-learning, and multi-agent machinery pursued elsewhere in this space "
+  "(Section 2.5), MPIR asks how much of that benefit is recoverable from a fixed, interpretable "
+  "checklist and a small, fixed number of meta-prompting calls—deliberately inexpensive to add on top "
+  "of whatever APO pipeline a practitioner already has.")
 
 P("Specifically, this study pursues four objectives:")
 BULLETS([
-    ("To develop a structured rubric for prompt evaluation.",
-     "We formalize established manual prompting heuristics into a seven-criteria framework for "
-     "systematically evaluating APO-generated prompts."),
-    ("To evaluate whether meta-prompted refinement improves APO-generated prompts.",
-     "MPIR applies rubric-guided feedback to iteratively refine prompts and empirically measures the "
-     "resulting effectiveness on benchmark tasks."),
-    ("To investigate the generalizability and modularity of heuristic-guided refinement.",
-     "We examine whether MPIR functions as a modular refinement layer across different APO frameworks "
-     "and across different underlying LLMs, while maintaining consistent gains."),
-    ("To investigate how individual prompting heuristics contribute to performance.",
-     "Through targeted ablations on representative BBH tasks, we quantify how each rubric criterion "
-     "contributes to refinement outcomes."),
+    ("To develop a structured rubric for prompt evaluation:",
+     "formalizing established manual prompting heuristics into a seven-criteria framework."),
+    ("To evaluate whether meta-prompted refinement improves APO-generated prompts:",
+     "applying rubric-guided feedback to iteratively refine and empirically validate prompts."),
+    ("To investigate the generalizability and modularity of heuristic-guided refinement:",
+     "testing MPIR as a layer across different APO frameworks and underlying LLMs."),
+    ("To investigate how individual prompting heuristics contribute to performance:",
+     "quantifying each rubric criterion's contribution via targeted ablations."),
 ])
 
 P("The remainder of this paper is organized as follows. Section 2 reviews related work on prompt "
@@ -222,6 +224,31 @@ P("Important gaps remain, however. When heuristics are used at all, they are typ
   "combination—an explicit, criterion-by-criterion rubric, applied as a separate stage on top of an "
   "existing APO output, with iterative empirical validation deciding which candidate survives—rather than "
   "any single component in isolation.")
+
+P("A closely related recent approach applies the same two-stage pattern—run a search-based optimizer, "
+  "then locally refine its output—to few-shot relation extraction, using gradient- or attribution-style "
+  "editing for the second stage rather than a fixed heuristic rubric scored by an LLM judge, and without "
+  "testing generality across multiple upstream APO methods or backbone models ‹64›. MPIR shares "
+  "its premise (a first-stage optimizer leaves room for post-hoc improvement) but differs in mechanism "
+  "(a human-authored, criterion-by-criterion rubric evaluated by meta-prompting rather than local "
+  "gradient-style edits) and in scope (evaluated across three upstream APO methods and two model "
+  "families on a general reasoning benchmark rather than one task and one optimizer).")
+
+H2("2.5. The Shifting Frontier of Prompt Optimization")
+P("Since the meta-prompting and heuristic-guided methods above were introduced, prompt optimization has "
+  "fragmented into more elaborate directions: evolutionary search with natural-language reflection, "
+  "shown to outperform reinforcement-learning-based optimization with far fewer rollouts "
+  "‹59›; reinforcement learning directly over edit actions; multi-agent debate and "
+  "tournament-style Elo ratings as richer fitness functions than single-judge scoring "
+  "‹62›; explicit error taxonomies that guide refinement top-down rather than through a "
+  "fixed checklist ‹60›; and prompt format, not just content, as its own optimization axis "
+  "‹61›. A recent survey frames the area through an optimization-theoretic lens "
+  "‹63›, and there is growing interest in learned or instance-adaptive rubrics that "
+  "replace fixed, human-authored criteria such as MPIR's seven. Relative to this frontier, MPIR's rubric "
+  "is not the most sophisticated available mechanism; its contribution is instead that a small, "
+  "interpretable, model-agnostic, and inexpensive post-hoc layer captures a meaningful share of the "
+  "benefit these heavier methods pursue, without their training, search infrastructure, or per-task "
+  "tuning cost—a different point on the cost-versus-sophistication trade-off, not a claim to surpass it.")
 
 P("The literature reveals a persistent tension: manual prompting offers interpretability and "
   "effectiveness but does not scale, while automatic optimization offers efficiency and scalability but "
@@ -587,18 +614,26 @@ FIG("case.png",
 H2("5.2. Analysis")
 
 H3("5.2.1. Overall Performance Improvements of MPIR")
-P("Table 2 shows a directionally positive but not statistically significant improvement over "
+P("Table 2 shows a directionally positive but not conclusively significant improvement over "
   "PromptWizard: MPIR reaches an average accuracy of 64.37%, versus 62.39% for PromptWizard, a difference "
-  "of 1.97 percentage points. A bootstrap resampling analysis across BBH tasks (10,000 iterations) gives "
-  "a 95% confidence interval of [−0.46, 4.70] for this difference; because the interval includes zero, "
-  "this task-level average improvement cannot be considered statistically significant at conventional "
-  "thresholds, and we report it as such rather than as an established effect. The more robust evidence for "
-  "MPIR comes from its consistency across individual tasks—it outperforms PromptWizard on 16 of 23 "
-  "tasks, with several gains of 10-20 points—and from the free rewrite baseline, which reaches only "
-  "57.15% on average, well below both PromptWizard and MPIR. Together, these results indicate that "
-  "MPIR's per-task gains are attributable to its structured seven-criteria rubric rather than simply to "
-  "GPT-4o's general rewriting ability, even though the pooled average improvement should be read as a "
-  "promising trend rather than a confirmed effect; Section 6 revisits this as a limitation.")
+  "of 1.97 percentage points, with a 95% bootstrap confidence interval of [−0.46, 4.70] (10,000 "
+  "resamples over the 23 tasks) that includes zero. Because the 23 tasks form matched pairs of "
+  "heterogeneous difficulty rather than an unpaired sample, we follow standard practice for this design "
+  "‹55,56› and supplement the bootstrap CI with three paired analyses of the same 23 "
+  "task-level differences. A paired Wilcoxon signed-rank test is not significant (W = 83.0, p = 0.158), "
+  "and a two-sided exact sign test on the win/loss count (16 wins, 6 losses, 1 tie) is borderline "
+  "(p = 0.052; one-sided p = 0.026). The paired effect size is small-to-moderate (Cohen's dz = 0.30). We "
+  "report all three rather than selecting the most favorable one: together they indicate a real but "
+  "modest and not fully conclusive effect, consistent with typical statistical power at this task count "
+  "‹57›, rather than an established, strongly significant improvement. The more robust evidence "
+  "for MPIR is qualitative and structural—its consistency across individual tasks (16 of 23, with "
+  "several gains of 10-20 points), across three different APO frameworks (Section 5.2.2), and across two "
+  "model families (Section 5.2.3)—together with the free rewrite baseline, which reaches only 57.15% on "
+  "average, well below both PromptWizard and MPIR. Together, these results indicate that MPIR's per-task "
+  "gains are attributable to its structured seven-criteria rubric rather than simply to GPT-4o's general "
+  "rewriting ability, even though the pooled average improvement should be read as a promising, "
+  "consistent trend rather than a statistically confirmed effect; Section 6 revisits this as a "
+  "limitation.")
 
 H3("5.2.2. Evaluating MPIR Across Multiple APO Frameworks")
 P("Table 3 shows that MPIR consistently improves average accuracy across APO frameworks: Iterative APE "
@@ -634,13 +669,10 @@ H3("5.2.4. Clarity, Structure, and Task Difficulty")
 P("MPIR also improves interpretability by embedding human-inspired structure, clarifying reasoning "
   "context, and filtering out details that could distract the model. In hyperbaton, PromptWizard's "
   "baseline prompt mixed background explanation with task directives in a single block, whereas MPIR "
-  "separated it into a context section defining the role and purpose and an instruction section with "
-  "explicit, numbered steps, helping the model distinguish framing from required actions. In web_of_lies, "
-  "PromptWizard's vague instruction (“How can we systematically analyze the statements to determine "
-  "the truthfulness of each individual in the scenario?”) became, after MPIR, an explicit role and "
-  "goal statement (“You are a logical analyst tasked with evaluating the truthfulness of statements "
-  "made by individuals in a given scenario...”), and similar edits elsewhere removed distracting, "
-  "task-irrelevant instructions that had been reducing output quality.")
+  "separated it into a context section and a numbered instruction section, helping the model distinguish "
+  "framing from required actions; similar edits elsewhere (e.g., recasting a vague instruction in "
+  "web_of_lies into an explicit role-and-goal statement) removed distracting, task-irrelevant content "
+  "that had been reducing output quality.")
 
 P("Across Tables 2-4, MPIR's strongest and most consistent gains occur on tasks governed by explicit "
   "structural or rule-based reasoning—hyperbaton, object_counting, boolean_expression, and "
@@ -736,31 +768,41 @@ TABLE("Table 7. Effect of the generic rubric and of removing prompt-effectivenes
 # ===========================================================================
 H1("6. Conclusion")
 
-P("This paper introduced Meta-Prompted Instruction Refinement (MPIR), a framework that integrates manual "
-  "prompting heuristics into automatic prompt optimization through a structured cycle of evaluation, "
-  "refinement, and validation. It asks whether human-inspired prompting heuristics can be systematically "
-  "integrated into APO systems to improve prompt quality while preserving the scalability of automated "
-  "optimization. Experiments on Big-Bench Hard show that rubric-guided meta-prompt refinement can improve "
-  "APO-generated prompts across multiple tasks and APO frameworks, and that MPIR is particularly "
-  "effective for structured, rule-based reasoning tasks, where heuristic-guided refinement yields clearer "
-  "and more reliable reasoning.")
+P("This paper introduced Meta-Prompted Instruction Refinement (MPIR), a lightweight, model-agnostic "
+  "framework that integrates manual prompting heuristics into automatic prompt optimization through a "
+  "structured cycle of evaluation, refinement, and validation. It asks whether human-inspired prompting "
+  "heuristics can be systematically integrated into APO systems to improve prompt quality while "
+  "preserving the scalability of automated optimization, and does so deliberately without the "
+  "additional training, search infrastructure, or per-task tuning that increasingly elaborate 2025-2026 "
+  "prompt-optimization methods require (Section 2.5). Experiments on Big-Bench Hard show that "
+  "rubric-guided meta-prompt refinement can improve APO-generated prompts across multiple tasks and APO "
+  "frameworks, and that MPIR is particularly effective for structured, rule-based reasoning tasks, where "
+  "heuristic-guided refinement yields clearer and more reliable reasoning.")
 
 P("This study also has limitations. Most importantly, the average gain over the PromptWizard baseline is "
-  "modest and, at the task-population level, not statistically significant: its 95% bootstrap confidence "
-  "interval spans zero (Section 5.2.1). We therefore treat that pooled result as a promising trend rather "
+  "modest and not conclusively significant by any single test: its 95% bootstrap confidence interval "
+  "spans zero, a paired Wilcoxon signed-rank test is not significant, and a sign test on the win/loss "
+  "count is borderline (Section 5.2.1). We therefore treat the pooled result as a promising trend rather "
   "than a confirmed effect, and rely more heavily on the per-task win rate (16 of 23 tasks) and on the "
   "consistent, replicated pattern across three APO frameworks and two model families as the stronger "
-  "evidence for MPIR's contribution. Relatedly, all reported results come from a single run per condition "
-  "at temperature 0 rather than repeated trials with varying seeds, so our confidence intervals capture "
-  "variance across BBH tasks but not run-to-run variance in the optimization process itself; repeated-trial "
-  "estimates of that variance are an important direction for follow-up work. To keep the comparison fair, "
-  "MPIR also reuses PromptWizard's optimization examples during validation, which may introduce evaluation "
-  "bias, and the seven-criteria rubric was developed in close proximity to the BBH tasks themselves, which "
-  "may introduce construct dependence and limit generalizability to other benchmark families. The quality "
-  "of MPIR's refined prompts remains partially bounded by the quality of the prompts and examples produced "
-  "by the underlying APO framework. Finally, because MPIR depends on versioned commercial APIs "
-  "(GPT-3.5-turbo, GPT-4o, Gemini 3.5 Flash-Lite), exact reproducibility is subject to provider-side model "
-  "updates and deprecations outside the authors' control.")
+  "evidence for MPIR's contribution—a pattern consistent with the modest statistical power that a "
+  "23-task evaluation affords ‹57›. Relatedly, all reported results come from a single run per "
+  "condition at temperature 0 rather than repeated trials with varying seeds, so our confidence "
+  "intervals capture variance across BBH tasks but not run-to-run variance in the optimization process "
+  "itself. This is a common gap in the prompt-optimization literature rather than one unique to this "
+  "work—most published APO methods, including the PromptWizard baseline used here, report single-seed "
+  "results ‹47›—but recent evidence that LLM evaluations can be brittle across repeated prompts "
+  "and prompt variants ‹33,58› makes repeated-trial estimates of that variance an important "
+  "direction for follow-up work. To keep the comparison fair, MPIR also reuses PromptWizard's optimization examples during "
+  "validation, which may introduce evaluation bias, and the seven-criteria rubric was developed in close "
+  "proximity to the BBH tasks themselves, which may introduce construct dependence and limit "
+  "generalizability to other benchmark families. The quality of MPIR's refined prompts remains partially "
+  "bounded by the quality of the prompts and examples produced by the underlying APO framework. Finally, "
+  "because MPIR depends on versioned commercial APIs, exact reproducibility is subject to provider-side "
+  "model updates and deprecations outside the authors' control; notably, GPT-3.5-turbo, the target model "
+  "used for our primary results (chosen for comparability with the PromptWizard baseline), is scheduled "
+  "for retirement from the OpenAI API on October 23, 2026 ‹65›, after which reproducing these "
+  "exact numbers will require a pinned legacy deployment or a re-run on its successor.")
 
 P("Future work could extend MPIR along several directions: broader evaluation across additional datasets "
   "and reasoning domains; adaptive, task-specific rubrics; independent construct validation, by deriving "
