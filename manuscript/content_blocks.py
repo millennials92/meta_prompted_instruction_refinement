@@ -37,10 +37,13 @@ ABSTRACT = (
     "search infrastructure, or access to model internals. Extensive experiments on the Big-Bench Hard "
     "(BBH) benchmark show that MPIR outperforms its PromptWizard baseline on 16 of 23 tasks, with gains "
     "of up to 20 percentage points on individual tasks, and that the same refinement layer improves two "
-    "further APO methods (Iterative APE and ProTeGi) as well as a different underlying LLM family. These "
-    "results demonstrate that a simple, interpretable, post-hoc heuristic layer can meaningfully improve "
-    "prompts already optimized by heavier automated methods, bridging human heuristics with automation "
-    "at a fraction of the engineering cost of learned or evolutionary alternatives."
+    "further APO methods (Iterative APE and ProTeGi) as well as a different underlying LLM family; the "
+    "pooled average gain is directionally positive but not conclusively significant by paired "
+    "statistical tests, so this per-task and cross-framework consistency, rather than the pooled figure "
+    "alone, is offered as the primary evidence. Together, these results indicate that a simple, "
+    "interpretable, post-hoc heuristic layer can improve prompts already optimized by heavier automated "
+    "methods, bridging human heuristics with automation at a fraction of the engineering cost of learned "
+    "or evolutionary alternatives."
 )
 
 KEYWORDS = "Prompt engineering, meta-prompting, automatic prompt optimization, large language models, Big-Bench Hard"
@@ -311,8 +314,11 @@ P("Important gaps remain, however. When heuristics are used at all, they are typ
   "reported improvements may not consistently transfer to task outcomes. Meta-prompting thus expands "
   "automation but still lacks a structured integration of heuristic knowledge. MPIR differs from its two "
   "closest relatives in this respect. PE2 is itself a complete, self-contained optimizer that formalizes "
-  "one evaluation-refinement loop; it does not layer onto an already-optimized prompt from another APO "
-  "system, nor does it select among candidates using a held-out validation score. PROPEL instead bakes a "
+  "one evaluation-refinement loop with its own held-out scoring, much like MPIR's own validation stage; "
+  "the key difference is architectural rather than in whether validation is used at all—PE2 optimizes a "
+  "prompt from scratch as a single end-to-end pipeline, whereas MPIR is explicitly designed to layer onto "
+  "a prompt that a separate, already-completed APO run has already produced, making it agnostic to which "
+  "upstream method generated that prompt. PROPEL instead bakes a "
   "large set of expert-derived principles into a single refinement pass as implicit priors, rather than "
   "scoring a prompt against each principle explicitly and iterating multiple evaluation-refinement-"
   "validation cycles until an empirically best candidate is found. MPIR's contribution is precisely this "
@@ -333,7 +339,7 @@ H2("2.5. The Shifting Frontier of Prompt Optimization")
 P("Since the meta-prompting and heuristic-guided methods above were introduced, prompt optimization has "
   "fragmented into more elaborate directions: evolutionary search with natural-language reflection, "
   "shown to outperform reinforcement-learning-based optimization with far fewer rollouts "
-  "‹59›; reinforcement learning directly over edit actions; multi-agent debate and "
+  "‹59›; reinforcement learning directly over edit actions ‹67›; multi-agent debate and "
   "tournament-style Elo ratings as richer fitness functions than single-judge scoring "
   "‹62›; explicit error taxonomies that guide refinement top-down rather than through a "
   "fixed checklist ‹60›; and prompt format, not just content, as its own optimization axis "
@@ -368,6 +374,7 @@ TABLE("Table 1. Positioning of MPIR relative to representative prompt-optimizati
           ["ETGPO ‹60›", "No", "No", "Yes", "Partial", "Yes"],
           ["CFPO ‹61›", "No", "No", "Yes", "Yes", "Yes"],
           ["GEPA ‹59›", "No", "No", "Yes", "Yes", "Yes"],
+          ["DEEVO ‹62›", "No", "No", "Yes", "Partial", "Yes"],
           ["MPIR (this work)", "Yes", "Yes", "Yes", "Yes", "Yes"],
       ], full=True)
 
@@ -960,7 +967,7 @@ H2("5.3. Ablation Studies")
 H3("5.3.1. Which Rubric Criteria Matter Most")
 P("To assess each rubric criterion's contribution, we ran an ablation on five representative BBH tasks, "
   "removing one criterion at a time (Table 7). Removing any single criterion reduces average accuracy "
-  "from the full rubric's 80.0% to between 66.0% and 75.0%, so every criterion plays a meaningful role, "
+  "from the full rubric's 79.9% to between 66.0% and 75.0%, so every criterion plays a meaningful role, "
   "though to different degrees. Four criteria prove particularly critical—Instruction & Separation "
   "(C4), Role Prompting (C1), Guided Chain of Thought (C3), and Step Back (C2)—each reducing average "
   "accuracy by over 11 points when removed, underscoring their role in structuring reasoning and reducing "
@@ -980,7 +987,7 @@ TABLE("Table 7. Effect of removing individual rubric criteria across five BBH ta
           ["ruin_names", "72.0", "52.4", "51.1", "50.2", "54.7", "67.1", "60.4", "57.3"],
           ["object_counting", "92.4", "90.2", "91.6", "88.4", "91.6", "92.0", "88.4", "92.0"],
           ["reasoning_about_colored_objects", "68.4", "59.1", "52.0", "68.9", "79.6", "62.7", "60.9", "69.8"],
-          ["Average", "80.0", "67.0", "69.0", "69.0", "66.0", "71.0", "70.0", "75.0"],
+          ["Average", "79.9", "67.0", "69.0", "69.0", "66.0", "71.0", "70.0", "75.0"],
       ], full=True, note="bold_last_row")
 
 H3("5.3.2. Heuristic Rubric vs. Generic Rubric")
@@ -1025,11 +1032,10 @@ BULLETS([
      "another—removing any single one measurably reduces accuracy, with Instruction and Separation, "
      "Role Prompting, Guided Chain of Thought, and Step Back identified as the most load-bearing."),
     ("Objective 2 (whether meta-prompted refinement improves APO-generated prompts):",
-     "partially achieved. MPIR improves PromptWizard on 16 of 23 BBH tasks and the pooled average "
-     "improvement is directionally positive, but Section 5.2.1 and Section 6.1 show this pooled "
-     "improvement is not conclusively significant by paired statistical tests at this task count. The "
-     "objective is better described as achieved in a qualitative, per-task sense than in a pooled, "
-     "population-level sense."),
+     "mixed evidence. MPIR improves PromptWizard on 16 of 23 BBH tasks, but none of the three paired "
+     "tests in Section 5.2.1 (Section 6.1) confirm the pooled average improvement at conventional "
+     "significance thresholds—this null pooled result stands as reported rather than being explained "
+     "away, and the per-task win rate is offered as complementary evidence, not a substitute for it."),
     ("Objective 3 (generalizability and modularity across APO frameworks and models):",
      "achieved within the tested scope. Section 5.2.2 shows consistent improvement when MPIR is applied "
      "to two additional APO methods beyond PromptWizard, and Section 5.2.3 shows the same pattern holds "
@@ -1079,8 +1085,8 @@ P("Beyond the BBH benchmark used for evaluation, the underlying pattern MPIR tar
   "could apply MPIR's Instruction and Separation criterion specifically to keep the static instruction "
   "distinguishable from retrieved content that changes per query. We have not evaluated MPIR in any of "
   "these settings, and Section 6.2 already notes that generalization beyond BBH-style reasoning tasks is "
-  "untested; we raise them here as plausible directions for the applied evaluation that Section 7 lists "
-  "as future work, in keeping with this journal's focus on actionable applications of AI research.")
+  "untested; we raise them here as plausible directions for the broader applied evaluation Section 7 "
+  "calls for, in keeping with this journal's focus on actionable applications of AI research.")
 
 # ===========================================================================
 H1("6. Threats to Validity")
@@ -1169,7 +1175,11 @@ P("Future work could extend MPIR along several directions. Repeated-trial evalua
   "heavier methods such as GEPA while retaining MPIR's lower training and infrastructure cost. Applying "
   "MPIR to the frontier-model regime, where BBH itself is largely saturated ‹27›, would require "
   "pairing it with a harder successor benchmark such as BIG-Bench Extra Hard rather than BBH directly. "
-  "Finally, combining MPIR with complementary approaches such as symbolic reasoning modules, retrieval "
+  "Applied evaluation beyond BBH-style reasoning tasks—in customer-support and helpdesk deflection "
+  "prompts, tutoring systems that generate worked explanations, and retrieval-augmented enterprise "
+  "assistants, the three settings identified as plausible fits in Section 5.5—would test whether the "
+  "gains reported here transfer to the applied AI systems this journal's scope emphasizes. Finally, "
+  "combining MPIR with complementary approaches such as symbolic reasoning modules, retrieval "
   "augmentation, self-consistency decoding ‹66›, or automated methods for learning prompting "
   "heuristics directly from empirical performance data are all directions that could be pursued "
   "independently of one another, since none of them are mutually exclusive with the rubric-guided "
