@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# Final manuscript content for the AIA (Artificial Intelligence and Applications) docx.
-# Citation tokens use unicode guillemets, e.g. ‘9‹ or ‹9,10›, referring to
+# Manuscript content for the AI Open (Elsevier/KeAi) LaTeX submission, built via build_latex.py.
+# Citation tokens use unicode guillemets, e.g. ‹9› or ‹9,10›, referring to
 # the bare numeric suffix of the original reference_N bib keys. These get resolved to
-# bracketed, renumbered-by-first-appearance citations, e.g. [3] or [3, 7], by build_docx.py.
+# \citep{} author-year citations against manuscript/latex/cas-refs.bib by build_latex.py.
 
 TITLE = "Meta-Prompted Instruction Refinement: Bridging Manual Prompting Techniques and Automatic Prompt Optimization"
 
