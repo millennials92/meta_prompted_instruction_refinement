@@ -73,6 +73,7 @@ def _escape_plain(s):
 
 
 _MANUAL_NUM_RE = re.compile(r"^(Figure|Table|Algorithm)\s+\d+\.\s*")
+_APPENDIX_NUM_RE = re.compile(r"^Appendix\s+[A-Z]\.\s*")
 
 
 def strip_manual_number(text):
@@ -80,6 +81,13 @@ def strip_manual_number(text):
     auto-numbering there); LaTeX's \\caption numbers automatically, so drop
     the leading "Figure N."/"Table N."/"Algorithm N." to avoid double numbering."""
     return _MANUAL_NUM_RE.sub("", text, count=1)
+
+
+def strip_appendix_label(text):
+    """Same idea as strip_manual_number, for H1 appendix headings: after \\appendix is
+    issued, LaTeX auto-prefixes "Appendix A/B/C..." to each \\section, so drop the
+    hand-written "Appendix X. " prefix used for the DOCX build to avoid double-labeling."""
+    return _APPENDIX_NUM_RE.sub("", text, count=1)
 
 
 def resolve_citations(text):
@@ -94,8 +102,10 @@ def latex_body():
     out = []
     for b in C.BLOCKS:
         t = b["type"]
-        if t == "h1":
-            out.append(f"\\section{{{esc(b['text'])}}}")
+        if t == "appendix_start":
+            out.append(r"\appendix")
+        elif t == "h1":
+            out.append(f"\\section{{{esc(strip_appendix_label(b['text']))}}}")
         elif t == "h2":
             out.append(f"\\subsection{{{esc(b['text'])}}}")
         elif t == "h3":
@@ -212,7 +222,7 @@ def author_block():
         lines.append(f"\\author[{i}]{{{esc(a['name'])}}}{opts}")
         if a.get("corresponding"):
             lines.append(f"\\cormark[1]")
-            lines.append(r"\ead{" + "corresponding.author@example.edu" + "}")
+            lines.append(r"\ead{" + C.CORRESPONDING_AUTHOR_EMAIL + "}")
         lines.append("")
     for i, aff in enumerate(C.AFFILIATIONS, start=1):
         lines.append(f"\\affiliation[{i}]{{organization={{{esc(aff)}}}}}")

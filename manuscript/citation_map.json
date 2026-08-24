@@ -58,5 +58,6 @@
   "reference_62": "Nair, A., Banerjee, A., Mombaerts, L., Hagen, M., & Borogovac, T. (2025). Tournament of prompts: Evolving LLM instructions through structured debates and Elo ratings. In KDD 2025 Workshop on Prompt Optimization.",
   "reference_63": "Li, W., Wang, X., Li, W., & Jin, B. (2025). A survey of automatic prompt engineering: An optimization perspective. arXiv:2502.11560.",
   "reference_64": "Chakma, A., Surdeanu, M., & Blanco, E. (2026). Two-stage prompt optimization for few-shot relation extraction: From reasoning-guided search to gradient-guided refinement. arXiv:2606.29639.",
-  "reference_65": "OpenAI. (2026). Deprecations. OpenAI API documentation."
+  "reference_65": "OpenAI. (2026). Deprecations. OpenAI API documentation.",
+  "reference_66": "Wang, X., Wei, J., Schuurmans, D., Le, Q. V., Chi, E. H., Narang, S., Chowdhery, A., & Zhou, D. (2023). Self-consistency improves chain of thought reasoning in language models. In The Eleventh International Conference on Learning Representations."
 }

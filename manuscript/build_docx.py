@@ -304,7 +304,9 @@ def add_table(block):
 # ---------------------------------------------------------------------------
 for b in C.BLOCKS:
     t = b["type"]
-    if t == "h1":
+    if t == "appendix_start":
+        pass  # no-op for DOCX; heading text already carries an explicit "Appendix X." prefix
+    elif t == "h1":
         add_heading(resolve_citations(b["text"]), 1)
     elif t == "h2":
         add_heading(resolve_citations(b["text"]), 2)
