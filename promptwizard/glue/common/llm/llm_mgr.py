@@ -14,10 +14,31 @@ from ..utils.runtime_tasks import str_to_class
 import os
 logger = get_glue_logger(__name__)
 
+def call_gemini_api(messages, model_name):
+    from google import genai
+    from google.genai import types
+
+    client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+    system_text = "\n".join(m["content"] for m in messages if m["role"] == "system")
+    user_text = "\n".join(m["content"] for m in messages if m["role"] != "system")
+    response = client.models.generate_content(
+        model=model_name,
+        contents=user_text,
+        config=types.GenerateContentConfig(
+            system_instruction=system_text or None,
+            temperature=0.0,
+        ),
+    )
+    return response.text
+
+
 def call_api(messages, model_name=None):
     from openai import OpenAI
     from azure.identity import get_bearer_token_provider, AzureCliCredential
     from openai import AzureOpenAI
+
+    if model_name and model_name.startswith("gemini"):
+        return call_gemini_api(messages, model_name)
 
     if os.environ['USE_OPENAI_API_KEY'] == "True":
         client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])

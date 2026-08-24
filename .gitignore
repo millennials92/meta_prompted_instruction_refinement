@@ -27,6 +27,17 @@ env/
 logs/
 demos/logs/
 
+# LaTeX build artifacts (keep .tex/.pdf/.bib/.cls/.sty/.bst)
+manuscript/latex/*.aux
+manuscript/latex/*.bbl
+manuscript/latex/*.blg
+manuscript/latex/*.log
+manuscript/latex/*.out
+manuscript/latex/*.abs
+manuscript/latex/*.fls
+manuscript/latex/*.fdb_latexmk
+manuscript/latex/*.synctex.gz
+
 # OS
 .DS_Store
 Thumbs.db

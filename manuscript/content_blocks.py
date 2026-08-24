@@ -42,7 +42,7 @@ ABSTRACT = (
     "at a fraction of the engineering cost of learned or evolutionary alternatives."
 )
 
-KEYWORDS = "Prompt engineering, meta-prompting, prompt optimization, large language models, automatic prompt optimization, Big-Bench Hard"
+KEYWORDS = "Prompt engineering, meta-prompting, automatic prompt optimization, large language models, Big-Bench Hard"
 
 # ---------------------------------------------------------------------------
 BLOCKS = []
@@ -814,7 +814,7 @@ P("Future work could extend MPIR along several directions: broader evaluation ac
 H1("Acknowledgement")
 P("The authors thank the reviewers for their constructive comments on earlier drafts of this manuscript.")
 
-H1("Funding Support")
+H1("Funding")
 P("This research received no specific grant from any funding agency in the public, commercial, or "
   "not-for-profit sectors.")
 
@@ -822,7 +822,7 @@ H1("Ethical Statement")
 P("This study did not involve human participants, human data, or animal subjects, and did not require "
   "ethical approval.")
 
-H1("Conflicts of Interest")
+H1("Declaration of Competing Interest")
 P("The authors declare that they have no conflicts of interest.")
 
 H1("Data Availability Statement")

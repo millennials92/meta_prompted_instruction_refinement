@@ -43,12 +43,22 @@ class Heuristic(PromptOptimizer, UniversalBaseClass):
     iolog = ParamLogger()
 
     def __init__(self, dataset: List, base_path: str, setup_config: SetupConfig,
-                 prompt_pool: HeuristicPromptPool, data_processor: DatasetSpecificProcessing, logger):
+                 prompt_pool: HeuristicPromptPool, data_processor: DatasetSpecificProcessing, logger,
+                 meta_model_name: str = None, target_model_name: str = None):
+        """
+        :param meta_model_name: Model used for the meta-prompting stages (evaluation and refinement).
+            Defaults to META_MODEL_NAME (gpt-4o) when not given, matching the paper's primary experiments.
+        :param target_model_name: Model used to answer validation questions (the "target" model whose
+            accuracy is being optimized). Defaults to None, which falls through to LLMMgr's own default
+            (OPENAI_MODEL_NAME), matching the paper's primary experiments.
+        """
         self.dataset = dataset
         self.setup_config = setup_config
         self.data_processor = data_processor
         self.logger = logger
         self.prompt_pool = prompt_pool
+        self.meta_model_name = meta_model_name or self.META_MODEL_NAME
+        self.target_model_name = target_model_name
         base_path = join(base_path, LogLiterals.DIR_NAME)
         self.iolog.reset_eval_glue(base_path)
         self.conversation_history = []
@@ -105,13 +115,13 @@ class Heuristic(PromptOptimizer, UniversalBaseClass):
         chat_history = [
             {"role": "user", "content": prompt_evaluation}
         ]
-        eval_response = self.chat_completion_history(chat_history, model_name=self.META_MODEL_NAME)
+        eval_response = self.chat_completion_history(chat_history, model_name=self.meta_model_name)
         chat_history.append({"role": "assistant", "content": eval_response})
         self.logger.info(f"Rubric evaluation: {eval_response}")
 
         prompt_refinement = self.prompt_pool.prompt_refinement
         chat_history.append({"role": "user", "content": prompt_refinement})
-        refined_prompt = self.chat_completion_history(chat_history, model_name=self.META_MODEL_NAME)
+        refined_prompt = self.chat_completion_history(chat_history, model_name=self.meta_model_name)
 
         final_best_prompt = re.findall(DatasetSpecificProcessing.TEXT_DELIMITER_PATTERN, refined_prompt)
         final_improved_prompt = self.prompt_pool.improved_prompt.format(instruction=final_best_prompt[0])
@@ -167,7 +177,7 @@ class Heuristic(PromptOptimizer, UniversalBaseClass):
         :rtype: (bool, str, str)
         """
         final_prompt = self.prompt_pool.eval_prompt.format(instruction=current_prompt, question=question)
-        llm_output = self.chat_completion(user_prompt=final_prompt)
+        llm_output = self.chat_completion(user_prompt=final_prompt, model_name=self.target_model_name)
 
         is_correct, predicted_ans = self.data_processor.access_answer(llm_output, gt_answer)
         return {self.EvalLiterals.IS_CORRECT: is_correct,
