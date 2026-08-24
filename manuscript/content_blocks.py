@@ -770,8 +770,8 @@ TABLE("Table 3. Accuracy (%) across 23 BBH tasks.",
           ["movie_recommendation", "66.2", "73.3", "48.00", "66.7", "79.1"],
           ["formal_fallacies", "53.8", "53.3", "31.11", "53.3", "51.6"],
           ["dyck_languages", "1.7", "14.2", "14.67", "12.9", "16.9"],
-          ["tracking_shuffled_objects", "22.4", "69.8", "18.07", "65.2", "63.8"],
-          ["Average", "50.7", "62.39", "57.15", "64.37", "69.5"],
+          ["tracking_shuffled_objects", "22.4", "69.8", "18.07", "65.5", "63.8"],
+          ["Average", "50.7", "62.39", "57.15", "64.38", "69.5"],
       ], full=True, colw=[0.30, 0.14, 0.16, 0.14, 0.12, 0.14], note="bold_last_row")
 
 P("Table 4 reports accuracy before and after MPIR refinement across two further APO methods, Iterative "
@@ -807,7 +807,7 @@ TABLE("Table 4. Accuracy (%) before and after MPIR refinement, for three APO met
           ["formal_fallacies", "52.44", "55.11", "53.3", "52.89", "56.89", "53.3"],
           ["dyck_languages", "24.44", "20.89", "14.2", "34.22", "32.44", "12.9"],
           ["tracking_shuffled_objects", "62.96", "61.63", "69.8", "58.22", "60.89", "65.5"],
-          ["Average (23 tasks)", "70.16", "72.81", "62.39", "74.02", "74.26", "64.37"],
+          ["Average (23 tasks)", "70.16", "72.81", "62.39", "74.02", "74.26", "64.38"],
       ], full=True, colw=None, note="bold_last_row")
 
 P("Beyond aggregate performance, concrete examples illustrate where MPIR improves on baseline APO "
@@ -826,14 +826,14 @@ H2("5.2. Analysis")
 
 H3("5.2.1. Overall Performance Improvements of MPIR")
 P("Table 3 shows a directionally positive but not conclusively significant improvement over "
-  "PromptWizard: MPIR reaches an average accuracy of 64.37%, versus 62.39% for PromptWizard, a difference "
-  "of 1.97 percentage points, with a 95% bootstrap confidence interval of [−0.46, 4.70] (10,000 "
+  "PromptWizard: MPIR reaches an average accuracy of 64.38%, versus 62.39% for PromptWizard, a difference "
+  "of 1.99 percentage points, with a 95% bootstrap confidence interval of [−0.46, 4.70] (10,000 "
   "resamples over the 23 tasks) that includes zero. Because the 23 tasks form matched pairs of "
   "heterogeneous difficulty rather than an unpaired sample, we follow standard practice for this design "
   "‹55,56› and supplement the bootstrap CI with three paired analyses of the same 23 "
   "task-level differences. A paired Wilcoxon signed-rank test is not significant (W = 83.0, p = 0.158), "
   "and a two-sided exact sign test on the win/loss count (16 wins, 6 losses, 1 tie) is borderline "
-  "(p = 0.052; one-sided p = 0.026). The paired effect size is small-to-moderate (Cohen's dz = 0.30). We "
+  "(p = 0.052; one-sided p = 0.026). The paired effect size is small-to-moderate (Cohen's dz = 0.31). We "
   "report all three rather than selecting the most favorable one: together they indicate a real but "
   "modest and not fully conclusive effect, consistent with typical statistical power at this task count "
   "‹57›, rather than an established, strongly significant improvement. The more robust evidence "
@@ -848,7 +848,7 @@ P("Table 3 shows a directionally positive but not conclusively significant impro
 
 H3("5.2.2. Evaluating MPIR Across Multiple APO Frameworks")
 P("Table 4 shows that MPIR consistently improves average accuracy across APO frameworks: Iterative APE "
-  "from 70.16% to 74.02%, ProTeGi from 72.81% to 74.26%, and PromptWizard from 62.39% to 64.37%. Although "
+  "from 70.16% to 74.02%, ProTeGi from 72.81% to 74.26%, and PromptWizard from 62.39% to 64.38%. Although "
   "the magnitude of improvement varies across methods and tasks, the consistently positive trend supports "
   "MPIR functioning as a refinement layer across different APO frameworks rather than one tailored to "
   "PromptWizard-specific prompt structures.")
@@ -1097,7 +1097,7 @@ P("This section organizes the study's limitations, several already introduced al
 
 H2("6.1. Internal Validity")
 P("The central internal-validity concern is statistical: the average improvement over PromptWizard "
-  "(1.97 points) is not conclusively significant by any of the three paired tests reported in Section "
+  "(1.99 points) is not conclusively significant by any of the three paired tests reported in Section "
   "5.2.1, and all results come from a single run per condition at fixed temperature 0 rather than "
   "repeated trials with varied seeds or example orderings. A second concern is evaluator bias: MPIR's "
   "meta-prompting stages and the free rewrite baseline both use GPT-4o as judge and rewriter "
