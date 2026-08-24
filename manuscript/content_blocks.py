@@ -17,7 +17,7 @@ AFFILIATIONS = [
     "British University Vietnam, Hung Yen, Vietnam",
     "Millenia Education, Ho Chi Minh City, Vietnam",
 ]
-CORRESPONDING_AUTHOR_EMAIL = "ai-data-ai-presales@smartosc.com"
+CORRESPONDING_AUTHOR_EMAIL = "vinh.dq4@buv.edu.vn"
 CORRESPONDING_AUTHOR_NOTE = (
     "*Corresponding author: Quang-Vinh Dang, British University Vietnam, Hung Yen, Vietnam. "
     f"Email: {CORRESPONDING_AUTHOR_EMAIL}"
