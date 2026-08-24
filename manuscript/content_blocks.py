@@ -9,13 +9,13 @@ TITLE = "Meta-Prompted Instruction Refinement: Bridging Manual Prompting Techniq
 AUTHORS = [
     {"name": "Linh Nguyen", "affil_idx": [1], "corresponding": False},
     {"name": "Quang-Vinh Dang", "affil_idx": [2], "corresponding": True},
-    {"name": "Minh Ngoc Dinh", "affil_idx": [3], "corresponding": False},
+    {"name": "Minh Ngoc Dinh", "affil_idx": [3], "corresponding": False, "email": "Minh.dinh@maeducation.com"},
     {"name": "Thuy Nguyen", "affil_idx": [1], "corresponding": False},
 ]
 AFFILIATIONS = [
     "School of Science, Engineering & Technology, RMIT University Vietnam, 702 Nguyen Van Linh Boulevard, Ho Chi Minh City 700000, Vietnam",
     "British University Vietnam, Hung Yen, Vietnam",
-    "School of Computing Technologies, RMIT University, Melbourne, Australia",
+    "Millenia Education, Ho Chi Minh City, Vietnam",
 ]
 CORRESPONDING_AUTHOR_EMAIL = "ai-data-ai-presales@smartosc.com"
 CORRESPONDING_AUTHOR_NOTE = (

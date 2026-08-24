@@ -223,6 +223,8 @@ def author_block():
         if a.get("corresponding"):
             lines.append(f"\\cormark[1]")
             lines.append(r"\ead{" + C.CORRESPONDING_AUTHOR_EMAIL + "}")
+        elif a.get("email"):
+            lines.append(r"\ead{" + a["email"] + "}")
         lines.append("")
     for i, aff in enumerate(C.AFFILIATIONS, start=1):
         lines.append(f"\\affiliation[{i}]{{organization={{{esc(aff)}}}}}")
