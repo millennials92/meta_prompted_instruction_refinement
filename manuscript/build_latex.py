@@ -117,7 +117,13 @@ def latex_body():
                 out.append(f"\\item \\textbf{{{esc(head)}}} {resolve_citations(body)}")
             out.append(r"\end{itemize}")
         elif t == "figure":
-            path = os.path.join(FIGDIR, b["path"])
+            # Relative to LATEX_DIR (where manuscript.tex lives), forward
+            # slashes only: an absolute Windows path here puts literal
+            # backslashes inside \includegraphics{}, which LaTeX parses as
+            # control sequences (e.g. \work, \meta) rather than a path,
+            # breaking every figure and every page after it.
+            abs_path = os.path.join(FIGDIR, b["path"])
+            path = os.path.relpath(abs_path, LATEX_DIR).replace(os.sep, "/")
             width = r"\linewidth" if b["full"] else r"0.85\linewidth"
             out.append(r"\begin{figure}[htbp]")
             out.append(r"\centering")

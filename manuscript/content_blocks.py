@@ -710,21 +710,30 @@ P("Accuracy was chosen over softer metrics such as partial-credit scoring or emb
   "several thousand model responses without manual grading.")
 
 H2("4.5. Implementation Details")
-P("GPT-3.5-turbo ‹48› serves as the target model for all benchmark tasks, both as the backbone "
-  "of the PromptWizard baseline and for MPIR's validation stage, ensuring a consistent evaluation "
-  "environment. MPIR's meta-prompting stages—evaluation and refinement—use the more capable "
-  "GPT-4o ‹49› to provide expert-level feedback.")
+P("Qwen3-1.7B ‹68› serves as target, optimizer, and meta-prompting judge simultaneously, served "
+  "locally via vLLM rather than accessed through a closed API. Using one model in every role removes the "
+  "confound present in the original design, where a more capable closed model (GPT-4o) supplied MPIR's "
+  "(GPT-4o) supplied MPIR's meta-prompting feedback for a weaker target model (GPT-3.5-turbo): any gain "
+  "could not be cleanly attributed to the rubric-guided refinement procedure itself rather than to the "
+  "meta-model's superior general capability. It also ties the reported numbers to a specific, "
+  "redistributable model checkpoint instead of a closed endpoint that can silently change behavior "
+  "between the time of writing and the time of reading.")
 
-P("PromptWizard randomly selects 25 training examples for prompt optimization and in-context example "
-  "construction, with the remainder reserved for testing; MPIR uses the same 25 examples during "
-  "validation to keep the comparison fair, with the remaining data again serving as the test set. "
-  "Refinement runs for 7 rounds, balancing improvement opportunity against computational cost: each round "
-  "issues 2 meta-prompting calls (evaluation and refinement, on GPT-4o) plus one validation call per "
-  "held-out example (on GPT-3.5-turbo), so MPIR adds on the order of 200 additional API calls per task on "
-  "top of the underlying APO method's own optimization cost—a real overhead that should be weighed "
-  "against its per-task accuracy gains in latency- or cost-sensitive deployments. All "
-  "models are accessed via API with temperature fixed at 0. Full PromptWizard hyperparameters are "
-  "reported in Table 2 to support reproducibility. The implementation of MPIR is publicly available at "
+P("Each task's examples are partitioned three ways, not two: 25 examples for optimizer training and "
+  "in-context example construction, a further 25 disjoint examples for MPIR's validation stage, and the "
+  "remainder as the test set that no stage touches during optimization or refinement. This corrects the "
+  "original design, in which MPIR validated candidate prompts on the same 25 examples the underlying APO "
+  "method had already used for training and in-context example selection—so candidate selection across "
+  "MPIR's rounds was scoring against data the upstream optimizer had already fit to, an internal validity "
+  "threat serious enough that neither prior review round caught it because both worked from the reported "
+  "numbers rather than the code that produced them. Refinement runs for 7 rounds, balancing improvement "
+  "opportunity against computational cost: each round issues 2 meta-prompting calls (evaluation and "
+  "refinement) plus one validation call per held-out example, so MPIR adds on the order of 200 additional "
+  "model calls per task on top of the underlying APO method's own optimization cost—a real overhead that "
+  "should be weighed against its per-task accuracy gains in latency- or cost-sensitive deployments. All "
+  "calls use temperature 0. Full PromptWizard hyperparameters are reported in Table 2 to support "
+  "reproducibility. The implementation of MPIR, including the corrected validation split and the APE and "
+  "ProTeGi implementations added during this rebuild, is publicly available at "
   "https://github.com/millennials92/meta_prompted_instruction_refinement.")
 
 TABLE("Table 2. Hyperparameter settings of PromptWizard.",

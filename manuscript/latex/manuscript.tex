@@ -150,7 +150,7 @@ These three stages echo concepts that appear under different names elsewhere in 
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{/Users/vinhdq1/work/meta_prompted_instruction_refinement/manuscript/figures/figure_3.png}
+\includegraphics[width=\linewidth]{../figures/figure_3.png}
 \caption{Overview of the Meta-Prompted Instruction Refinement (MPIR) cycle. An APO-generated prompt P0 enters a three-stage loop---Evaluation, Refinement, and Validation---guided by heuristic criteria. Each iteration uses P0 as the base and generates an improved candidate prompt (P1, P2, ..., PN). After N iterations, the prompt with the highest validation score is selected as the final prompt.}
 \end{figure}
 
@@ -272,13 +272,13 @@ The workflow has two stages (Figures 4 and 5). Stage 1 uses PromptWizard as the 
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.85\linewidth]{/Users/vinhdq1/work/meta_prompted_instruction_refinement/manuscript/figures/PromptWizard.png}
+\includegraphics[width=0.85\linewidth]{../figures/PromptWizard.png}
 \caption{Stage 1: workflow of the PromptWizard base APO, adapted from \citep{agarwal2025}. It performs iterative refinement of prompt instructions, diverse example selection, sequential optimization, and self-generated reasoning and validation to produce an optimized prompt with few-shot examples and reasoning chains.}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.85\linewidth]{/Users/vinhdq1/work/meta_prompted_instruction_refinement/manuscript/figures/MPIR.png}
+\includegraphics[width=0.85\linewidth]{../figures/MPIR.png}
 \caption{Stage 2: workflow of Meta-Prompted Instruction Refinement (MPIR). MPIR builds on the PromptWizard APO output and performs iterative evaluation, refinement, and validation over N rounds to further improve prompt quality.}
 \end{figure}
 
@@ -339,9 +339,9 @@ Accuracy was chosen over softer metrics such as partial-credit scoring or embedd
 
 \subsection{4.5. Implementation Details}
 
-GPT-3.5-turbo \citep{openai2025b} serves as the target model for all benchmark tasks, both as the backbone of the PromptWizard baseline and for MPIR's validation stage, ensuring a consistent evaluation environment. MPIR's meta-prompting stages---evaluation and refinement---use the more capable GPT-4o \citep{openai2025c} to provide expert-level feedback.
+Qwen3-1.7B \citep{qwenteam2025} serves as target, optimizer, and meta-prompting judge simultaneously, served locally via vLLM rather than accessed through a closed API. Using one model in every role removes the confound present in the original design, where a more capable closed model (GPT-4o) supplied MPIR's (GPT-4o) supplied MPIR's meta-prompting feedback for a weaker target model (GPT-3.5-turbo): any gain could not be cleanly attributed to the rubric-guided refinement procedure itself rather than to the meta-model's superior general capability. It also ties the reported numbers to a specific, redistributable model checkpoint instead of a closed endpoint that can silently change behavior between the time of writing and the time of reading.
 
-PromptWizard randomly selects 25 training examples for prompt optimization and in-context example construction, with the remainder reserved for testing; MPIR uses the same 25 examples during validation to keep the comparison fair, with the remaining data again serving as the test set. Refinement runs for 7 rounds, balancing improvement opportunity against computational cost: each round issues 2 meta-prompting calls (evaluation and refinement, on GPT-4o) plus one validation call per held-out example (on GPT-3.5-turbo), so MPIR adds on the order of 200 additional API calls per task on top of the underlying APO method's own optimization cost---a real overhead that should be weighed against its per-task accuracy gains in latency- or cost-sensitive deployments. All models are accessed via API with temperature fixed at 0. Full PromptWizard hyperparameters are reported in Table 2 to support reproducibility. The implementation of MPIR is publicly available at \url{https://github.com/millennials92/meta_prompted_instruction_refinement}.
+Each task's examples are partitioned three ways, not two: 25 examples for optimizer training and in-context example construction, a further 25 disjoint examples for MPIR's validation stage, and the remainder as the test set that no stage touches during optimization or refinement. This corrects the original design, in which MPIR validated candidate prompts on the same 25 examples the underlying APO method had already used for training and in-context example selection---so candidate selection across MPIR's rounds was scoring against data the upstream optimizer had already fit to, an internal validity threat serious enough that neither prior review round caught it because both worked from the reported numbers rather than the code that produced them. Refinement runs for 7 rounds, balancing improvement opportunity against computational cost: each round issues 2 meta-prompting calls (evaluation and refinement) plus one validation call per held-out example, so MPIR adds on the order of 200 additional model calls per task on top of the underlying APO method's own optimization cost---a real overhead that should be weighed against its per-task accuracy gains in latency- or cost-sensitive deployments. All calls use temperature 0. Full PromptWizard hyperparameters are reported in Table 2 to support reproducibility. The implementation of MPIR, including the corrected validation split and the APE and ProTeGi implementations added during this rebuild, is publicly available at \url{https://github.com/millennials92/meta_prompted_instruction_refinement}.
 
 \begin{table}[htbp]
 \centering
@@ -448,7 +448,7 @@ Beyond aggregate performance, concrete examples illustrate where MPIR improves o
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{/Users/vinhdq1/work/meta_prompted_instruction_refinement/manuscript/figures/case.png}
+\includegraphics[width=\linewidth]{../figures/case.png}
 \caption{Case study comparing PromptWizard and MPIR on the penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table task. PromptWizard incorrectly identifies two penguins younger than eight years old, while MPIR correctly counts only one.}
 \end{figure}
 
@@ -926,7 +926,7 @@ Section 5.1 and Figure 6 present a case in which MPIR corrects a PromptWizard re
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{/Users/vinhdq1/work/meta_prompted_instruction_refinement/manuscript/figures/case_study_2.png}
+\includegraphics[width=\linewidth]{../figures/case_study_2.png}
 \caption{Figure C.1. Case study comparing PromptWizard and MPIR on the tracking\_\allowbreak{}shuffled\_\allowbreak{}objects\_\allowbreak{}five\_\allowbreak{}objects task. Both systems follow the same sequence of swaps but diverge in intermediate reasoning: PromptWizard maintains consistent tracking of player positions and reaches the correct answer (C: left winger), whereas MPIR misapplies one swap and concludes incorrectly (B: right midfielder).}
 \end{figure}
 
