@@ -389,5 +389,104 @@ what is still assumed rather than verified.
   closed). Correctness so far rests on code review and prompt-template inspection, not
   execution. Running the §4.0 pilot is what actually validates them.
 
+### 2026-09-03 — Two-reviewer pass (code-reviewer + python-reviewer), fixes applied
+
+Triggered a review of the full diff against pre-rebuild HEAD, on the theory that a
+rebuild whose entire premise is "the previous numbers were wrong" should not ship its
+own new measurement bugs unreviewed. Two independent agents found five real issues,
+two of them CRITICAL/severe enough to have invalidated the §4.0 pilot outright. All
+five are now fixed and verified with unit-level smoke tests (mocked LLM, no real API
+calls) that specifically reproduce each bug and confirm the fix. Recorded here in
+detail because this is exactly the class of mistake this document exists to catch.
+
+1. **[CRITICAL, python-reviewer] APE/ProTeGi's search-time scoring never told the model
+   the answer-delimiter format.** `eval_prompt` (used by `score_candidate` /
+   `evaluate_on_batch` to score bare candidate instructions during search) had no
+   `answer_format` substitution — only the *final* prompt (built once, after search
+   ends, via `final_prompt.format(...)`) included it. Every candidate scored during
+   search would therefore answer in free text, `access_answer`'s `<ANS_START>` /
+   `<ANS_END>` extraction would find nothing, and every candidate would score ~0
+   regardless of quality — meaning `top_n`/beam-search selection during search was
+   driven by noise, not signal, even though the final reported accuracy would still
+   look plausible. My own smoke test had missed this because its fake LLM was too
+   lenient (always emitted the delimiter). Fixed by baking `answer_format` into the
+   instruction text passed to `eval_prompt.format()` inside `score_candidate` /
+   `evaluate_on_batch`, mirroring how `critique_n_refine`'s own `solve_template` already
+   solves the identical problem. (First attempt at this fix added `{answer_format}`
+   directly to the `eval_prompt` *template* — wrong, because that template is also used
+   by the shared `GluePromptOpt.predict_and_access()` final-eval path, which never
+   passes `answer_format` and already receives a fully-formatted instruction; that
+   broke every technique's final evaluation with a `KeyError`. Reverted the template
+   change, fixed the call sites instead.)
+2. **[CRITICAL, both reviewers independently] `data_prep.py`'s three-way split was not
+   actually seed-namespaced.** `train.jsonl`/`val.jsonl`/`test.jsonl` were shared across
+   every seed for a task; only the audit-trail `partitions_seed{N}.json` was
+   seed-specific. Preparing a second seed for an already-split task silently overwrote
+   the first seed's data files, while the first seed's partition-index file still
+   reported `"seed": 1` and passed the cache-hit check — so re-requesting seed 1 later
+   would silently return seed 2's data under seed 1's name. Exactly the multi-seed grid
+   in §4.1 would have hit this on task 2 of every 3-seed condition. Fixed: train/val/test
+   filenames now include the seed; the partitions file also now records `num_examples`,
+   `optimizer_train_size`, and `mpir_validation_size` so a config or source-data change
+   invalidates a stale cache instead of silently reusing it.
+3. **[HIGH, both reviewers] `seed` never seeded anything that generates variance.**
+   `GluePromptOpt.evaluate(seed=...)` only stamped `seed` into filenames/log rows; nothing
+   called `random.seed(seed)`, so APE/ProTeGi/critique_n_refine's internal
+   `random.sample()` calls (demo selection, minibatch sampling) drew from whatever
+   ambient global-RNG state existed at that point in the process -- not reproducible
+   from, or actually varying with, the recorded seed. Fixed: `GluePromptOpt.__init__`
+   now accepts an optional `seed` and calls `random.seed(seed)` before constructing the
+   technique. All four demo notebooks now pass `seed=seed`. (LLM decode-level seeding
+   for closed/local APIs remains partially wired -- see open item below.)
+4. **[HIGH, code-reviewer] APE scored different candidates in the same selection round
+   on different random minibatches.** Comparisons feeding `top_n` selection were not
+   apples-to-apples. ProTeGi already did this correctly (one `eval_batch` per round,
+   reused for every candidate). Fixed: APE now draws one shared scoring minibatch per
+   round and reuses it for every candidate compared in that round, including re-scoring
+   retained top candidates on the new round's minibatch so they stay comparable to
+   newly resampled ones.
+5. **[HIGH→addressed, code-reviewer; MEDIUM, python-reviewer] `LLMMgr.chat_completion`
+   swallowed every exception and returned a fixed placeholder string**, which then
+   fails delimiter extraction and gets recorded as an ordinary wrong answer in
+   `results/predictions/*.jsonl` — indistinguishable from a genuine model mistake, and
+   directly undermining §5's "every table recomputable from released predictions"
+   claim. `tenacity` was already imported but unused. Fixed: `call_api` now retries
+   (3 attempts, fixed+random backoff) and re-raises after exhausting retries; the
+   swallow-to-sentinel in `chat_completion` is removed entirely, so a persistent
+   failure now crashes the run loudly (to be resumed) instead of silently corrupting a
+   result.
+
+**Also fixed, lower severity:**
+- `call_api`'s Azure-only imports (`azure.identity`, `AzureOpenAI`) now sit inside the
+  branches that actually need them, after the local-endpoint check — a machine set up
+  purely for local inference no longer needs `azure-identity` installed at all.
+- `data_prep.py` now opens every file with explicit `encoding="utf-8"` (Windows defaults
+  to the locale codepage otherwise) and asserts a task has more examples than
+  `OPTIMIZER_TRAIN_SIZE + MPIR_VALIDATION_SIZE` before slicing, so an undersized task
+  fails loudly at split time with a clear message instead of silently producing an
+  empty test set.
+- **Cross-task demo bug, caught by its own stale notebook output:** `promptwizard.ipynb`
+  and `MPIR.ipynb` used different `dataset_to_run` values while `MPIR.ipynb` loaded a
+  fixed `results/promptwizard.pkl` regardless of task — running the two "documented
+  workflow" notebooks back-to-back would refine and evaluate the wrong task's prompt.
+  `MPIR.ipynb`'s own saved output literally showed reasoning_about_colored_objects
+  content despite its source reading `dataset_to_run = 'hyperbaton'`, confirming this
+  had actually happened. Fixed: aligned both notebooks on the same demo task, and every
+  pkl filename (`promptwizard`/`ape`/`protegi`) is now scoped by task+seed and
+  constructed identically by both the producer and consumer notebook, so a future
+  mismatch raises `FileNotFoundError` instead of silently loading the wrong prompt.
+
+**Open items from the review, deliberately deferred (not correctness-blocking for a
+single-seed pilot):**
+- The debug-only `iolog`/`glue_logs` path shares one `experiment_name` across every
+  grid cell, making the gitignored debug log undifferentiated once the grid runs at
+  scale. Does not affect the tracked `results/predictions/*.jsonl` provenance files.
+  Worth revisiting once the Phase 4 grid runner is built.
+- `seed` is threaded to the local vLLM endpoint's decoding but not to the closed-model
+  (OpenAI/Azure) paths -- low priority given the rebuild's local-only direction.
+- `call_local_api` constructs a new `OpenAI` client per call rather than reusing one
+  instance -- a performance nit, not a correctness issue, across what will be a large
+  number of calls in the full grid.
+
 **Still unstarted:** environment/vLLM serving setup on the GPU machine, the §4.0
 go/no-go pilot, the full grid, and all manuscript surgery in §6.

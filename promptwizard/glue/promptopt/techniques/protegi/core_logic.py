@@ -69,7 +69,8 @@ class ProTeGi(PromptOptimizer, UniversalBaseClass):
         return response
 
     @iolog.log_io_params
-    def evaluate_on_batch(self, instruction: str, batch: List[dict]) -> Tuple[float, List[dict]]:
+    def evaluate_on_batch(self, instruction: str, batch: List[dict],
+                          params: PromptOptimizationParams) -> Tuple[float, List[dict]]:
         """
         Run `instruction` over every example in `batch`. Returns both the
         accuracy (used to score candidates) and the subset of examples answered
@@ -78,17 +79,30 @@ class ProTeGi(PromptOptimizer, UniversalBaseClass):
 
         :param instruction: Instruction to evaluate.
         :param batch: Examples to evaluate over.
+        :param params: Hyperparameters for this optimization run (supplies answer_format).
         :return: (accuracy, wrong_examples)
         """
         if not batch:
             return 0.0, []
+
+        # Candidates evaluated here are bare instructions (base/edited/
+        # paraphrased) with no answer-format instruction baked in yet (that
+        # only happens at the very end, in final_prompt.format()). Without it
+        # the model is never told to emit the <ANS_START>/<ANS_END> delimiter
+        # access_answer requires, so every candidate would score ~0 regardless
+        # of quality, and "wrong_examples" would become the whole batch every
+        # round -- bake it into the instruction text here, the same fix
+        # critique_n_refine applies via its own solve_template's answer_format
+        # placeholder.
+        instruction_with_format = f"{instruction}\n\n{params.answer_format}"
 
         correct_count = 0
         wrong_examples = []
         for example in batch:
             question = example[DatasetSpecificProcessing.QUESTION_LITERAL]
             actual_answer = example[DatasetSpecificProcessing.FINAL_ANSWER_LITERAL]
-            eval_prompt = self.prompt_pool.eval_prompt.format(instruction=instruction, question=question)
+            eval_prompt = self.prompt_pool.eval_prompt.format(
+                instruction=instruction_with_format, question=question)
             llm_output = self.chat_completion(eval_prompt)
             is_correct, _ = self.data_processor.access_answer(llm_output, actual_answer)
             if is_correct:
@@ -157,7 +171,7 @@ class ProTeGi(PromptOptimizer, UniversalBaseClass):
         :return: List of successor candidate instructions (edits + paraphrases).
         """
         minibatch = random.sample(self.dataset, min(params.minibatch_size, len(self.dataset)))
-        _, wrong_examples = self.evaluate_on_batch(instruction, minibatch)
+        _, wrong_examples = self.evaluate_on_batch(instruction, minibatch, params)
         if not wrong_examples:
             return [instruction]
 
@@ -191,7 +205,7 @@ class ProTeGi(PromptOptimizer, UniversalBaseClass):
             candidates = list(dict.fromkeys(candidates))  # de-duplicate, preserve order
 
             eval_batch = random.sample(self.dataset, min(params.eval_batch_size, len(self.dataset)))
-            scored = [(candidate, self.evaluate_on_batch(candidate, eval_batch)[0]) for candidate in candidates]
+            scored = [(candidate, self.evaluate_on_batch(candidate, eval_batch, params)[0]) for candidate in candidates]
             scored.sort(key=lambda item: item[1], reverse=True)
 
             beam = [candidate for candidate, _ in scored[:params.beam_width]]

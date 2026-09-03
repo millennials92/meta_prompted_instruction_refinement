@@ -52,16 +52,18 @@ def call_local_api(messages, model_name=None, seed=None):
     return response.choices[0].message.content
 
 
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(2) + wait_random(0, 2), reraise=True)
 def call_api(messages, model_name=None, seed=None):
-    from openai import OpenAI
-    from azure.identity import get_bearer_token_provider, AzureCliCredential
-    from openai import AzureOpenAI
-
+    # Checked, and the local endpoint's own import resolved, before any of the
+    # closed-model imports below -- a machine set up purely for local
+    # inference should not need azure-identity installed at all.
     if os.environ.get("LOCAL_OPENAI_BASE_URL"):
         return call_local_api(messages, model_name=model_name, seed=seed)
 
     if model_name and model_name.startswith("gemini"):
         return call_gemini_api(messages, model_name)
+
+    from openai import OpenAI
 
     if os.environ['USE_OPENAI_API_KEY'] == "True":
         client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
@@ -72,6 +74,9 @@ def call_api(messages, model_name=None, seed=None):
             temperature=0.0,
         )
     else:
+        from azure.identity import get_bearer_token_provider, AzureCliCredential
+        from openai import AzureOpenAI
+
         token_provider = get_bearer_token_provider(
                 AzureCliCredential(), "https://cognitiveservices.azure.com/.default"
             )
@@ -94,20 +99,21 @@ def call_api(messages, model_name=None, seed=None):
 class LLMMgr:
     @staticmethod
     def chat_completion(messages: Dict, model_name: str = None, seed: int = None):
+        # call_api() already retries transient failures (3 attempts, backoff)
+        # and re-raises once exhausted. A prior version of this method caught
+        # every exception here and returned a fixed placeholder string instead
+        # -- which is graded as an ordinary wrong answer and written into
+        # results/predictions/*.jsonl indistinguishable from a genuine model
+        # mistake. Letting the exception propagate means a run that hits a
+        # real failure crashes loudly and is resumed, rather than silently
+        # recording corrupted numbers (REBUILD.md §5's whole point).
         llm_handle = os.environ.get("MODEL_TYPE", "AzureOpenAI")
-        try:
-            if(llm_handle == "AzureOpenAI"):
-                # Code to for calling LLMs
-                return call_api(messages, model_name=model_name, seed=seed)
-            elif(llm_handle == "LLamaAML"):
-                # Code to for calling SLMs
-                return 0
-        except Exception as e:
-            print(e)
-            return "Sorry, I am not able to understand your query. Please try again."
-            # raise GlueLLMException(f"Exception when calling {llm_handle.__class__.__name__} "
-            #                        f"LLM in chat mode, with message {messages} ", e)
-        
+        if llm_handle == "AzureOpenAI":
+            return call_api(messages, model_name=model_name, seed=seed)
+        elif llm_handle == "LLamaAML":
+            # Code to for calling SLMs
+            return 0
+
 
     @staticmethod
     def get_all_model_ids_of_type(llm_config: LLMConfig, llm_output_type: str):

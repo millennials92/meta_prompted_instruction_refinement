@@ -85,24 +85,40 @@ class APE(PromptOptimizer, UniversalBaseClass):
         return candidates
 
     @iolog.log_io_params
-    def score_candidate(self, instruction: str, params: PromptOptimizationParams) -> float:
+    def score_candidate(self, instruction: str, params: PromptOptimizationParams,
+                        scoring_set: List[dict] = None) -> float:
         """
-        Execution accuracy of `instruction` over a random scoring minibatch drawn
-        from the training set (Zhou et al. 2023, §2.2).
+        Execution accuracy of `instruction` over a scoring minibatch (Zhou et al.
+        2023, §2.2).
 
         :param instruction: Candidate instruction to score.
         :param params: Hyperparameters for this optimization run.
+        :param scoring_set: Minibatch to score against. Callers comparing several
+            candidates in the same selection round must pass the same
+            scoring_set to every call, or the comparison is not apples-to-apples
+            (a fresh random draw per candidate is generated only when omitted).
         :return: Fraction of the scoring minibatch answered correctly.
         """
-        scoring_set = random.sample(self.dataset, min(params.num_scoring_examples, len(self.dataset)))
+        if scoring_set is None:
+            scoring_set = random.sample(self.dataset, min(params.num_scoring_examples, len(self.dataset)))
         if not scoring_set:
             return 0.0
+
+        # Candidates scored here are bare induced instructions with no answer-
+        # format instruction baked in yet (that only happens at the very end,
+        # in final_prompt.format()). Without it the model is never told to
+        # emit the <ANS_START>/<ANS_END> delimiter access_answer requires, so
+        # every candidate would score ~0 regardless of quality -- bake it into
+        # the instruction text here, the same fix critique_n_refine applies
+        # via its own solve_template's answer_format placeholder.
+        instruction_with_format = f"{instruction}\n\n{params.answer_format}"
 
         correct_count = 0
         for example in scoring_set:
             question = example[DatasetSpecificProcessing.QUESTION_LITERAL]
             actual_answer = example[DatasetSpecificProcessing.FINAL_ANSWER_LITERAL]
-            eval_prompt = self.prompt_pool.eval_prompt.format(instruction=instruction, question=question)
+            eval_prompt = self.prompt_pool.eval_prompt.format(
+                instruction=instruction_with_format, question=question)
             llm_output = self.chat_completion(eval_prompt)
             is_correct, _ = self.data_processor.access_answer(llm_output, actual_answer)
             correct_count += int(is_correct)
@@ -139,7 +155,12 @@ class APE(PromptOptimizer, UniversalBaseClass):
         if not candidates:
             candidates = [params.base_instruction or params.task_description]
 
-        scored = [(candidate, self.score_candidate(candidate, params)) for candidate in candidates]
+        # One shared minibatch per selection round -- every candidate compared
+        # in the same round must be scored on the same examples, or the
+        # comparison is not apples-to-apples.
+        initial_scoring_set = random.sample(self.dataset, min(params.num_scoring_examples, len(self.dataset)))
+        scored = [(candidate, self.score_candidate(candidate, params, initial_scoring_set))
+                  for candidate in candidates]
 
         for iteration in range(params.iterations):
             scored.sort(key=lambda item: item[1], reverse=True)
@@ -150,7 +171,13 @@ class APE(PromptOptimizer, UniversalBaseClass):
                 for _ in range(params.num_resamples_per_candidate):
                     resampled.append(self.resample_candidate(candidate))
 
-            resampled_scored = [(candidate, self.score_candidate(candidate, params)) for candidate in resampled]
+            round_scoring_set = random.sample(self.dataset, min(params.num_scoring_examples, len(self.dataset)))
+            resampled_scored = [(candidate, self.score_candidate(candidate, params, round_scoring_set))
+                                for candidate in resampled]
+            # Re-score the retained top candidates on this round's minibatch too,
+            # so they stay comparable to the newly resampled ones.
+            top_candidates = [(candidate, self.score_candidate(candidate, params, round_scoring_set))
+                              for candidate, _ in top_candidates]
             scored = top_candidates + resampled_scored
             self.logger.info(f"APE iteration {iteration + 1}: "
                              f"best so far = {max(scored, key=lambda item: item[1])}")

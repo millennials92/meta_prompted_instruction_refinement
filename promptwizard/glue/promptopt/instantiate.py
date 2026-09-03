@@ -42,7 +42,8 @@ class GluePromptOpt:
                  data_processor: DatasetSpecificProcessing,
                  dataset_processor_pkl_path: str = None,
                  prompt_pool_path: str = None,
-                 validation_dataset_jsonl: str = None):
+                 validation_dataset_jsonl: str = None,
+                 seed: int = None):
         """
         Collates all the configs present in different yaml files. Initialize logger, de-serialize pickle file that has
         class/method for dataset processing (for given dataset).
@@ -62,7 +63,17 @@ class GluePromptOpt:
         techniques (e.g. MPIR/heuristic) that score candidates on held-out data rather than on the
         optimizer's own training examples. When omitted, the technique falls back to dataset_jsonl, matching
         prior behavior.
+        :param seed: When given, seeds the global `random` module before the technique is constructed.
+        Every technique's own randomness (which demos/minibatch to sample, etc.) draws from the global
+        `random` module rather than a per-instance RNG, so this is the one place that needs to seed it
+        for a run's optimizer-side stochasticity to actually vary with -- and be reproducible from -- the
+        seed recorded in results/predictions/*.jsonl (REBUILD.md §4.1, §5). Does not affect the seed used
+        for the train/val/test split itself, which data_prep.py seeds independently via its own
+        random.Random(seed) instance.
         """
+        if seed is not None:
+            random.seed(seed)
+
         if dataset_jsonl != None:
             if data_processor:
                 self.data_processor = data_processor
