@@ -1,5 +1,11 @@
 # Meta-Prompted Instruction Refinement (MPIR)
 
+> **Status (2026-09-03):** the AI Open submission (AIOPEN-D-26-00563) was desk-rejected.
+> A rebuild is planned. Two defects were found in the evaluation code that mean the
+> currently reported numbers do not measure what the manuscript describes — see
+> [`REBUILD.md`](REBUILD.md) §2 before using or citing any result in this repo.
+> Operational plan for the rebuild: [`HANDOFF-GPU.md`](HANDOFF-GPU.md).
+
 ## 📃 Abstract
 
 Large language models (LLMs) are transforming artificial intelligence by enabling systems that can reason, write, and assist in complex tasks, and these capabilities that are increasingly important for science, education, and everyday applications. However, these models are critically dependent on the quality of their input prompts, making prompt design a central bottleneck. Manual prompt engineering, with techniques such as chain-of-thought reasoning and role assignment, can yield high performance, but requires expert knowledge and is not scalable. Automatic prompt optimization (APO) offers efficiency; however, its prompts often lack the structured guidance of human-designed heuristics. Here, we introduce Meta-Prompted Instruction Refinement (MPIR), a framework that refines APO-generated prompts using a seven-criteria rubric, meta-prompted evaluation and refinement, and empirical validation. MPIR outperforms APO in 16 of 23 tasks on the Big-Bench Hard (BBH) benchmark, with improvements of up to 20 percentage points on certain tasks. These results demonstrate that MPIR bridges human heuristics with automation, making prompt optimization more effective, scalable, and interpretable. Importantly, this approach democratizes AI by reducing the dependence on domain expertise, reducing labor efforts, and fostering more reliable and accessible systems.
