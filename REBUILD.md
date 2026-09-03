@@ -99,8 +99,32 @@ relying on it again.
 
 ## 2. Code-level defects found while planning the rebuild
 
-These are new findings, not in either review report. Both are in `demos/MPIR.ipynb`.
-Both mean the reported numbers do not measure what the manuscript says they measure.
+These are new findings, not in either review report. The first two are in
+`demos/MPIR.ipynb`; the third is a defect in the repository itself, found while
+starting the rebuild. All three mean the reported numbers do not measure what
+the manuscript says they measure, or cannot be traced to anything in the repo.
+
+### 2.0 APE and ProTeGi have no implementation anywhere in the repository
+
+Tables 3 and 4 report full results for "Iterative APE" and "ProTeGi" as baselines
+and as APO backbones refined by MPIR (§4.3.2, §5.2.2), and §6.2's External
+Validity claim leans on "three APO backbones" for generalization. But
+`promptwizard/glue/promptopt/techniques/` contained exactly two optimizers
+(`critique_n_refine` = PromptWizard, `heuristic` = MPIR) before this rebuild —
+no APE or ProTeGi code exists in the working tree, in `.gitignore`d paths, or
+anywhere in git history on any branch. The two tracked results files
+(`results/Big_bench_hard.xlsx`, `results/Albation.xlsx`) hold only
+PromptWizard/MPIR columns. Roughly a third of the manuscript's cross-framework
+evidence has no traceable source in this repository. Neither prior review round
+caught this, since both worked from the manuscript text and aggregate xlsx
+files rather than asking whether the underlying code existed.
+
+**Resolution (2026-09-03):** clean-room implementations of both, added under
+`promptwizard/glue/promptopt/techniques/ape/` and `.../protegi/`, following the
+published algorithms (Zhou et al. 2023; Pryzant et al. 2023) and matching this
+repo's existing `PromptOptimizer`/`PromptPool` framework so they plug into
+`GluePromptOpt` exactly like the other two techniques. See §8 for what shipped
+and what remains a documented simplification.
 
 ### 2.1 MPIR validates on PromptWizard's own training examples
 
@@ -317,3 +341,53 @@ failure mode that produced this letter would repeat.
 the move to open-weight models, the paper to write is a different one — an honest
 measurement of how much a cheap post-hoc rubric layer buys, with the answer being "less
 than the field assumes" — and that paper wants a different abstract and a different venue.
+
+---
+
+## 8. Rebuild progress log
+
+Kept as a running record so anyone picking this up mid-stream knows what shipped and
+what is still assumed rather than verified.
+
+### 2026-09-03 — Phase 1 & 2, and APE/ProTeGi implementations
+
+**Phase 1 (retarget + prediction logging), done:**
+- `llm_mgr.call_api()` gains a local-endpoint branch (`LOCAL_OPENAI_BASE_URL` /
+  `LOCAL_MODEL_NAME`), checked before every closed-model path, with optional seed
+  passthrough. Both notebooks' duplicated judge `call_api` now import this shared
+  function instead of hardcoding OpenAI/Azure.
+- Removed the hardcoded `META_MODEL_NAME="gpt-4o"` default in the heuristic (MPIR)
+  technique.
+- `GluePromptOpt.evaluate()` writes one tracked JSONL row per example under
+  `results/predictions/<task>_<condition>_<seed>.jsonl` (§5's requirement) in addition
+  to the existing gitignored iolog dump.
+
+**Phase 2 (validation-split fix), done:**
+- Fixed §2.1's leak: a new shared `demos/data_prep.py` produces an idempotent
+  three-way partition (optimizer-train/mpir-validation/test) per (task, seed), used by
+  every optimizer notebook instead of each one reshuffling its own split.
+  `GluePromptOpt` gained an explicit `validation_dataset_jsonl` constructor arg so the
+  heuristic technique scores candidates against the disjoint validation partition.
+- `llm_as_judge_eval` now defaults to `False` (exact match primary), centralized in a
+  new shared `demos/bbh_processor.py` (previously duplicated per notebook).
+
+**§2.0 defect resolution — APE and ProTeGi implemented, done:**
+- `promptwizard/glue/promptopt/techniques/ape/` and `.../protegi/`: clean-room
+  implementations following Zhou et al. 2023 (forward-mode generation + iterative
+  Monte Carlo resampling) and Pryzant et al. 2023 (textual-gradient edits + beam
+  search), registered in `constants.py`/`utils.py` alongside the existing two
+  techniques. Demo configs and notebooks (`demos/ape.ipynb`, `demos/protegi.ipynb`)
+  mirror `promptwizard.ipynb`'s structure.
+- **Documented deviation from Pryzant et al. 2023:** candidate selection scores every
+  successor on a full minibatch each beam-search round rather than the paper's
+  UCB-bandit sampling scheme (which exists to cut evaluation cost over larger candidate
+  pools). Flagged in the class docstring in `protegi/core_logic.py`. Should not change
+  which candidates survive at the pool sizes configured in
+  `demos/configs/protegi/promptopt_config.yaml`, but has not been checked against the
+  original ProTeGi codebase's reported numbers on any shared task.
+- **Not yet done:** neither implementation has been run against a real LLM (local or
+  closed). Correctness so far rests on code review and prompt-template inspection, not
+  execution. Running the §4.0 pilot is what actually validates them.
+
+**Still unstarted:** environment/vLLM serving setup on the GPU machine, the §4.0
+go/no-go pilot, the full grid, and all manuscript surgery in §6.

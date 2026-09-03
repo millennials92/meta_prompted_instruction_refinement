@@ -9,6 +9,8 @@ from ..common.base_classes import UniversalBaseClass
 class SupportedPromptOpt(Enum):
     CRITIQUE_N_REFINE = "critique_n_refine"
     HEURISTIC = "heuristic"
+    APE = "ape"
+    PROTEGI = "protegi"
 
 
     @classmethod

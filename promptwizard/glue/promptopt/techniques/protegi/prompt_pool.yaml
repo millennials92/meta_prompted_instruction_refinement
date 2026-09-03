@@ -1,0 +1,57 @@
+
+final_prompt: |
+  {instruction}
+  {few_shot_examples}
+
+  {answer_format}
+
+ans_delimiter_instruction: ""
+
+eval_prompt: |
+  {instruction}
+
+  [Question] {question}
+  [Answer]
+
+system_prompt: You are a helpful assistant that critiques and edits task instructions.
+
+quest_reason_ans: |
+
+  [Question] {question}
+  [Answer] {answer}
+
+gradient_template: |
+  I'm trying to write a zero-shot instruction that will help the most capable and
+  suitable agent to solve the task.
+
+  My current instruction is:
+  {instruction}
+
+  But this instruction gets the following examples wrong:
+  {errors}
+
+  Give a concise, specific diagnosis of what is wrong with the current
+  instruction that would cause it to get these examples wrong. Do not propose
+  a fix yet, only diagnose the failure.
+
+edit_template: |
+  I'm trying to write a zero-shot instruction that will help the most capable and
+  suitable agent to solve the task.
+
+  My current instruction is:
+  {instruction}
+
+  Based on this feedback on why the instruction produces wrong answers:
+  {gradient}
+
+  Write {num_edits} new, improved instructions that fix the problem described in
+  the feedback. Each instruction should be wrapped between <START> and <END> tags,
+  one pair per instruction.
+
+paraphrase_template: |
+  Generate a variation of the following instruction while keeping the semantic
+  meaning.
+
+  Input: {instruction}
+
+  Wrap the new instruction between <START> and <END> tags.

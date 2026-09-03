@@ -7,6 +7,10 @@ from .techniques.critique_n_refine.base_classes import CritiqueNRefineParams, \
     CritiqueNRefinePromptPool
 from .techniques.heuristic.core_logic import Heuristic
 from .techniques.heuristic.base_classes import HeuristicParams, HeuristicPromptPool
+from .techniques.ape.core_logic import APE
+from .techniques.ape.base_classes import APEParams, APEPromptPool
+from .techniques.protegi.core_logic import ProTeGi
+from .techniques.protegi.base_classes import ProTeGiParams, ProTeGiPromptPool
 
 
 def get_promptopt_class(prompt_technique_name: str) -> tuple[Type[PromptOptimizer], Type[PromptOptimizationParams], Type[PromptPool]]:
@@ -21,6 +25,10 @@ def get_promptopt_class(prompt_technique_name: str) -> tuple[Type[PromptOptimize
         return CritiqueNRefine, CritiqueNRefineParams, CritiqueNRefinePromptPool
     elif prompt_technique_name == SupportedPromptOpt.HEURISTIC.value:
         return Heuristic, HeuristicParams, HeuristicPromptPool
+    elif prompt_technique_name == SupportedPromptOpt.APE.value:
+        return APE, APEParams, APEPromptPool
+    elif prompt_technique_name == SupportedPromptOpt.PROTEGI.value:
+        return ProTeGi, ProTeGiParams, ProTeGiPromptPool
     else:
         raise GlueValidaionException(f"Value provided for `prompt_technique_name` field in config yaml of "
                                      f"prompt manager is `{prompt_technique_name}`, which is not a valid name for "

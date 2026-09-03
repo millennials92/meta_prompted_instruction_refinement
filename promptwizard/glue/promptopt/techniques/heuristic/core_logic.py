@@ -1,6 +1,6 @@
 import re
 from os.path import join
-from typing import List
+from typing import Any, List
 
 from ....paramlogger import ParamLogger
 from ....paramlogger.constants import LogLiterals
@@ -180,3 +180,26 @@ class Heuristic(PromptOptimizer, UniversalBaseClass):
         return {self.EvalLiterals.IS_CORRECT: is_correct,
                 self.EvalLiterals.PREDICTED_ANS: predicted_ans,
                 self.EvalLiterals.LLM_OUTPUT: llm_output}
+
+    def get_best_prompt(self, params: PromptOptimizationParams, current_prompt: str = None, **kwargs) -> (str, Any):
+        """
+        Satisfies the PromptOptimizer interface (get_best_prompt is abstract there,
+        so without this override Heuristic cannot even be instantiated). MPIR's
+        documented entry point is GluePromptOpt.improve_prompt(current_prompt),
+        which calls improve_prompt_with_score_check() directly and does not go
+        through this method. This wrapper is for any caller that wants a single
+        get_best_prompt(params, current_prompt=...) call instead.
+
+        :param current_prompt: The upstream APO technique's output (PromptWizard /
+            APE / ProTeGi) that MPIR refines. Required -- MPIR refines an existing
+            prompt rather than searching from a task description alone.
+        :return: (best_prompt, expert_profile)
+        """
+        if current_prompt is None:
+            raise ValueError(
+                "Heuristic.get_best_prompt requires current_prompt (the upstream "
+                "APO technique's output to refine). Use "
+                "GluePromptOpt.improve_prompt(current_prompt) for the documented "
+                "MPIR workflow instead.")
+        best_prompt = self.improve_prompt_with_score_check(current_prompt, params)
+        return best_prompt, self.prompt_pool.system_prompt

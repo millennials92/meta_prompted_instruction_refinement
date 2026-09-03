@@ -1,0 +1,37 @@
+
+final_prompt: |
+  {instruction}
+  {few_shot_examples}
+
+  {answer_format}
+
+ans_delimiter_instruction: ""
+
+eval_prompt: |
+  {instruction}
+
+  [Question] {question}
+  [Answer]
+
+system_prompt: You are a helpful assistant that infers precise task instructions from examples.
+
+quest_reason_ans: |
+
+  [Question] {question}
+  [Answer] {answer}
+
+forward_gen_template: |
+  I gave a friend an instruction. Based on the instruction they produced the following
+  input-output pairs:
+
+  {demos}
+
+  What was the instruction I gave? Wrap your best guess at the instruction between
+  <START> and <END> tags.
+
+resample_template: |
+  Generate a variation of the following instruction while keeping the semantic meaning.
+
+  Input: {instruction}
+
+  Wrap the new instruction between <START> and <END> tags.

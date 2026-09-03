@@ -1,0 +1,26 @@
+
+############################ ProTeGi Start ############################
+prompt_technique_name: "protegi"
+# Description of task. This will be fed to prompt.
+task_description: 'Answer the given question correctly.'
+# Starting instruction that beam search refines.
+base_instruction: "Let's think step by step."
+# Instruction for specifying answer format
+answer_format: 'Wrap the final answer between <ANS_START> and <ANS_END>'
+# Number of samples from dataset, set aside as training data.
+seen_set_size: 25
+# Number of examples to be given for few shots
+few_shot_count: 0
+# Size of the minibatch run against a candidate to surface errors
+minibatch_size: 5
+# Number of edited candidates requested per textual gradient
+num_edits_per_gradient: 2
+# Number of paraphrases generated per edited candidate
+num_paraphrases_per_edit: 1
+# Size of the minibatch used to score every candidate before pruning the beam
+eval_batch_size: 8
+# Number of candidates retained across rounds (beam width)
+beam_width: 3
+# Number of gradient-descent-like rounds (expand + score + prune)
+num_steps: 3
+############################ ProTeGi End ############################

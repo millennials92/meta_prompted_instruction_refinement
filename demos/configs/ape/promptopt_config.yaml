@@ -1,0 +1,26 @@
+
+############################ APE Start ############################
+prompt_technique_name: "ape"
+# Description of task. This will be fed to prompt.
+task_description: 'Answer the given question correctly.'
+# Optional seed instruction, appended to the induced candidate pool as-is.
+base_instruction: "Let's think step by step."
+# Instruction for specifying answer format
+answer_format: 'Wrap the final answer between <ANS_START> and <ANS_END>'
+# Number of samples from dataset, set aside as training data.
+seen_set_size: 25
+# Number of examples to be given for few shots
+few_shot_count: 0
+# Number of input-output demonstrations shown per forward-generation call
+num_demos_per_prompt: 5
+# Number of candidate instructions to induce via forward generation
+num_candidates: 10
+# Size of the minibatch used to score each candidate by execution accuracy
+num_scoring_examples: 5
+# Number of iterative Monte Carlo search rounds
+iterations: 2
+# Number of resampled (paraphrased) candidates per retained candidate, per iteration
+num_resamples_per_candidate: 3
+# Number of top-scoring candidates retained for resampling each iteration
+top_n: 3
+############################ APE End ############################
