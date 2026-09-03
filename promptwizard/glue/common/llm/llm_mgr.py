@@ -32,10 +32,33 @@ def call_gemini_api(messages, model_name):
     return response.text
 
 
-def call_api(messages, model_name=None):
+def call_local_api(messages, model_name=None, seed=None):
+    from openai import OpenAI
+
+    client = OpenAI(
+        base_url=os.environ["LOCAL_OPENAI_BASE_URL"],
+        api_key="EMPTY",
+    )
+    model = model_name or os.environ["LOCAL_MODEL_NAME"]
+    kwargs = {}
+    if seed is not None:
+        kwargs["seed"] = seed
+    response = client.chat.completions.create(
+        model=model,
+        messages=messages,
+        temperature=0.0,
+        **kwargs,
+    )
+    return response.choices[0].message.content
+
+
+def call_api(messages, model_name=None, seed=None):
     from openai import OpenAI
     from azure.identity import get_bearer_token_provider, AzureCliCredential
     from openai import AzureOpenAI
+
+    if os.environ.get("LOCAL_OPENAI_BASE_URL"):
+        return call_local_api(messages, model_name=model_name, seed=seed)
 
     if model_name and model_name.startswith("gemini"):
         return call_gemini_api(messages, model_name)
@@ -70,12 +93,12 @@ def call_api(messages, model_name=None):
 
 class LLMMgr:
     @staticmethod
-    def chat_completion(messages: Dict, model_name: str = None):
+    def chat_completion(messages: Dict, model_name: str = None, seed: int = None):
         llm_handle = os.environ.get("MODEL_TYPE", "AzureOpenAI")
         try:
-            if(llm_handle == "AzureOpenAI"): 
+            if(llm_handle == "AzureOpenAI"):
                 # Code to for calling LLMs
-                return call_api(messages, model_name=model_name)
+                return call_api(messages, model_name=model_name, seed=seed)
             elif(llm_handle == "LLamaAML"):
                 # Code to for calling SLMs
                 return 0

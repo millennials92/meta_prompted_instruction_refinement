@@ -1,4 +1,7 @@
+from os import makedirs
 from os.path import dirname, join
+import hashlib
+import json
 import pickle
 import time
 from typing import Any
@@ -38,7 +41,8 @@ class GluePromptOpt:
                  dataset_jsonl: str,
                  data_processor: DatasetSpecificProcessing,
                  dataset_processor_pkl_path: str = None,
-                 prompt_pool_path: str = None):
+                 prompt_pool_path: str = None,
+                 validation_dataset_jsonl: str = None):
         """
         Collates all the configs present in different yaml files. Initialize logger, de-serialize pickle file that has
         class/method for dataset processing (for given dataset).
@@ -46,12 +50,18 @@ class GluePromptOpt:
         :param llm_config_path: Path to yaml file that has LLM related configs.
         :param prompt_config_path: Path to yaml file that has prompt templates for the given techniques.
         :param setup_config_path: Path to yaml file that has user preferences.
-        :param dataset_jsonl: Path to jsonl file that has dataset present in jsonl format.
+        :param dataset_jsonl: Path to jsonl file that has dataset present in jsonl format. Used as the
+        optimizer's own training set.
         :param data_processor: object of DatasetSpecificProcessing class, which has data handling methods which are
         specific to that dataset
         :param dataset_processor_pkl_path: Path to pickle file that has object of class DatasetSpecificProcessing
                                            serialized.
         :param prompt_pool_path: Path to yaml file that has prompts
+        :param validation_dataset_jsonl: Path to jsonl file with a dataset disjoint from dataset_jsonl. When
+        given, the technique is constructed against this set instead of the training set -- required for
+        techniques (e.g. MPIR/heuristic) that score candidates on held-out data rather than on the
+        optimizer's own training examples. When omitted, the technique falls back to dataset_jsonl, matching
+        prior behavior.
         """
         if dataset_jsonl != None:
             if data_processor:
@@ -105,7 +115,12 @@ class GluePromptOpt:
         # This iolog is going to be used when doing complete evaluation over test-dataset
         self.iolog.reset_eval_glue(join(base_path, "evaluation"))
 
-        self.prompt_opt = prompt_opt_cls(training_dataset, base_path, self.setup_config,
+        if validation_dataset_jsonl is not None:
+            technique_dataset = read_jsonl(validation_dataset_jsonl)
+        else:
+            technique_dataset = training_dataset
+
+        self.prompt_opt = prompt_opt_cls(technique_dataset, base_path, self.setup_config,
                                          self.prompt_pool, self.data_processor, self.logger)
 
     def get_best_prompt(self,use_examples=False,run_without_train_examples=False,generate_synthetic_examples=False,resolve_tie_criteria="max") -> (str, Any):
@@ -121,11 +136,23 @@ class GluePromptOpt:
         self.logger.info(f"Time taken to find best prompt: {(time.time() - start_time)} sec")
         return self.BEST_PROMPT, self.EXPERT_PROFILE
 
-    def evaluate(self, test_dataset_jsonl: str) -> float:
+    def evaluate(self, test_dataset_jsonl: str, task_name: str = None, condition_name: str = None,
+                 seed: int = None, predictions_dir: str = "results/predictions") -> float:
         """
         Evaluate the performance of self.BEST_PROMPT over test dataset. Return the accuracy.
 
+        Besides the existing per-run iolog dump (under the gitignored logs/ dir), this writes one
+        tracked JSONL file per (task_name, condition_name, seed) under predictions_dir -- one row per
+        example with the fields needed to recompute any reported number and to run example-level
+        paired significance tests. task_name/condition_name/seed are optional so ad-hoc calls (e.g. a
+        single demo run without a grid identity) keep working; they should be supplied for anything
+        feeding into REBUILD.md's analysis.
+
         :param test_dataset_jsonl: Path to jsonl file that has test dataset
+        :param task_name: BBH task group this run belongs to (e.g. "hyperbaton").
+        :param condition_name: Grid condition identity (e.g. "protegi_mpir").
+        :param seed: Seed used for this run, if the condition is seeded.
+        :param predictions_dir: Tracked directory to write the per-example JSONL into.
         :return: Percentage accuracy
         """
 
@@ -136,21 +163,44 @@ class GluePromptOpt:
                               "either manually or by calling get_best_prompt() method.")
             return
 
+        prompt_hash = hashlib.sha256(self.BEST_PROMPT.encode("utf-8")).hexdigest()[:16]
+
+        makedirs(predictions_dir, exist_ok=True)
+        predictions_file_name = "_".join(str(part) for part in
+                                          [task_name, condition_name, seed] if part is not None) \
+            or f"eval_result_{self.setup_config.experiment_name}"
+        predictions_path = join(predictions_dir, f"{predictions_file_name}.jsonl")
+
         total_correct = 0
         total_count = 0
-        for json_obj in read_jsonl_row(test_dataset_jsonl):
-            answer = self.predict_and_access(json_obj[DatasetSpecificProcessing.QUESTION_LITERAL],
-                                             json_obj[DatasetSpecificProcessing.FINAL_ANSWER_LITERAL])
-      
-            total_correct += answer[self.EvalLiterals.IS_CORRECT]
-            total_count += 1
-            result = {"accuracy": f"{total_correct}/{total_count} : {total_correct/total_count*100.0}%",
-                      "predicted": answer[self.EvalLiterals.PREDICTED_ANS],
-                      "actual": json_obj[DatasetSpecificProcessing.FINAL_ANSWER_LITERAL],
-                      "llm_output": answer[self.EvalLiterals.LLM_OUTPUT],
-                      "question": json_obj[DatasetSpecificProcessing.QUESTION_LITERAL],}
-            self.iolog.append_dict_to_chained_logs(result)
-            self.logger.info(result)
+        with open(predictions_path, "w", encoding="utf-8") as predictions_file:
+            for example_index, json_obj in enumerate(read_jsonl_row(test_dataset_jsonl)):
+                answer = self.predict_and_access(json_obj[DatasetSpecificProcessing.QUESTION_LITERAL],
+                                                 json_obj[DatasetSpecificProcessing.FINAL_ANSWER_LITERAL])
+
+                total_correct += answer[self.EvalLiterals.IS_CORRECT]
+                total_count += 1
+                result = {"accuracy": f"{total_correct}/{total_count} : {total_correct/total_count*100.0}%",
+                          "predicted": answer[self.EvalLiterals.PREDICTED_ANS],
+                          "actual": json_obj[DatasetSpecificProcessing.FINAL_ANSWER_LITERAL],
+                          "llm_output": answer[self.EvalLiterals.LLM_OUTPUT],
+                          "question": json_obj[DatasetSpecificProcessing.QUESTION_LITERAL],}
+                self.iolog.append_dict_to_chained_logs(result)
+                self.logger.info(result)
+
+                prediction_row = {
+                    "task": task_name,
+                    "condition": condition_name,
+                    "seed": seed,
+                    "example_index": example_index,
+                    "prompt_hash": prompt_hash,
+                    "question": json_obj[DatasetSpecificProcessing.QUESTION_LITERAL],
+                    "llm_output": answer[self.EvalLiterals.LLM_OUTPUT],
+                    "predicted": answer[self.EvalLiterals.PREDICTED_ANS],
+                    "actual": json_obj[DatasetSpecificProcessing.FINAL_ANSWER_LITERAL],
+                    "is_correct": bool(answer[self.EvalLiterals.IS_CORRECT]),
+                }
+                predictions_file.write(json.dumps(prediction_row) + "\n")
 
         self.iolog.dump_chained_log_to_file(file_name=f"eval_result_{self.setup_config.experiment_name}")
         self.logger.info(f"Time taken for evaluation: {(time.time() - start_time)} sec")

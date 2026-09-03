@@ -21,10 +21,6 @@ class Heuristic(PromptOptimizer, UniversalBaseClass):
 
     TECHNIQUE_NAME = SupportedPromptOpt.HEURISTIC.value
 
-    # Model used for the meta-prompting stages (rubric evaluation and refinement),
-    # kept distinct from the target LLM used during validation.
-    META_MODEL_NAME = "gpt-4o"
-
     class EvalLiterals:
         IS_CORRECT = "is_correct"
         PREDICTED_ANS = "predicted_ans"
@@ -47,17 +43,18 @@ class Heuristic(PromptOptimizer, UniversalBaseClass):
                  meta_model_name: str = None, target_model_name: str = None):
         """
         :param meta_model_name: Model used for the meta-prompting stages (evaluation and refinement).
-            Defaults to META_MODEL_NAME (gpt-4o) when not given, matching the paper's primary experiments.
+            Defaults to None, which falls through to LLMMgr's own default resolution (the local
+            endpoint's LOCAL_MODEL_NAME, or OPENAI_MODEL_NAME for closed-model runs).
         :param target_model_name: Model used to answer validation questions (the "target" model whose
-            accuracy is being optimized). Defaults to None, which falls through to LLMMgr's own default
-            (OPENAI_MODEL_NAME), matching the paper's primary experiments.
+            accuracy is being optimized). Defaults to None, which falls through to LLMMgr's own default,
+            same resolution as meta_model_name.
         """
         self.dataset = dataset
         self.setup_config = setup_config
         self.data_processor = data_processor
         self.logger = logger
         self.prompt_pool = prompt_pool
-        self.meta_model_name = meta_model_name or self.META_MODEL_NAME
+        self.meta_model_name = meta_model_name
         self.target_model_name = target_model_name
         base_path = join(base_path, LogLiterals.DIR_NAME)
         self.iolog.reset_eval_glue(base_path)
