@@ -488,5 +488,55 @@ single-seed pilot):**
   instance -- a performance nit, not a correctness issue, across what will be a large
   number of calls in the full grid.
 
-**Still unstarted:** environment/vLLM serving setup on the GPU machine, the §4.0
-go/no-go pilot, the full grid, and all manuscript surgery in §6.
+### 2026-09-03 — Pilot scaffolding: manual baseline conditions + missing task configs
+
+Model decision for the §4.0 pilot: **Qwen/Qwen3-1.7B**, serving as target, optimizer,
+and judge simultaneously (per §4's design). This machine's GPU (RTX 5000 Ada, 16GB) is
+the serving target.
+
+Before this, only PromptWizard/APE/ProTeGi/MPIR had runnable notebooks — three of the
+nine §4.1 grid conditions (Zero-shot CoT, Expert few-shot CoT, Free rewrite) had no
+code at all, and `demos/configs/promptwizard/` was missing task-specific configs for
+two of the three §4.0 gate tasks (`hyperbaton`, `penguins_in_a_table` — only
+`ruin_names` existed). Added:
+
+- `demos/configs/promptwizard/promptopt_config_hyperbaton.yaml` and
+  `..._penguins_in_a_table.yaml`, mirroring the existing `ruin_names` config's
+  hyperparameters with each task's own `task_description`.
+- `demos/cot_prompts.py`: extracts the BBH authors' own one-line task description and
+  full three-exemplar chain-of-thought prefix directly from
+  `BIG-Bench-Hard/cot-prompts/<task>.txt` (stripping the canary/separator header), so
+  Zero-shot CoT and Expert few-shot CoT share the same authoritative task framing
+  instead of a hand-duplicated description.
+- `demos/baselines.ipynb`: runs all three manual conditions for one task/seed.
+  `GluePromptOpt` is constructed with the heuristic (MPIR) config purely as a
+  lightweight vehicle for `evaluate()`'s logging and `data_processor`/`setup_config`
+  plumbing -- no optimizer search runs; `BEST_PROMPT` is set directly per condition,
+  each formatted through the framework's own `final_prompt` template (so
+  `answer_format` is threaded consistently with every other condition).
+  - **Free rewrite**'s exact methodology was never specified anywhere reproducible
+    (this baseline is part of §2.0's "no source in the repo" defect) — operationalized
+    here as: load the same PromptWizard-optimized prompt MPIR refines
+    (`results/promptwizard_<task>_seed<seed>.pkl`), ask the pilot model once to improve
+    it with no rubric/criteria, evaluate the result. Matches HANDOFF-GPU.md §6.4's
+    description of the control's *purpose* (isolate MPIR's structured rubric from
+    generic rewriting ability) but is a new operationalization, not a recovered one --
+    flagged here so it isn't mistaken for a verified detail.
+- Verified end-to-end against the **real** hyperbaton BBH data and real cot-prompts
+  file (only the LLM call itself mocked): task description extraction, delimiter-format
+  threading, answer extraction, and `results/predictions/*.jsonl` provenance all
+  confirmed correct for all three conditions.
+
+**Still open before the §4.0 pilot can execute:**
+- `vllm` is not installed in the `py313` environment yet.
+- No `.env` exists yet with `LOCAL_OPENAI_BASE_URL` / `LOCAL_MODEL_NAME` pointed at a
+  served Qwen3-1.7B instance.
+- Two pre-existing, now-superseded files remain tracked from before the seed-scoped
+  split fix: `demos/data/hyperbaton/train.jsonl` and `test.jsonl` (the old, un-seeded
+  naming scheme). Nothing reads them any more; left in place rather than deleted
+  without being asked, but worth cleaning up.
+
+**Still unstarted:** vLLM serving setup on the GPU machine, the §4.0
+go/no-go pilot itself (executing all nine conditions × three tasks against Qwen3-1.7B
+and checking the reported deltas reproduce), the full grid, and all manuscript surgery
+in §6.
