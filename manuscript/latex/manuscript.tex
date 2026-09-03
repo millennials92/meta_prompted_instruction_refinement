@@ -110,35 +110,35 @@ A closely related recent approach applies the same two-stage pattern---run a sea
 
 Since the meta-prompting and heuristic-guided methods above were introduced, prompt optimization has fragmented into more elaborate directions: evolutionary search with natural-language reflection, shown to outperform reinforcement-learning-based optimization with far fewer rollouts \citep{agrawal2026}; reinforcement learning directly over edit actions \citep{lin2025}; multi-agent debate and tournament-style Elo ratings as richer fitness functions than single-judge scoring \citep{nair2025}; explicit error taxonomies that guide refinement top-down rather than through a fixed checklist \citep{singh2026}; and prompt format, not just content, as its own optimization axis \citep{liu2025}. A recent survey frames the area through an optimization-theoretic lens \citep{li2025}, and there is growing interest in learned or instance-adaptive rubrics that replace fixed, human-authored criteria such as MPIR's seven. Relative to this frontier, MPIR's rubric is not the most sophisticated available mechanism; its contribution is instead that a small, interpretable, model-agnostic, and inexpensive post-hoc layer captures a meaningful share of the benefit these heavier methods pursue, without their training, search infrastructure, or per-task tuning cost---a different point on the cost-versus-sophistication trade-off, not a claim to surpass it.
 
-Table 1 summarizes where MPIR sits relative to the methods discussed above, along five dimensions that recur throughout this section: whether the method is guided by an explicit, human-authored rubric rather than a learned or implicit one; whether it is agnostic to the specific APO method or model it is paired with, rather than being a self-contained optimizer; whether it requires no additional training or fine-tuning; whether it retains empirical, held-out validation as part of candidate selection rather than relying on the judge's score alone; and whether it supports multiple iterative rounds rather than a single pass.
+Table 1 summarizes where MPIR sits relative to the methods discussed above, keyed on mechanism rather than a checklist of binary properties: how each method proposes new candidate prompts, how it decides which candidate survives, and whether it is a self-contained optimizer or a layer designed to sit on top of an arbitrary upstream APO output.
 
 \begin{table}[htbp]
 \centering
 \small
-\caption{Positioning of MPIR relative to representative prompt-optimization and refinement methods.}
+\caption{Mechanism comparison of MPIR against representative prompt-optimization and refinement methods.}
 \resizebox{\linewidth}{!}{%
-\begin{tabular}{lccccc}
+\begin{tabular}{lccc}
 \toprule
-\textbf{Method} & \textbf{Explicit rubric} & \textbf{APO-agnostic layer} & \textbf{Training-free} & \textbf{Held-out validation} & \textbf{Multi-round} \\
+\textbf{Method} & \textbf{Candidate generation} & \textbf{Selection mechanism} & \textbf{Relation to upstream APO} \\
 \midrule
-APE ‹19› & No & No & Yes & Yes & Yes \\
-ProTeGi ‹20› & No & No & Yes & Yes & Yes \\
-EvoPrompt ‹21› & No & No & Yes & Yes & Yes \\
-OPRO ‹22› & No & No & Yes & Yes & Yes \\
-PromptWizard ‹23› & Partial & No & Yes & Yes & Yes \\
-PE2 ‹24› & Partial & No & Yes & Yes & Yes \\
-PROPEL ‹26› & Yes & No & Yes & No & No \\
-ETGPO ‹60› & No & No & Yes & Partial & Yes \\
-CFPO ‹61› & No & No & Yes & Yes & Yes \\
-GEPA ‹59› & No & No & Yes & Yes & Yes \\
-DEEVO ‹62› & No & No & Yes & Partial & Yes \\
-MPIR (this work) & Yes & Yes & Yes & Yes & Yes \\
+APE ‹19› & Program synthesis over input-output demonstrations & Execution accuracy on a scoring set & Self-contained optimizer \\
+ProTeGi ‹20› & LLM-diagnosed textual critique, treated as a gradient proxy, then edited & Beam search over minibatch accuracy & Self-contained optimizer \\
+EvoPrompt ‹21› & Genetic crossover and mutation over prompt strings & Fitness-based selection each generation & Self-contained optimizer \\
+OPRO ‹22› & LLM proposes the next candidate conditioned on a running score history & Best-of-trajectory so far & Self-contained optimizer \\
+PromptWizard ‹23› & Critique-based feedback with sequential instruction/example re-optimization & Scoring against sampled training batches & Self-contained optimizer \\
+PE2 ‹24› & Two-step structured template: diagnose via checklist, then propose an edit & Held-out scoring within one end-to-end pipeline & Self-contained optimizer \\
+PROPEL ‹26› & Curated expert-derived principles injected as priors during one pass & Implicit in the priors; no separate validation stage & Self-contained optimizer \\
+ETGPO ‹60› & Refinement guided top-down by an explicit error taxonomy & Validated within its own search loop, not a held-out set & Self-contained optimizer \\
+CFPO ‹61› & Joint search over prompt content and prompt format & As reported in the source study & Self-contained optimizer \\
+GEPA ‹59› & Evolutionary search combined with natural-language reflection & Reflection-guided selection across generations & Self-contained optimizer \\
+DEEVO ‹62› & Multi-agent debate producing candidate edits & Tournament-style Elo rating & Self-contained optimizer \\
+MPIR (this work) & Meta-prompted refinement guided by a fixed seven-criterion rubric & Empirical accuracy on a held-out validation set across N rounds & Post-hoc layer on any upstream APO output \\
 \bottomrule
 \end{tabular}
 }
 \end{table}
 
-No prior method combines all five properties. PROPEL is rubric-guided but bakes its principles into a single pass without a separate validation stage; ETGPO organizes refinement around failure categories rather than a fixed rubric, and validates only within its own search loop rather than against a truly held-out set; and the remaining methods are self-contained optimizers rather than layers designed to sit on top of an arbitrary upstream APO output. MPIR's position in this table is also its main limitation: an explicit, model-agnostic, iteratively validated rubric is a simpler mechanism than reflective evolution or reinforcement learning over edits, and Section 5 shows this simplicity comes with a correspondingly modest effect size.
+The comparison surfaces two things a checklist table would flatten. First, MPIR's rubric is a fixed, human-authored checklist evaluated by meta-prompting, not a search operator of its own---every other method in the table generates and selects candidates through some form of search (genetic, gradient-proxy, trajectory-conditioned, or debate-based); MPIR instead adds one more evaluation-refinement-validation cycle on top of whatever search an upstream method already ran. Second, only MPIR is explicitly designed to be agnostic to which upstream method produced the prompt it refines: PROPEL and PE2 both incorporate structured, heuristic-informed refinement, but as an integrated part of their own single-pass or single-pipeline search rather than as a separable stage that could sit on top of a different optimizer's output. This positioning is also MPIR's main limitation, not just its contribution: a fixed rubric evaluated by meta-prompting is mechanically simpler than reflective evolution, gradient-proxy search, or reinforcement learning over edits, and Section 5 shows this simplicity comes with a correspondingly modest effect size.
 
 The literature reveals a persistent tension: manual prompting offers interpretability and effectiveness but does not scale, while automatic optimization offers efficiency and scalability but often neglects heuristic grounding. Emerging meta-prompting methods attempt to bridge this divide but lack systematic integration and principled evaluation. MPIR is designed to close this gap by formalizing manual heuristics into explicit rubrics, applying them as an independent stage of the optimization pipeline after an APO prompt has already been produced, and validating the resulting prompt's effectiveness on held-out data---combining human insight with automated scalability.
 
