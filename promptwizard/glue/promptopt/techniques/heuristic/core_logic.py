@@ -164,40 +164,58 @@ class Heuristic(PromptOptimizer, UniversalBaseClass):
         self.logger.info(f"Refined prompt: {final_improved_prompt}")
         return final_improved_prompt
 
+    def _score_prompt(self, prompt: str) -> float:
+        """Validation accuracy of `prompt` over self.dataset."""
+        num_correct = 0
+        for example in self.dataset:
+            question = example[DatasetSpecificProcessing.QUESTION_LITERAL]
+            actual_answer = example[DatasetSpecificProcessing.FINAL_ANSWER_LITERAL]
+            result = self.validate_llm_answer(prompt, question, actual_answer)
+            if result[self.EvalLiterals.IS_CORRECT]:
+                num_correct += 1
+        return num_correct / len(self.dataset) if self.dataset else 0.0
+
     def improve_prompt_with_score_check(self, initial_prompt: str, params: PromptOptimizationParams) -> str:
         """
         Runs improve_prompt() for params.validation_round rounds, scores each
         refined candidate on the held-out dataset via validate_llm_answer(), and
-        returns the best-scoring candidate across all rounds.
+        returns the best-scoring candidate across all rounds -- but only if it
+        beats the pre-refinement prompt's own score.
 
         :param initial_prompt: The original prompt to optimize.
         :param params: Parameters controlling the optimization process.
         :return: The best-performing prompt discovered.
         :rtype: str
         """
+        # Baseline: score initial_prompt itself before any refinement. Without
+        # this, best_score started at float('-inf'), so round 1's candidate
+        # always "won" regardless of how it scored -- confirmed live, where a
+        # weaker local meta-model produced a well-formed <START>/<END>
+        # candidate that was itself just echoed meta-prompting scaffolding
+        # (this time APE's own "I gave a friend an instruction..." induction
+        # template, not caught by improve_prompt()'s marker-based contamination
+        # check, which only knows this technique's own template strings) and
+        # every validation call against it scored 0.0 -- yet it was accepted
+        # as "the best prompt" since -inf < 0.0. Scoring the baseline and
+        # requiring strict improvement over it is a general safety net that
+        # doesn't depend on recognizing any particular contamination pattern.
+        baseline_score = self._score_prompt(initial_prompt)
+        self.logger.info(f"Baseline score (pre-refinement prompt): {baseline_score:.2f}")
+
         best_prompt = initial_prompt
-        best_score = float('-inf')
+        best_score = baseline_score
 
         for attempt in range(params.validation_round):
             self.conversation_history = []
             improved_prompt = self.improve_prompt(initial_prompt, params)
-
-            num_correct = 0
-            for example in self.dataset:
-                question = example[DatasetSpecificProcessing.QUESTION_LITERAL]
-                actual_answer = example[DatasetSpecificProcessing.FINAL_ANSWER_LITERAL]
-                result = self.validate_llm_answer(improved_prompt, question, actual_answer)
-                if result[self.EvalLiterals.IS_CORRECT]:
-                    num_correct += 1
-
-            score = num_correct / len(self.dataset) if self.dataset else 0.0
+            score = self._score_prompt(improved_prompt)
             self.logger.info(f"Attempt {attempt + 1}: Scored Improved Prompt = {score:.2f}")
 
             if score > best_score:
                 best_score = score
                 best_prompt = improved_prompt
 
-        self.logger.info(f"Best score achieved: {best_score:.2f}")
+        self.logger.info(f"Best score achieved: {best_score:.2f} (baseline was {baseline_score:.2f})")
         return best_prompt
 
     def validate_llm_answer(self, current_prompt: str, question: str, gt_answer: str) -> dict:
