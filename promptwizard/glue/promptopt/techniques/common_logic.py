@@ -67,9 +67,14 @@ class DatasetSpecificProcessing(ABC):
         :param gt_answer: The expected ground truth answer
         """
 
-        predicted_answer = self.extract_final_answer(llm_output)
+        # .strip() matters: models routinely wrap the answer with incidental
+        # whitespace/newlines inside delimiter tags (e.g. Qwen3 producing
+        # "<ANS_START>\n4\n<ANS_END>") -- without stripping, exact-match
+        # comparison silently marks every such answer wrong regardless of
+        # correctness.
+        predicted_answer = self.extract_final_answer(llm_output).strip()
         is_correct = False
-        if predicted_answer and (predicted_answer.lower() == gt_answer.lower()):
+        if predicted_answer and (predicted_answer.lower() == gt_answer.strip().lower()):
             is_correct = True
 
         return is_correct, predicted_answer

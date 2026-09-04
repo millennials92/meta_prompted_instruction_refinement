@@ -43,6 +43,16 @@ def call_local_api(messages, model_name=None, seed=None):
     kwargs = {}
     if seed is not None:
         kwargs["seed"] = seed
+    # Reasoning models (e.g. Qwen3) emit a long <think>...</think> trace before
+    # the answer unless told not to -- observed to add ~200+ tokens even for a
+    # trivial "2+2" prompt. Disabled by default: it multiplies latency across
+    # thousands of calls, and the original methodology's target model
+    # (GPT-3.5-turbo) was non-reasoning, so keeping this off is also the more
+    # comparable choice. Set LOCAL_MODEL_ENABLE_THINKING=true to re-enable
+    # (e.g. to test whether reasoning changes MPIR's meta-prompting quality).
+    # vLLM-specific extension, silently ignored by servers that don't support it.
+    if os.environ.get("LOCAL_MODEL_ENABLE_THINKING", "false").lower() != "true":
+        kwargs["extra_body"] = {"chat_template_kwargs": {"enable_thinking": False}}
     response = client.chat.completions.create(
         model=model,
         messages=messages,

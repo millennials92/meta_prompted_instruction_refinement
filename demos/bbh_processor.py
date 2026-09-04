@@ -81,13 +81,19 @@ class BBH(DatasetSpecificProcessing):
         save_jsonlist(dataset_jsonl, examples_set, "w")
 
     def extract_final_answer(self, answer: str):
-        return extract_between(text=answer, start="<ANS_START>", end="<ANS_END>")
+        # .strip() matters: models routinely wrap the answer with incidental
+        # whitespace/newlines inside the delimiter tags (observed with Qwen3,
+        # e.g. "<ANS_START>\n4\n<ANS_END>") -- without stripping, exact-match
+        # comparison silently marks every such answer wrong regardless of
+        # correctness, deflating every condition's measured accuracy uniformly
+        # and invisibly. Found while validating against a live model server.
+        return extract_between(text=answer, start="<ANS_START>", end="<ANS_END>").strip()
 
     def access_answer(self, llm_output: str, gt_answer: str):
         predicted_answer = self.extract_final_answer(llm_output)
         if LLM_AS_JUDGE_EVAL:
             is_correct = llm_eval(predicted_answer, gt_answer)
         else:
-            is_correct = bool(predicted_answer) and predicted_answer.lower() == gt_answer.lower()
+            is_correct = bool(predicted_answer) and predicted_answer.lower() == gt_answer.strip().lower()
 
         return is_correct, predicted_answer
