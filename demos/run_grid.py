@@ -27,6 +27,15 @@ import traceback
 
 sys.path.insert(0, "../")
 
+from dotenv import load_dotenv
+# Explicit path, not the bare load_dotenv() the demo notebooks use: dotenv's
+# default discovery walks up from the calling file's location, which works
+# from a notebook running in demos/ but is fragile for a script that might be
+# invoked with a different cwd. Found the hard way -- the mocked smoke tests
+# never caught this gap because they patch LLMMgr.chat_completion directly,
+# bypassing the environment-variable-dependent call_api() entirely.
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"), override=True)
+
 from bbh_processor import BBH
 from cot_prompts import expert_few_shot_prefix, task_description as get_task_description
 from data_prep import prepare_bbh_task_split

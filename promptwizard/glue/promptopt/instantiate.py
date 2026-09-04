@@ -1,4 +1,4 @@
-from os import makedirs
+from os import makedirs, replace as os_replace
 from os.path import dirname, join
 import hashlib
 import json
@@ -181,10 +181,20 @@ class GluePromptOpt:
                                           [task_name, condition_name, seed] if part is not None) \
             or f"eval_result_{self.setup_config.experiment_name}"
         predictions_path = join(predictions_dir, f"{predictions_file_name}.jsonl")
+        # Written to a temp path and renamed into place only after the full
+        # loop completes -- a crash partway through (e.g. a call exhausting
+        # LLMMgr's retries) previously left an empty/partial file at
+        # predictions_path indistinguishable from a completed run, which a
+        # resumable caller's "does the output file exist" check (e.g.
+        # demos/run_grid.py) would then silently treat as done and skip
+        # forever. Found when a real grid run crashed on its very first call
+        # (a dotenv-loading bug in run_grid.py, since fixed) and left three
+        # empty *.jsonl files that would have been silently skipped on retry.
+        tmp_predictions_path = predictions_path + ".tmp"
 
         total_correct = 0
         total_count = 0
-        with open(predictions_path, "w", encoding="utf-8") as predictions_file:
+        with open(tmp_predictions_path, "w", encoding="utf-8") as predictions_file:
             for example_index, json_obj in enumerate(read_jsonl_row(test_dataset_jsonl)):
                 answer = self.predict_and_access(json_obj[DatasetSpecificProcessing.QUESTION_LITERAL],
                                                  json_obj[DatasetSpecificProcessing.FINAL_ANSWER_LITERAL])
@@ -212,6 +222,11 @@ class GluePromptOpt:
                     "is_correct": bool(answer[self.EvalLiterals.IS_CORRECT]),
                 }
                 predictions_file.write(json.dumps(prediction_row) + "\n")
+
+        # Only reached if the loop above completed without raising -- promote
+        # the temp file to its real name so it's now safe for a caller to
+        # treat predictions_path's existence as "this condition is done".
+        os_replace(tmp_predictions_path, predictions_path)
 
         self.iolog.dump_chained_log_to_file(file_name=f"eval_result_{self.setup_config.experiment_name}")
         self.logger.info(f"Time taken for evaluation: {(time.time() - start_time)} sec")
