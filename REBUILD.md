@@ -540,3 +540,86 @@ two of the three §4.0 gate tasks (`hyperbaton`, `penguins_in_a_table` — only
 go/no-go pilot itself (executing all nine conditions × three tasks against Qwen3-1.7B
 and checking the reported deltas reproduce), the full grid, and all manuscript surgery
 in §6.
+
+### 2026-09-05 — §4.0 pilot executed: NO-GO. Effect does not reproduce on Qwen3-1.7B.
+
+vLLM served on WSL2 (native Windows vLLM has no CUDA wheels), Qwen3-1.7B as target,
+optimizer and judge, thinking mode disabled. All 27 cells (9 conditions × 3 gate tasks:
+`hyperbaton`, `ruin_names`, `penguins_in_a_table`, seed 42) completed with 0 failures.
+
+**Six further real correctness bugs found live** (invisible to every mocked smoke test,
+each confirmed against actual model output before being fixed) — recorded in the detail
+this document exists to catch:
+
+1. Qwen3's `<think>...</think>` trace and verbose style needed `enable_thinking: false`
+   and an explicit `max_tokens` cap; without the latter, PromptWizard's long optimized
+   prompt left too little of a small `--max-model-len` for the response to reach its
+   answer tag, truncating mid-sentence and scoring 0/50.
+2. `access_answer` did exact string match; Qwen3 sometimes answers a bare letter (`A`)
+   against a `(A)`-formatted ground truth. Fixed with paren/whitespace-stripping
+   normalization (`bbh_processor.py`'s `_normalize_for_comparison`).
+3. `expert_few_shot_cot` scored exactly 0.0: the raw BBH exemplars end in unwrapped
+   prose, so a model told separately to "wrap the final answer" wrapped its *entire*
+   response. Fixed by appending a bare `<ANS_START>(X)<ANS_END>` tag after each
+   exemplar's concluding sentence (`cot_prompts.py`), matching the format the
+   manuscript's own Appendix A.3 already demonstrates.
+4. MPIR's `Heuristic.improve_prompt` crashed (`IndexError`) when the meta-model's
+   refinement response had no `<START>/<END>` wrapper at all — took down every
+   remaining condition for that task via `run_grid.py`'s per-task exception handling.
+   Fixed with an empty-match fallback that keeps the prompt unchanged for that round.
+5. Same method, a *worse* variant with no crash to flag it: a well-formed
+   `<START>/<END>` match whose wrapped content was the meta-model echoing its own
+   `prompt_evaluation` rubric-template scaffolding verbatim, with no answer-format
+   instruction — scored a whole condition exactly 0.0 silently. Fixed with a
+   marker-string rejection check, but recognized as whack-a-mole against specific
+   phrasings (see #6).
+6. **The real fix, generalizing #4/#5:** `improve_prompt_with_score_check` initialized
+   `best_score = float('-inf')`, so round 1's candidate always "won" regardless of
+   actual quality — the two fixes above only caught contamination patterns matching a
+   known string. Found live a *third* variant (the meta-model echoing APE's own
+   induction-template opener, "I gave a friend an instruction...") that neither marker
+   check recognized, scoring `hyperbaton/ape_mpir` exactly 0.0. Fixed properly: score
+   the pre-refinement prompt as a baseline and only accept a round's candidate if it
+   *strictly* beats that baseline — a general safety net independent of recognizing any
+   particular failure text.
+7. **Separately, a methodology bug (not a meta-model quality issue):** `run_grid.py`
+   evaluated every `<optimizer>_mpir` condition through `gp_mpir` (built from
+   `configs/heuristic/*`), silently swapping in Heuristic's own `eval_prompt` template
+   instead of the base optimizer's. APE's and ProTeGi's templates differ from
+   Heuristic's by trailing whitespace only (`"[Answer]"` vs `"[Answer] "`), but that's
+   enough to flip a greedy decode's next token — confirmed via direct, repeated
+   (5×, deterministic) API calls that the *same* rendered prompt reliably produces
+   different outputs depending on which template wrapped it. `hyperbaton/ape_mpir`
+   scored 0.07 through the wrong template on a prompt that is byte-identical to `ape`'s
+   own 0.515-scoring prompt. Fixed: `<optimizer>_mpir` is now evaluated through the
+   same `GluePromptOpt` instance as its base `<optimizer>` condition (only the
+   refinement step itself still uses `gp_mpir`). PromptWizard's own template happens to
+   be byte-identical to Heuristic's, so `promptwizard_mpir` results were never affected
+   by this specific bug.
+
+**Final pilot numbers** (`results/grid_summary.jsonl`, `results/pilot_analysis.json`,
+one seed, exact match, all six live bugs above fixed before the numbers below were
+accepted):
+
+| Task | promptwizard → +mpir | ape → +mpir | protegi → +mpir |
+|---|---|---|---|
+| hyperbaton | 0.580 → 0.580 | 0.515 → 0.520 | 0.170 → 0.170 |
+| ruin_names | 0.600 → 0.600 | 0.410 → 0.410 | 0.045 → 0.045 |
+| penguins_in_a_table | 0.698 → 0.698 | 0.177 → 0.167 | 0.021 → 0.021 |
+
+MPIR changed the base optimizer's accuracy in exactly 1 of 9 (task, optimizer) cells,
+by +0.005 (one example out of 200) — every other cell is unchanged to three decimal
+places, meaning `improve_prompt_with_score_check`'s baseline safety net (fix #6) almost
+never found a refinement round that beat doing nothing. `demos/analyze_grid.py`
+confirms this formally: pooled McNemar p=1.0 and GEE p∈{1.0, nan} for all three
+base-vs-MPIR pairs, pooled accuracy differences of 0.0000 (ape: [-0.0104, +0.0050] 95%
+CI), 0 or 1 of 3 tasks favoring MPIR by the conservative sign test.
+
+**Decision, per §4.0's pre-committed rule ("if the effect does not reproduce on all
+three, stop and switch to the reframe-only path"): NO-GO.** The effect does not survive
+the move to a same-model-as-everything open-weight pilot on any of the three highest-
+signal tasks from the original draft. Per §7: "the paper to write is a different one —
+an honest measurement of how much a cheap post-hoc rubric layer buys, with the answer
+being 'less than the field assumes'." Next: manuscript surgery per §6, targeting TMLR
+per §7, **not** the full 23-task grid in §4.1 — running 20 more tasks cannot revive an
+effect that failed to appear on the three tasks most favorable to it.
