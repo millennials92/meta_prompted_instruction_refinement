@@ -227,7 +227,22 @@ def run_task(task: str, seed: int, summary: list) -> None:
 
         mpir_prompt, gp_mpir = run_mpir(optimizer_name, best_prompt, task, seed,
                                         split_paths.train_file_name, split_paths.val_file_name, bbh_processor)
-        evaluate_condition(gp_mpir, test_file_name, task, f"{optimizer_name}_mpir", seed, mpir_prompt, summary)
+        # Evaluated through gp_opt_eval (the base optimizer's own GluePromptOpt
+        # instance/prompt_pool), not gp_mpir -- gp_mpir exists only to run
+        # Heuristic's refinement step (improve_prompt(), which correctly uses
+        # Heuristic's own meta-prompting templates). Evaluating the *result*
+        # through gp_mpir would silently swap in Heuristic's eval_prompt
+        # wrapper template instead of the base optimizer's, confounding the
+        # base-vs-MPIR comparison with template-formatting differences
+        # unrelated to MPIR itself. Confirmed live: APE's and ProTeGi's
+        # eval_prompt differ from Heuristic's by trailing whitespace only
+        # ("[Answer]" vs "[Answer] "), but that's enough to flip a greedy
+        # decode's very next token -- hyperbaton/ape_mpir scored 0.07 through
+        # gp_mpir's template on a prompt that, when the identical text was
+        # sent through APE's own template, is the same prompt "ape" scored
+        # 0.515 with. (PromptWizard's own template happens to be byte-identical
+        # to Heuristic's, so promptwizard_mpir was never affected by this.)
+        evaluate_condition(gp_opt_eval, test_file_name, task, f"{optimizer_name}_mpir", seed, mpir_prompt, summary)
 
     # Free rewrite: unstructured control, rewriting the PromptWizard prompt
     # once with no rubric (manuscript §4.3.1 / Appendix D; REBUILD.md §4.0).
