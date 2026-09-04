@@ -53,6 +53,16 @@ def call_local_api(messages, model_name=None, seed=None):
     # vLLM-specific extension, silently ignored by servers that don't support it.
     if os.environ.get("LOCAL_MODEL_ENABLE_THINKING", "false").lower() != "true":
         kwargs["extra_body"] = {"chat_template_kwargs": {"enable_thinking": False}}
+    # Explicit cap rather than letting the server default to "fill whatever
+    # context remains": found live that a long optimizer-generated prompt
+    # (PromptWizard's refined instruction + few-shot reasoning chains, ~1800
+    # tokens) combined with Qwen3's verbose style left too little of a small
+    # --max-model-len for the response to reach its answer tag before being
+    # cut off mid-sentence, corrupting every affected example's score. A
+    # generous explicit cap bounds worst-case per-call latency regardless of
+    # how large --max-model-len is configured, without truncating the
+    # reasoning-plus-short-answer responses BBH tasks actually need.
+    kwargs.setdefault("max_tokens", int(os.environ.get("LOCAL_MODEL_MAX_TOKENS", "1024")))
     response = client.chat.completions.create(
         model=model,
         messages=messages,
