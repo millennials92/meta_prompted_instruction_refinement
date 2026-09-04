@@ -137,7 +137,30 @@ class Heuristic(PromptOptimizer, UniversalBaseClass):
             self.logger.info("Refinement response had no <START>/<END>-wrapped candidate; "
                              "keeping the prompt from before this round unchanged.")
             return current_prompt
-        final_improved_prompt = self.prompt_pool.improved_prompt.format(instruction=final_best_prompt[0])
+
+        candidate = final_best_prompt[0]
+        # A weaker meta-model can also produce a *well-formed* <START>/<END>
+        # match that is nonetheless garbage: confirmed live, where the model
+        # wrapped a fragment of our own meta-prompting scaffolding (echoing
+        # "You are a Senior Prompt Engineer... Prompt Under Evaluation...
+        # Seven-Criteria Evaluation Rubric" from prompt_evaluation itself,
+        # verbatim, as if that self-referential text were "the refined task
+        # prompt") rather than producing fresh task-solving instructions. The
+        # resulting prompt had no answer-format instruction at all, so every
+        # evaluation call using it silently produced unparseable free-form
+        # answers -- a full condition scored exactly 0.0 with no crash to
+        # flag it. These three phrases are unique, verbatim strings from this
+        # technique's own prompt_evaluation template (heuristic/prompt_pool.yaml)
+        # that a genuine refined task prompt has no legitimate reason to contain.
+        _META_TEMPLATE_MARKERS = ("Senior Prompt Engineer", "Prompt Under Evaluation",
+                                  "Seven-Criteria Evaluation Rubric")
+        if any(marker in candidate for marker in _META_TEMPLATE_MARKERS):
+            self.logger.info("Refinement candidate echoed this technique's own meta-prompting "
+                             "template instead of producing a refined task prompt; "
+                             "keeping the prompt from before this round unchanged.")
+            return current_prompt
+
+        final_improved_prompt = self.prompt_pool.improved_prompt.format(instruction=candidate)
         self.logger.info(f"Refined prompt: {final_improved_prompt}")
         return final_improved_prompt
 
