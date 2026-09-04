@@ -121,6 +121,22 @@ class Heuristic(PromptOptimizer, UniversalBaseClass):
         refined_prompt = self.chat_completion_history(chat_history, model_name=self.meta_model_name)
 
         final_best_prompt = re.findall(DatasetSpecificProcessing.TEXT_DELIMITER_PATTERN, refined_prompt)
+        # Falls back to the un-refined current_prompt when the meta-model's
+        # response doesn't contain a <START>/<END>-wrapped candidate, rather
+        # than raising IndexError on an empty match list. GPT-4o (the
+        # meta-model in the original methodology) reliably followed this
+        # formatting instruction; a smaller local meta-model does not always
+        # -- confirmed live, where this crashed improve_prompt_with_score_check
+        # (and, via its per-task exception handling, every remaining
+        # condition for that task) partway through a real pilot run. This
+        # round's candidate is simply skipped rather than treated as an
+        # improvement, matching how improve_prompt_with_score_check already
+        # only keeps a round's candidate when it scores strictly better than
+        # the best seen so far.
+        if not final_best_prompt:
+            self.logger.info("Refinement response had no <START>/<END>-wrapped candidate; "
+                             "keeping the prompt from before this round unchanged.")
+            return current_prompt
         final_improved_prompt = self.prompt_pool.improved_prompt.format(instruction=final_best_prompt[0])
         self.logger.info(f"Refined prompt: {final_improved_prompt}")
         return final_improved_prompt
