@@ -71,10 +71,15 @@ class DatasetSpecificProcessing(ABC):
         # whitespace/newlines inside delimiter tags (e.g. Qwen3 producing
         # "<ANS_START>\n4\n<ANS_END>") -- without stripping, exact-match
         # comparison silently marks every such answer wrong regardless of
-        # correctness.
+        # correctness. Stripping parentheses too: a model told to "wrap the
+        # final answer" sometimes wraps only the bare option letter ("A")
+        # instead of the full "(A)" identifier the ground truth uses --
+        # parentheses are pure formatting around a multiple-choice letter,
+        # never semantically meaningful content, so this is safe on both sides.
         predicted_answer = self.extract_final_answer(llm_output).strip()
+        normalize = lambda s: s.strip().replace("(", "").replace(")", "").lower()
         is_correct = False
-        if predicted_answer and (predicted_answer.lower() == gt_answer.strip().lower()):
+        if predicted_answer and (normalize(predicted_answer) == normalize(gt_answer)):
             is_correct = True
 
         return is_correct, predicted_answer

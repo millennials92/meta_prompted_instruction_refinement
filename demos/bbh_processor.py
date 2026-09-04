@@ -89,11 +89,25 @@ class BBH(DatasetSpecificProcessing):
         # and invisibly. Found while validating against a live model server.
         return extract_between(text=answer, start="<ANS_START>", end="<ANS_END>").strip()
 
+    @staticmethod
+    def _normalize_for_comparison(text: str) -> str:
+        # BBH multiple-choice ground truth is formatted "(A)", but a model
+        # told to "wrap the final answer" sometimes wraps only the bare
+        # letter ("A") instead of the full "(A)" option identifier --
+        # observed live with Qwen3 on otherwise-correct reasoning. Since
+        # parentheses are pure formatting around a multiple-choice letter and
+        # never semantically meaningful BBH content, stripping them from both
+        # sides before comparing fixes this without risking conflating
+        # genuinely different answers (numeric/yes-no answers never contain
+        # parentheses to begin with, so this is a no-op for them).
+        return text.strip().replace("(", "").replace(")", "").lower()
+
     def access_answer(self, llm_output: str, gt_answer: str):
         predicted_answer = self.extract_final_answer(llm_output)
         if LLM_AS_JUDGE_EVAL:
             is_correct = llm_eval(predicted_answer, gt_answer)
         else:
-            is_correct = bool(predicted_answer) and predicted_answer.lower() == gt_answer.strip().lower()
+            is_correct = bool(predicted_answer) and (
+                self._normalize_for_comparison(predicted_answer) == self._normalize_for_comparison(gt_answer))
 
         return is_correct, predicted_answer
