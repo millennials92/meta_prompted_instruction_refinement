@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-# Manuscript content for the AI Open (Elsevier/KeAi) LaTeX submission, built via build_latex.py.
+# Manuscript content, built via build_latex.py using the Elsevier/KeAi CAS LaTeX class inherited
+# from the original AI Open submission (REBUILD.md's desk-rejection diagnosis). REBUILD.md Section 7
+# recommends retargeting to TMLR given the honest null-result framing this rebuild produced; the
+# LaTeX template itself has not yet been converted to TMLR's own class/format -- tracked as a
+# separate, explicit follow-up rather than done silently here.
 # Citation tokens use unicode guillemets, e.g. ‹9› or ‹9,10›, referring to
 # the bare numeric suffix of the original reference_N bib keys. These get resolved to
 # \citep{} author-year citations against manuscript/latex/cas-refs.bib by build_latex.py.
@@ -24,26 +28,35 @@ CORRESPONDING_AUTHOR_NOTE = (
 )
 
 ABSTRACT = (
-    "Large language models (LLMs) are transforming artificial intelligence by enabling systems that can "
-    "reason, write, and assist with complex tasks, capabilities that are increasingly important for "
-    "science, education, and everyday applications. Yet these models remain critically dependent on the "
-    "quality of their input prompts, making prompt design a central bottleneck. Manual prompt engineering, "
-    "using techniques such as chain-of-thought reasoning and role assignment, can yield high performance "
-    "but requires expert knowledge and does not scale. Automatic prompt optimization (APO) offers "
-    "efficiency, but its outputs often lack the structured guidance that makes human-crafted prompts "
-    "effective. This paper introduces Meta-Prompted Instruction Refinement (MPIR), a lightweight, "
-    "model-agnostic framework that refines APO-generated prompts through a seven-criteria rubric, "
-    "meta-prompted evaluation and refinement, and empirical validation—without any additional training, "
-    "search infrastructure, or access to model internals. Extensive experiments on the Big-Bench Hard "
-    "(BBH) benchmark show that MPIR outperforms its PromptWizard baseline on 16 of 23 tasks, with gains "
-    "of up to 20 percentage points on individual tasks, and that the same refinement layer improves two "
-    "further APO methods (Iterative APE and ProTeGi) as well as a different underlying LLM family; the "
-    "pooled average gain is directionally positive but not conclusively significant by paired "
-    "statistical tests, so this per-task and cross-framework consistency, rather than the pooled figure "
-    "alone, is offered as the primary evidence. Together, these results indicate that a simple, "
-    "interpretable, post-hoc heuristic layer can improve prompts already optimized by heavier automated "
-    "methods, bridging human heuristics with automation at a fraction of the engineering cost of learned "
-    "or evolutionary alternatives."
+    "Large language models remain critically dependent on prompt quality, and automatic prompt "
+    "optimization (APO) methods often produce output that lacks the structured guidance human-crafted "
+    "prompts provide. This paper investigates Meta-Prompted Instruction Refinement (MPIR), a lightweight, "
+    "model-agnostic layer that refines an APO-generated prompt through a seven-criteria rubric, "
+    "meta-prompted evaluation and refinement, and empirical validation against a held-out set. An initial "
+    "evaluation, using GPT-4o to judge and refine prompts targeting GPT-3.5-turbo, reported per-task gains "
+    "on a majority of Big-Bench Hard (BBH) tasks but a pooled improvement that did not reach conventional "
+    "significance; a subsequent audit found its validation stage had scored candidates against data the "
+    "upstream optimizer had already trained on, so even its per-task pattern was not reliable on its own. "
+    "We corrected the split and asked the question the initial evaluation could not answer cleanly: were "
+    "the apparent gains attributable to the rubric-refinement mechanism, or to GPT-4o's capability "
+    "advantage over the model it refined prompts for? To isolate the mechanism, we reran a pre-registered "
+    "go/no-go pilot with a single small open-weight model (Qwen3-1.7B) acting as target, optimizer, and "
+    "refinement judge simultaneously, across three APO backbones (PromptWizard, APE, ProTeGi) "
+    "on the three BBH tasks where the original evaluation showed its largest gains. The effect did not "
+    "reproduce: MPIR's refined prompt was byte-identical to its base optimizer's prompt in all nine "
+    "(task, optimizer) cells tested—refinement was attempted every time and accepted zero times—and pooled "
+    "McNemar and GEE tests on the resulting predictions return p-values of 1.0 (or undefined, where "
+    "accuracy did not vary at all) and accuracy differences of 0.0000 across all three optimizers. Tracing "
+    "the cause, we identify and fix a general defect in the refinement algorithm itself—it never scores "
+    "the pre-refinement prompt as a baseline, so any round is accepted as an \"improvement\" regardless of "
+    "whether it beats doing nothing—plus six further correctness bugs surfaced by running the pilot live, "
+    "two of them distinct ways a small model's meta-prompting output can be well-formed but semantically "
+    "empty, each invisible until run against a live model rather than a mocked one. Correcting all seven, "
+    "the layer still could not produce a single accepted refinement under a model too weak to reliably "
+    "critique its own prompts. We report this as a boundary-condition "
+    "finding rather than a positive result: a cheap, post-hoc rubric layer of this kind appears to depend "
+    "on the refining model's own capability, and its benefit, if any, is smaller than the original "
+    "per-task deltas alone would suggest."
 )
 
 KEYWORDS = "Prompt engineering, meta-prompting, automatic prompt optimization, large language models, Big-Bench Hard"
@@ -149,17 +162,36 @@ P("This paper addresses that gap with Meta-Prompted Instruction Refinement (MPIR
   "checklist and a small, fixed number of meta-prompting calls—deliberately inexpensive to add on top "
   "of whatever APO pipeline a practitioner already has.")
 
-P("Specifically, this study pursues four objectives:")
+P("Specifically, this study pursues three objectives:")
 BULLETS([
     ("To develop a structured rubric for prompt evaluation:",
      "formalizing established manual prompting heuristics into a seven-criteria framework."),
-    ("To evaluate whether meta-prompted refinement improves APO-generated prompts:",
-     "applying rubric-guided feedback to iteratively refine and empirically validate prompts."),
-    ("To investigate the generalizability and modularity of heuristic-guided refinement:",
-     "testing MPIR as a layer across different APO frameworks and underlying LLMs."),
-    ("To investigate how individual prompting heuristics contribute to performance:",
-     "quantifying each rubric criterion's contribution via targeted ablations."),
+    ("To evaluate whether meta-prompted refinement improves APO-generated prompts, and under what "
+     "conditions:",
+     "applying rubric-guided feedback to iteratively refine and empirically validate prompts, first "
+     "under a strong closed meta-model and then, to isolate the mechanism from that model's general "
+     "capability, under a single small open-weight model performing every role simultaneously."),
+    ("To investigate the generalizability of heuristic-guided refinement across APO frameworks:",
+     "testing MPIR as a layer across three different upstream optimizers under both configurations."),
 ])
+
+P("This study pursues these objectives in two phases, reported together because the second only makes "
+  "sense in light of the first. The first phase used GPT-4o as MPIR's meta-model and GPT-3.5-turbo as "
+  "the target model it refined prompts for—the configuration under which MPIR was originally developed—"
+  "and reported per-task gains on a majority of BBH tasks alongside a pooled average improvement that did "
+  "not reach conventional statistical significance. A subsequent code audit, prompted by that "
+  "inconclusive pooled result, found the first phase's validation stage had scored candidate prompts "
+  "against data the upstream optimizer had already trained on (Section 4.5) rather than genuinely "
+  "held-out examples—so even its per-task pattern could not be taken as reliable evidence on its own "
+  "terms, independent of the significance question. Rather than defend numbers produced under a leaked "
+  "validation split, this paper corrects the split and asks the question the first phase could not "
+  "answer cleanly: are MPIR's apparent per-task gains attributable to the rubric-refinement mechanism "
+  "itself, or to GPT-4o's general capability advantage over the GPT-3.5-turbo model it was refining "
+  "prompts for? Section 4.5 describes the second phase designed to isolate that question—a corrected "
+  "validation split and a single small open-weight model performing every role (target, optimizer, and "
+  "refinement judge) simultaneously, removing the capability asymmetry entirely—and Section 5 reports "
+  "what happened as a result: not a confirmation of the first phase's per-task pattern, but its "
+  "disappearance.")
 
 P("The remainder of this paper is organized as follows. Section 2 reviews related work on prompt "
   "engineering and automatic prompt optimization. Section 3 introduces the MPIR framework. Section 4 "
@@ -346,10 +378,13 @@ P("Since the meta-prompting and heuristic-guided methods above were introduced, 
   "‹61›. A recent survey frames the area through an optimization-theoretic lens "
   "‹63›, and there is growing interest in learned or instance-adaptive rubrics that "
   "replace fixed, human-authored criteria such as MPIR's seven. Relative to this frontier, MPIR's rubric "
-  "is not the most sophisticated available mechanism; its contribution is instead that a small, "
-  "interpretable, model-agnostic, and inexpensive post-hoc layer captures a meaningful share of the "
-  "benefit these heavier methods pursue, without their training, search infrastructure, or per-task "
-  "tuning cost—a different point on the cost-versus-sophistication trade-off, not a claim to surpass it.")
+  "is not the most sophisticated available mechanism; its premise was that a small, interpretable, "
+  "model-agnostic, and inexpensive post-hoc layer might capture a meaningful share of the benefit these "
+  "heavier methods pursue, without their training, search infrastructure, or per-task tuning cost—a "
+  "different point on the cost-versus-sophistication trade-off, rather than a claim to surpass it. "
+  "Section 5 tests this premise directly under an open-weight model and finds it does not hold at that "
+  "model scale: whether it holds under a meta-model closer to the heavier methods' own typical "
+  "requirements remains open (Section 7).")
 
 P("Table 1 summarizes where MPIR sits relative to the methods discussed above, keyed on mechanism rather "
   "than a checklist of binary properties: how each method proposes new candidate prompts, how it decides "
@@ -445,7 +480,10 @@ P("where R(P0) denotes the space of candidate refinements derived from P0.")
 
 H2("3.2. MPIR Algorithm")
 P("Algorithm 1 details the iterative process of evaluation, refinement, and validation that produces the "
-  "final refined prompt.")
+  "final refined prompt. It differs from the version implemented for this paper's original evaluation "
+  "(Section 1) in one respect, discussed after the algorithm: it scores the unrefined prompt P0 itself as "
+  "an explicit baseline before the refinement loop begins, and only replaces Pfinal when a round's "
+  "candidate strictly exceeds the best score seen so far, including that baseline.")
 
 ALGO(
     "Algorithm 1. MPIR Algorithm",
@@ -454,12 +492,12 @@ ALGO(
               "(Qv, Av) = {(qi, ai)}, i=1..M: validation set; R: seven-criteria rubric; N: refinement rounds"),
     ensure="Refined prompt Pfinal",
     steps=[
-        "Initialize: Pfinal ← P0; Abest ← −∞",
+        "Initialize: Pfinal ← P0; Abest ← Validate(L, P0, (Qv, Av))   ▷ Score the baseline first",
         "for t = 1 to N do",
         "    S ← Evaluate(Meval, L′, P0, R)                    ▷ Rubric feedback",
         "    P′ ← Refine(Mrefine, L′, P0, S)                  ▷ Generate revised prompt",
         "    A′ ← Validate(L, P′, (Qv, Av))                    ▷ Performance of P′",
-        "    if A′ ≥ Abest then",
+        "    if A′ > Abest then                                ▷ Strict: a tie keeps P0",
         "        Pfinal ← P′; Abest ← A′",
         "    end if",
         "end for",
@@ -470,7 +508,22 @@ ALGO(
 P("Notation: P0 is the initial APO prompt used as the base for every refinement round; Pfinal is the "
   "best-performing prompt found across all rounds; P′ is the candidate produced in the current round; "
   "S is the textual rubric feedback returned by Evaluate(); Abest is the best validation score observed "
-  "so far (initialized to −∞); and A′ is the validation score of the current candidate P′.")
+  "so far, initialized to the unrefined baseline's own score rather than −∞; and A′ is the validation "
+  "score of the current candidate P′.")
+
+P("The baseline-initialization step and the strict inequality are the one place this paper's methodology "
+  "differs from the algorithm as originally implemented, and the difference matters more than a single "
+  "line suggests. Initializing Abest to −∞ (as in the original implementation) means the very first "
+  "refinement round is accepted as \"the best prompt so far\" regardless of its actual score, since any "
+  "score exceeds −∞—so the algorithm can never conclude that refinement should be skipped in favor of the "
+  "prompt it started with, no matter how poor every round's candidate turns out to be. This is invisible "
+  "whenever the meta-model L′ reliably produces genuine improvements, which is the implicit assumption "
+  "behind treating Pfinal as evidence that refinement helped; it becomes consequential precisely when L′ "
+  "is not reliable enough to guarantee that, which Section 5 shows is exactly the regime a small "
+  "open-weight meta-model operates in. Scoring P0 explicitly and requiring strict improvement over it "
+  "turns Algorithm 1 into a true refinement procedure—one that can and, as Section 5.1 reports, "
+  "frequently does return Pfinal = P0 unchanged—rather than a procedure that reports some refinement "
+  "outcome by construction.")
 
 H2("3.3. Seven-Criteria Evaluation Rubric")
 P("The rubric combines insights from academic research, industry practice, and iterative "
@@ -502,24 +555,27 @@ P("Each criterion is grounded in an established prompting technique: Role Prompt
 
 H2("3.3.1. Illustrative Application of the Rubric")
 P("To make the abstract rubric concrete before Section 3.4 formalizes how it is applied automatically, "
-  "this subsection walks through how the seven criteria would assess the real PromptWizard-optimized "
-  "prompt for penguins_in_a_table reproduced in full in Appendix A.3, without reporting fabricated "
-  "numeric scores for an evaluation that was not separately logged for this specific illustration. The "
-  "PromptWizard prompt opens with a single undifferentiated paragraph that mixes a task description with "
-  "an aside about comparing a new penguin's height to existing entries—an instruction that turns out "
-  "to be irrelevant to most of the actual questions asked. Scored against the rubric: Role Prompting is "
-  "weak, since no task-relevant persona is assigned; Instruction and Separation is weak, since context "
-  "and directive are fused into one paragraph with no delimiter; Guided Chain of Thought is present only "
-  "implicitly, in the numbered reasoning steps of the worked examples rather than in the instructions "
-  "themselves; and Conclusion is absent, since the prompt ends abruptly after the worked examples with no "
-  "restatement of the task. The MPIR-refined version of the same prompt, reproduced in Appendix A.4, "
-  "directly addresses the two weakest criteria identified above: it opens with an explicit role "
-  "(\"You are a data analyst tasked with comparing the attributes of penguins...\"), separates context "
-  "from instructions under labeled headers (### Context, ### Instructions), and closes with an explicit "
-  "### Conclusion section restating the task. This is precisely the pattern reported quantitatively in "
-  "Section 5.2.4 and Table 7: removing Instruction and Separation (C4) or Role Prompting (C1) causes the "
-  "largest ablation drops, consistent with these being the criteria most visibly deficient in the "
-  "unrefined baseline for this task.")
+  "this subsection walks through how the seven criteria assess the real PromptWizard-optimized prompt "
+  "for penguins_in_a_table reproduced in full in Appendix A.1, without reporting fabricated numeric "
+  "scores for an evaluation that was not separately logged for this specific illustration. The prompt "
+  "opens with a single detached, out-of-place question—\"How could I determine the accuracy of my "
+  "solution to this problem?\"—that is not a task instruction at all, followed directly by the first "
+  "worked example with no intervening framing. Scored against the rubric: Role Prompting is weak, since "
+  "no task-relevant persona is assigned; Instruction and Separation is weak, since there is no "
+  "identifiable instruction segment to separate from context in the first place, only an opening "
+  "artifact of the search process itself; Guided Chain of Thought is present only implicitly, in the "
+  "worked examples' own reasoning rather than in an explicit directive; and Conclusion is absent, since "
+  "the prompt ends immediately after the third worked example with no restatement of the task.")
+
+P("This prompt is exactly the input MPIR's evaluation-refinement-validation cycle (Section 3.4) "
+  "operated on for seven rounds. Section 5.1 reports what happened: every round's candidate scored at or "
+  "below this prompt's own validation accuracy, so Algorithm 1's baseline-scoring correction (Section "
+  "3.2) returned it unchanged rather than accepting a rubric-motivated rewrite that could not "
+  "empirically justify itself. This is a deliberately unflattering illustration of the rubric relative "
+  "to the polished before/after contrasts common in the prompt-optimization literature, and we include it "
+  "for that reason: it is the actual behavior observed, not a curated success case, and Section 5.2.2 "
+  "discusses why a small meta-model applying this same rubric so rarely produced a candidate that "
+  "validated as an improvement.")
 
 H2("3.4. Evaluation and Refinement")
 P("The evaluation-refinement stage extends manual prompting strategies into a systematic process for "
@@ -572,6 +628,19 @@ CODE([
 ], caption="Figure 3. Meta-prompt used to refine a candidate prompt by applying all evaluation "
            "feedback.", full=False)
 
+P("The refinement meta-prompt in Figure 3 asks the LLM to return the revised prompt wrapped between "
+  "<START> and <END> delimiters, which the implementation then extracts programmatically. A weaker "
+  "meta-model does not always comply, and Section 5.2.4 reports two concrete ways it failed to during "
+  "the pilot: no delimited candidate at all, or a well-formed delimited candidate whose content was "
+  "itself a verbatim echo of a meta-prompting template the model had recently seen in its own context "
+  "window (Appendix B), rather than a genuine refined instruction. The implementation guards against "
+  "both before a candidate ever reaches validation: an empty extraction result falls back to the "
+  "pre-refinement prompt unchanged, and a candidate containing verbatim phrases unique to MPIR's own "
+  "evaluation template (Figure 2) is rejected on the same grounds. Neither check depends on recognizing "
+  "a specific failure by name, and Section 3.2's baseline-scoring correction provides a further, more "
+  "general safety net behind both: even a well-formed, uncontaminated candidate is only adopted if it "
+  "empirically outperforms the prompt it was meant to improve.")
+
 P("Evaluation and refinement together form a feedback-driven process for improving prompts, but "
   "refinement alone does not guarantee performance gains; MPIR therefore adds a validation stage to "
   "confirm that improvements translate into measurable benefits.")
@@ -595,6 +664,15 @@ P("This paper uses Big-Bench Hard (BBH) as the evaluation benchmark ‹27›. BB
   "understanding, world knowledge, and multilingual reasoning, with about 6,511 examples in total "
   "(roughly 250 per task). Its tasks are instruction-following in nature and were selected specifically "
   "for their difficulty, making BBH well suited for measuring gains from prompt optimization.")
+
+P("The results reported in Section 5 use three of the 23 tasks—hyperbaton, ruin_names, and "
+  "penguins_in_a_table—selected as a pre-registered go/no-go pilot (Section 4.5) rather than a "
+  "convenience sample: they are the three tasks on which the original GPT-4o/GPT-3.5-turbo evaluation "
+  "(Section 1) reported its largest gains, and were chosen for that reason before the pilot was run, on "
+  "the reasoning that a mechanism worth testing across all 23 tasks should first reproduce on the tasks "
+  "most favorable to it. It did not (Section 5.1), so the full 23-task grid was not run under the "
+  "corrected methodology; running 20 further tasks cannot revive an effect absent from the three tasks "
+  "most likely to show it.")
 
 H2("4.2. Workflow")
 P("The workflow has two stages (Figures 4 and 5). Stage 1 uses PromptWizard as the base APO to produce "
@@ -670,9 +748,10 @@ BULLETS([
      "PromptWizard serves as a strong automated baseline without human-crafted heuristics; each final "
      "prompt includes three automatically generated in-context examples."),
     ("Free rewrite baseline.",
-     "To isolate the contribution of MPIR's rubric from the general rewriting capability of GPT-4o, "
-     "GPT-4o freely rewrites PromptWizard-generated prompts without rubric-guided evaluation or "
-     "refinement, and the rewritten prompts are evaluated under the same BBH conditions as MPIR."),
+     "To isolate the contribution of MPIR's rubric from the general rewriting capability of the "
+     "meta-model, the same model used for MPIR's own meta-prompting (Section 4.5) freely rewrites "
+     "PromptWizard-generated prompts once, with no rubric-guided evaluation or refinement, and the "
+     "rewritten prompt is evaluated under the same conditions as MPIR."),
 ])
 
 H3("4.3.2. Extended APO baselines")
@@ -695,13 +774,13 @@ BULLETS([
 P("Together, these five conditions span a spectrum from no automation and no heuristics (manual "
   "zero-shot CoT) to full automation with heuristics but no scalability ceiling on human effort "
   "(expert-crafted few-shot CoT), with the three APO conditions and their MPIR-refined counterparts "
-  "occupying the space between. This design lets Section 5 attribute MPIR's gains specifically to its "
-  "rubric-guided refinement stage rather than to confounds that a narrower comparison would leave "
-  "unaddressed: the free rewrite baseline controls for GPT-4o's general rewriting capability "
-  "independent of any rubric; the extended APO baselines control for whether the effect is specific to "
-  "PromptWizard's particular prompt structure; and the two reference points bound the range of "
-  "achievable accuracy from unassisted manual prompting to unconstrained expert effort, giving Section "
-  "5.2.6 a concrete ceiling against which to interpret the remaining gap.")
+  "occupying the space between. This design lets Section 5 attribute any measured change specifically "
+  "to MPIR's rubric-guided refinement stage rather than to confounds that a narrower comparison would "
+  "leave unaddressed: the free rewrite baseline controls for the meta-model's general rewriting "
+  "capability independent of any rubric; the extended APO baselines control for whether an effect, if "
+  "present, is specific to PromptWizard's particular prompt structure; and the two reference points bound "
+  "the range of achievable accuracy from unassisted manual prompting to unconstrained expert effort, "
+  "giving Section 5.2.5 a concrete ceiling against which to interpret the gap Section 5.1 reports.")
 
 H2("4.4. Evaluation Metric")
 P("Performance is measured with accuracy: the proportion of model outputs matching ground-truth labels "
@@ -714,8 +793,9 @@ P("Accuracy was chosen over softer metrics such as partial-credit scoring or emb
   "comparable to the original BBH benchmark paper and to the PromptWizard, APE, and ProTeGi baselines, "
   "all of which report accuracy on the same tasks. This choice has a corresponding limitation, already "
   "noted in Section 6.3: accuracy treats every incorrect answer identically regardless of how close the "
-  "underlying reasoning came to correct, so it cannot by itself capture the reasoning-clarity "
-  "improvements documented qualitatively in Section 5.2.4. Predicted answers are extracted "
+  "underlying reasoning came to correct, which Section 5.2.3 shows matters concretely—several of the "
+  "weakest conditions reason to the correct option but fail the exact-match check purely on output "
+  "format. Predicted answers are extracted "
   "programmatically from each response using the delimiter tags specified in every prompt variant "
   "(<ANS_START> and <ANS_END>, illustrated throughout Appendix A), rather than by free-form parsing of "
   "the full response text; this delimiter convention, itself one instantiation of the Output Format "
@@ -726,7 +806,7 @@ H2("4.5. Implementation Details")
 P("Qwen3-1.7B ‹68› serves as target, optimizer, and meta-prompting judge simultaneously, served "
   "locally via vLLM rather than accessed through a closed API. Using one model in every role removes the "
   "confound present in the original design, where a more capable closed model (GPT-4o) supplied MPIR's "
-  "(GPT-4o) supplied MPIR's meta-prompting feedback for a weaker target model (GPT-3.5-turbo): any gain "
+  "meta-prompting feedback for a weaker target model (GPT-3.5-turbo): any gain "
   "could not be cleanly attributed to the rubric-guided refinement procedure itself rather than to the "
   "meta-model's superior general capability. It also ties the reported numbers to a specific, "
   "redistributable model checkpoint instead of a closed endpoint that can silently change behavior "
@@ -765,350 +845,222 @@ TABLE("Table 2. Hyperparameter settings of PromptWizard.",
 H1("5. Results and Analysis")
 
 H2("5.1. Results")
-P("Table 3 reports accuracy on the full test sets of the 23 BBH tasks (Section 4.1).")
+P("Table 3 reports accuracy on the full test set of each of the three pilot tasks (Section 4.1), for "
+  "every condition: the two manual reference points, each of the three APO baselines, and each baseline's "
+  "MPIR-refined counterpart. Test-set sizes are 200 examples for hyperbaton and ruin_names and 96 for "
+  "penguins_in_a_table (Appendix D), after removing the 25 optimizer-training and 25 MPIR-validation "
+  "examples from each task's total.")
 
-TABLE("Table 3. Accuracy (%) across 23 BBH tasks.",
-      header=["Task", "Manual", "PromptWizard", "Free Rewrite", "MPIR", "Expert-crafted"],
+TABLE("Table 3. Accuracy (%) on the three go/no-go pilot tasks, Qwen3-1.7B as target, optimizer, and "
+      "meta-prompting judge, single seed.",
+      header=["Task", "Zero-shot", "Expert few-shot", "PromptWizard", "+MPIR",
+              "APE", "+MPIR", "ProTeGi", "+MPIR", "Free rewrite"],
       rows=[
-          ["hyperbaton", "74.6", "62.2", "68.44", "84.0", "84.4"],
-          ["disambiguation_qa", "55.1", "61.7", "44.44", "62.2", "69.3"],
-          ["causal_judgement", "53.7", "59.3", "59.88", "56.8", "59.9"],
-          ["date_understanding", "55.6", "71.1", "73.33", "74.2", "80.0"],
-          ["penguins_in_a_table", "45.5", "75.0", "75.21", "82.6", "74.4"],
-          ["boolean_expression", "81.8", "92.0", "89.78", "94.2", "91.6"],
-          ["object_counting", "59.1", "91.5", "85.78", "92.4", "88.0"],
-          ["word_sorting", "82.6", "80.0", "81.78", "81.3", "65.3"],
-          ["logical_deduction", "45.3", "44.9", "39.11", "50.8", "59.4"],
-          ["salient_translation_error_detection", "44.0", "50.7", "49.78", "52.0", "54.7"],
-          ["geometric_shapes", "29.3", "57.8", "52.89", "49.3", "64.4"],
-          ["snarks", "45.0", "63.3", "59.48", "65.4", "72.5"],
-          ["temporal_sequences", "33.3", "44.4", "44.44", "38.2", "17.3"],
-          ["web_of_lies", "47.5", "52.4", "52.89", "52.9", "80.9"],
-          ["navigate", "49.3", "65.3", "74.67", "68.0", "93.8"],
-          ["reasoning_about_colored_objects", "54.2", "56.0", "53.33", "68.4", "83.1"],
-          ["sports_understanding", "78.2", "79.6", "89.33", "86.2", "93.8"],
-          ["multistep_arithmetic_two", "33.3", "51.1", "52.00", "51.5", "84.9"],
-          ["ruin_names", "54.7", "66.2", "56.00", "72.0", "69.3"],
-          ["movie_recommendation", "66.2", "73.3", "48.00", "66.7", "79.1"],
-          ["formal_fallacies", "53.8", "53.3", "31.11", "53.3", "51.6"],
-          ["dyck_languages", "1.7", "14.2", "14.67", "12.9", "16.9"],
-          ["tracking_shuffled_objects", "22.4", "69.8", "18.07", "65.5", "63.8"],
-          ["Average", "50.7", "62.39", "57.15", "64.38", "69.5"],
-      ], full=True, colw=[0.30, 0.14, 0.16, 0.14, 0.12, 0.14], note="bold_last_row")
+          ["hyperbaton", "51.0", "86.0", "58.0", "58.0", "51.5", "52.0", "17.0", "17.0", "61.0"],
+          ["ruin_names", "37.0", "50.0", "60.0", "60.0", "41.0", "41.0", "4.5", "4.5", "44.5"],
+          ["penguins_in_a_table", "6.3", "72.9", "69.8", "69.8", "17.7", "16.7", "2.1", "2.1", "55.2"],
+      ], full=True, colw=None)
 
-P("Table 4 reports accuracy before and after MPIR refinement across two further APO methods, Iterative "
-  "APE and ProTeGi, on the full set of 23 BBH tasks. The tasks where MPIR moves accuracy in the same "
-  "direction under all three methods most strongly are hyperbaton and ruin_names (consistently "
-  "positive) and geometric_shapes and tracking_shuffled_objects (consistently negative).")
-
-TABLE("Table 4. Accuracy (%) before and after MPIR refinement, for three APO methods, across all 23 "
-      "BBH tasks.",
-      header=["Task", "APE (before)", "ProTeGi (before)", "PromptWizard (before)",
-              "APE (after)", "ProTeGi (after)", "PromptWizard (after)"],
-      rows=[
-          ["hyperbaton", "82.67", "80.89", "62.2", "85.78", "88.89", "84.0"],
-          ["disambiguation_qa", "69.78", "73.78", "61.7", "68.00", "67.56", "62.2"],
-          ["causal_judgement", "58.02", "61.11", "59.3", "58.64", "58.64", "56.8"],
-          ["date_understanding", "87.56", "88.00", "71.1", "84.44", "85.78", "74.2"],
-          ["penguins_in_a_table", "80.99", "79.34", "75.0", "84.30", "76.86", "82.6"],
-          ["boolean_expression", "90.67", "90.67", "92.0", "93.78", "92.89", "94.2"],
-          ["object_counting", "92.00", "88.44", "91.5", "93.33", "93.33", "92.4"],
-          ["word_sorting", "69.33", "68.44", "80.0", "80.00", "66.67", "81.3"],
-          ["logical_deduction", "61.93", "60.74", "44.9", "59.70", "59.26", "50.83"],
-          ["salient_translation_error_detection", "55.11", "52.89", "50.7", "54.67", "49.33", "52.0"],
-          ["geometric_shapes", "62.67", "61.78", "57.8", "61.33", "60.89", "49.3"],
-          ["snarks", "61.44", "75.82", "63.3", "68.63", "73.20", "65.4"],
-          ["temporal_sequences", "26.67", "84.00", "44.4", "86.67", "86.22", "38.2"],
-          ["web_of_lies", "80.00", "81.33", "52.4", "73.33", "80.89", "52.9"],
-          ["navigate", "95.56", "95.56", "65.3", "92.89", "97.78", "68.0"],
-          ["reasoning_about_colored_objects", "82.67", "82.67", "56.0", "82.67", "83.56", "68.4"],
-          ["sports_understanding", "95.11", "93.33", "79.6", "96.44", "94.67", "86.2"],
-          ["multistep_arithmetic_two", "86.22", "83.56", "51.1", "84.89", "82.67", "51.5"],
-          ["ruin_names", "58.67", "58.67", "66.2", "68.44", "77.78", "72.0"],
-          ["movie_recommendation", "76.89", "76.00", "73.3", "79.11", "80.89", "66.7"],
-          ["formal_fallacies", "52.44", "55.11", "53.3", "52.89", "56.89", "53.3"],
-          ["dyck_languages", "24.44", "20.89", "14.2", "34.22", "32.44", "12.9"],
-          ["tracking_shuffled_objects", "62.96", "61.63", "69.8", "58.22", "60.89", "65.5"],
-          ["Average (23 tasks)", "70.16", "72.81", "62.39", "74.02", "74.26", "64.38"],
-      ], full=True, colw=None, note="bold_last_row")
-
-P("Beyond aggregate performance, concrete examples illustrate where MPIR improves on baseline APO "
-  "methods. In one penguins_in_a_table case (Figure 6), PromptWizard incorrectly counts two penguins "
-  "younger than 8 years old, mistakenly including an 8-year-old penguin, while MPIR's refinement produces "
-  "a clearer reasoning chain that correctly counts only one qualifying penguin—illustrating how "
-  "rubric-driven refinement can eliminate subtle reasoning errors by enforcing stricter interpretation of "
-  "task rules.")
-
-FIG("case.png",
-    "Figure 6. Case study comparing PromptWizard and MPIR on the penguins_in_a_table task. PromptWizard "
-    "incorrectly identifies two penguins younger than eight years old, while MPIR correctly counts only "
-    "one.", full=True)
+P("The pattern is stark and consistent across all three base optimizers: comparing the actual saved "
+  "prompt objects directly, byte for byte, MPIR's refined prompt is identical to its base optimizer's "
+  "prompt in all nine (task, optimizer) cells—seven refinement rounds ran in every cell, and none was "
+  "ever accepted over the unrefined baseline (Section 3.2). Two cells nonetheless show a nonzero "
+  "accuracy delta in Table 3 despite an identical prompt—hyperbaton's APE-refined condition rises from "
+  "51.5% to 52.0% and penguins_in_a_table's falls from 17.7% to 16.7%, one example out of 200 and one "
+  "example out of 96 respectively—which Section 5.2.2 attributes to measurement noise in re-scoring the "
+  "identical prompt rather than to anything MPIR did. Section 5.2.1 reports the underlying example-level "
+  "statistics, and Section 5.2.2 traces the mechanism, using the actual saved prompts, to why refinement "
+  "never once accepted a candidate over the unrefined baseline.")
 
 H2("5.2. Analysis")
 
-H3("5.2.1. Overall Performance Improvements of MPIR")
-P("Table 3 shows a directionally positive but not conclusively significant improvement over "
-  "PromptWizard: MPIR reaches an average accuracy of 64.38%, versus 62.39% for PromptWizard, a difference "
-  "of 1.99 percentage points, with a 95% bootstrap confidence interval of [−0.46, 4.70] (10,000 "
-  "resamples over the 23 tasks) that includes zero. Because the 23 tasks form matched pairs of "
-  "heterogeneous difficulty rather than an unpaired sample, we follow standard practice for this design "
-  "‹55,56› and supplement the bootstrap CI with three paired analyses of the same 23 "
-  "task-level differences. A paired Wilcoxon signed-rank test is not significant (W = 83.0, p = 0.158), "
-  "and a two-sided exact sign test on the win/loss count (16 wins, 6 losses, 1 tie) is borderline "
-  "(p = 0.052; one-sided p = 0.026). The paired effect size is small-to-moderate (Cohen's dz = 0.31). We "
-  "report all three rather than selecting the most favorable one: together they indicate a real but "
-  "modest and not fully conclusive effect, consistent with typical statistical power at this task count "
-  "‹57›, rather than an established, strongly significant improvement. The more robust evidence "
-  "for MPIR is qualitative and structural—its consistency across individual tasks (16 of 23, with "
-  "several gains of 10-20 points), across three different APO frameworks (Section 5.2.2), and across two "
-  "model families (Section 5.2.3)—together with the free rewrite baseline, which reaches only 57.15% on "
-  "average, well below both PromptWizard and MPIR. Together, these results indicate that MPIR's per-task "
-  "gains are attributable to its structured seven-criteria rubric rather than simply to GPT-4o's general "
-  "rewriting ability, even though the pooled average improvement should be read as a promising, "
-  "consistent trend rather than a statistically confirmed effect; Section 6.1 revisits this as a "
-  "threat to validity.")
+H3("5.2.1. Overall Performance: A Null Result")
+P("Table 3's pattern is not an artifact of how accuracy is aggregated: pooling every example across all "
+  "three tasks for each base-optimizer/MPIR pair and running McNemar's test on the resulting 2-by-2 "
+  "discordant-pair table gives p = 1.0 for all three comparisons (PromptWizard, n_discordant = 0; APE, "
+  "n_discordant = 10, evenly split 5/5 between examples MPIR fixed and examples MPIR broke; ProTeGi, "
+  "n_discordant = 0), and the pooled accuracy difference is 0.0000 in all three cases (95% task-clustered "
+  "bootstrap CI for APE: [−0.0104, +0.0050], comfortably straddling zero; PromptWizard and ProTeGi have "
+  "zero discordant examples, so their CIs are degenerate at exactly zero). A GEE logistic regression with "
+  "task as the clustering unit returns the same conclusion (coefficients of 0.0000 or −0.0000, "
+  "p equal to 1.0 or undefined when there is no variation to fit). The conservative task-level check—a paired "
+  "Wilcoxon signed-rank test and sign test on the three per-task differences—agrees: 0 or 1 of 3 tasks "
+  "favor MPIR over its base optimizer, depending on the pair, with every test statistic non-significant. "
+  "We report all four analyses, primary through conservative, because they agree with each other rather "
+  "than because any one is most favorable: under Qwen3-1.7B, MPIR does not measurably change PromptWizard, "
+  "APE, or ProTeGi's output on any of the three tasks tested.")
 
-H3("5.2.2. Evaluating MPIR Across Multiple APO Frameworks")
-P("Table 4 shows that MPIR consistently improves average accuracy across APO frameworks: Iterative APE "
-  "from 70.16% to 74.02%, ProTeGi from 72.81% to 74.26%, and PromptWizard from 62.39% to 64.38%. Although "
-  "the magnitude of improvement varies across methods and tasks, the consistently positive trend supports "
-  "MPIR functioning as a refinement layer across different APO frameworks rather than one tailored to "
-  "PromptWizard-specific prompt structures.")
+P("The free rewrite baseline (Section 4.3.1), an unstructured single-pass rewrite with no rubric, "
+  "provides a useful point of contrast even though it is not part of MPIR's own base-optimizer/MPIR "
+  "comparison: it beats PromptWizard on hyperbaton (61.0% versus 58.0%) but falls well short of it on "
+  "ruin_names (44.5% versus 60.0%) and penguins_in_a_table (55.2% versus 69.8%). This inconsistency—"
+  "helpful on one task, clearly harmful on the other two—suggests unstructured rewriting by this "
+  "meta-model is at least as unreliable as MPIR's rubric-guided version, not a cheaper substitute for it: "
+  "neither approach reliably improves on PromptWizard's own output under this model, for different "
+  "reasons (Section 5.2.2 diagnoses MPIR's; the free rewrite baseline's failure mode is not separately "
+  "diagnosed here since it is a reference point rather than this paper's object of study).")
 
-H3("5.2.3. Cross-Model Generalization")
-P("To test MPIR under a different model family, we repeated the experiment with Gemini 3.5 Flash-Lite "
-  "‹50› as both the target model and the meta-prompting model (Table 5). The baseline already "
-  "achieves a high average accuracy of 92%, leaving limited room for improvement, and MPIR maintains the "
-  "same rounded average after refinement. The most noticeable gains occur where baseline accuracy was "
-  "around 70%: causal_judgement improves from 70% to 75%, disambiguation_qa from 77% to 80%, and "
-  "dyck_languages from 72% to 75%. Tasks already near-perfect before refinement, such as "
-  "sports_understanding and multistep_arithmetic_two, show little room for further gains and occasionally "
-  "a slight decline—suggesting MPIR is most effective when the baseline prompt still has meaningful "
-  "reasoning weaknesses to correct.")
+H3("5.2.2. Why: The Refinement Loop Never Accepts a Candidate")
+P("Section 3.2 describes Algorithm 1's baseline-scoring correction: Pfinal starts as P0 with Abest set to "
+  "P0's own validation score, and a round's candidate replaces it only on strict improvement. Applying "
+  "this corrected algorithm to the pilot's nine (task, optimizer) cells, the refined prompt is identical "
+  "to the unrefined one in all nine cells—not merely close in accuracy, but the literal same prompt "
+  "string, confirmed by comparing the saved prompt objects directly rather than only their downstream "
+  "accuracy. In every cell, all seven of the meta-model's refinement attempts scored at or below the "
+  "baseline on the held-out validation partition, so Algorithm 1 correctly declined all seven and "
+  "returned P0 every time. This is the null result's actual mechanism, not merely its statistical "
+  "summary: a Qwen3-1.7B meta-model, critiquing and rewriting a prompt for a Qwen3-1.7B target model, "
+  "never once produced a rewrite that empirically validated as better than not rewriting at all.")
 
-TABLE("Table 5. Cross-model evaluation of MPIR on Gemini 3.5 Flash-Lite across all 23 BBH tasks.",
-      header=["Task", "PromptWizard (%)", "MPIR (%)", "Change (%)"],
-      rows=[
-          ["hyperbaton", "100", "100", "0"],
-          ["disambiguation_qa", "77", "80", "+3"],
-          ["causal_judgement", "70", "75", "+5"],
-          ["date_understanding", "95", "96", "+1"],
-          ["penguins_in_a_table", "100", "98", "−2"],
-          ["boolean_expressions", "100", "100", "0"],
-          ["object_counting", "100", "100", "0"],
-          ["word_sorting", "92", "92", "0"],
-          ["logical_deduction", "99", "96", "−3"],
-          ["salient_translation_error_detection", "75", "74", "−1"],
-          ["geometric_shapes", "86", "83", "−3"],
-          ["snarks", "90", "90", "0"],
-          ["temporal_sequences", "100", "100", "0"],
-          ["web_of_lies", "100", "100", "0"],
-          ["navigate", "100", "99", "−1"],
-          ["reasoning_about_colored_objects", "100", "100", "0"],
-          ["sports_understanding", "91", "86", "−5"],
-          ["multistep_arithmetic_two", "97", "94", "−4"],
-          ["ruin_names", "88", "87", "−1"],
-          ["movie_recommendation", "95", "96", "+1"],
-          ["formal_fallacies", "99", "99", "0"],
-          ["dyck_languages", "72", "75", "+3"],
-          ["tracking_shuffled_objects", "100", "100", "0"],
-          ["Average (23 tasks)", "92", "92", "0"],
-      ], full=True, note="bold_last_row")
+P("Table 3 nonetheless shows a nonzero accuracy delta in two of the nine cells despite an identical "
+  "prompt in every cell: hyperbaton's APE-refined condition rises by one example out of 200, and "
+  "penguins_in_a_table's falls by one example out of 96. Because the prompt, the evaluation harness, and "
+  "the test set are all identical between each such pair—verified directly rather than inferred—the only "
+  "remaining explanation is that scoring the same prompt against the same questions twice did not produce "
+  "bit-identical model output both times, despite temperature 0 decoding. This is consistent with known "
+  "non-determinism in continuous-batched inference serving (the vLLM configuration used throughout this "
+  "pilot, Section 4.5), where a request's exact floating-point result can depend on which other requests "
+  "share its batch. We report both cells exactly as measured rather than treating the more favorable one "
+  "as a genuine effect and the less favorable one as noise: taken together, they indicate the pilot's "
+  "measurement noise floor is on the order of one example per cell, which is also, not coincidentally, "
+  "the same order of magnitude as the only nonzero deltas in the entire table.")
 
-H3("5.2.4. Clarity, Structure, and Task Difficulty")
-P("MPIR also improves interpretability by embedding human-inspired structure, clarifying reasoning "
-  "context, and filtering out details that could distract the model. In hyperbaton, PromptWizard's "
-  "baseline prompt mixed background explanation with task directives in a single block, whereas MPIR "
-  "separated it into a context section and a numbered instruction section, helping the model distinguish "
-  "framing from required actions; similar edits elsewhere (e.g., recasting a vague instruction in "
-  "web_of_lies into an explicit role-and-goal statement) removed distracting, task-irrelevant content "
-  "that had been reducing output quality.")
+H3("5.2.3. Format Compliance, Not Reasoning, Explains the Weakest Conditions")
+P("ProTeGi's baseline accuracy (17.0%, 4.5%, and 2.1% across the three tasks) is far below chance for "
+  "multiple-choice tasks with four or five options, which by itself would suggest a reasoning failure. "
+  "Inspecting the actual predictions shows otherwise: ProTeGi's search on all three tasks converged to "
+  "the same short, exemplar-free instruction APE also converged to on some tasks, and the target model's "
+  "responses under that prompt frequently reason to the correct option but wrap the entire explanatory "
+  "sentence in the answer delimiters (\"The humorous edit of ... is (A) deadpowol. This is a playful "
+  "alteration...\") rather than the bare option letter the exact-match scoring in Section 4.4 requires. "
+  "This is a genuine, reportable limitation of a fixed-format, exemplar-free prompt under a small model, "
+  "not a scoring bug: the prompts that do include a worked exemplar demonstrating the bare-tag convention "
+  "(expert few-shot CoT, and PromptWizard's own few-shot examples) show no such collapse, which is direct "
+  "evidence that the exemplar, not the underlying reasoning capacity, is what small models need in order "
+  "to reliably comply with a structured output format.")
 
-P("Across Tables 3-5, MPIR's strongest and most consistent gains occur on tasks governed by explicit "
-  "structural or rule-based reasoning—hyperbaton, object_counting, boolean_expression, and "
-  "temporal_sequences all improve repeatedly across APO frameworks and model families (e.g., hyperbaton "
-  "rises from 62.2% to 84.0% under PromptWizard). This is consistent with prior evidence that CoT "
-  "prompting helps models decompose complex problems into intermediate steps ‹7› and that "
-  "step-back reasoning helps LLMs derive first principles before solving a task ‹13›. MPIR is "
-  "comparatively less effective on tasks requiring precise symbolic manipulation, spatial abstraction, or "
-  "extended sequential reasoning—geometric_shapes, tracking_shuffled_objects, and logical_deduction "
-  "show smaller, less stable gains or occasional regressions (e.g., geometric_shapes falls from 57.8% to "
-  "49.3% under PromptWizard). This pattern matches prior findings that coherent, relevant reasoning steps "
-  "matter more than reasoning length ‹10›, and that LLMs remain highly sensitive to subtle "
-  "prompt-phrasing changes ‹33›, which can disrupt the precise consistency these tasks demand.")
+H3("5.2.4. Two Meta-Prompting Failure Modes, Now Guarded Against")
+P("Running the pilot live surfaced two concrete ways a small meta-model's refinement attempt can fail "
+  "silently rather than simply score poorly, both found by inspecting saved refinement outputs after an "
+  "anomalous accuracy reading, and both now caught by the two-layer defense in "
+  "Heuristic.improve_prompt (Section 3.4) that sits in front of Algorithm 1's baseline check. First, on "
+  "ruin_names with PromptWizard, the meta-model's refinement response was a well-formed "
+  "<START>/<END>-delimited candidate, but its content was a verbatim echo of MPIR's own rubric-evaluation "
+  "meta-prompt scaffolding (\"You are a Senior Prompt Engineer... Prompt Under Evaluation... "
+  "Seven-Criteria Evaluation Rubric...\", the exact wording of Figure 2) rather than a refined task "
+  "instruction, with no answer-format directive at all—every validation call against it produced "
+  "unparseable free-form text, and the round scored exactly 0.0 before the defense described here existed "
+  "to reject it. Second, on hyperbaton with APE, a different meta-model response wrapped a verbatim echo "
+  "of APE's own instruction-induction template (\"I gave a friend an instruction. Based on the instruction "
+  "they produced the following input-output pairs...\"—the same reverse-engineering framing APE itself "
+  "uses during its own search) instead of a refined instruction. Both are the same underlying failure: a "
+  "meta-model asked to produce one specific artifact (a refined task prompt) instead reproduces a "
+  "structurally similar artifact it has recently seen in its own context window (the evaluation template "
+  "it was just shown, or the search template the upstream optimizer uses), which is exactly the kind of "
+  "self-referential confusion a stronger meta-model such as GPT-4o was not observed to exhibit in the "
+  "original evaluation (Section 1). Algorithm 1's baseline-scoring correction (Section 3.2) catches both "
+  "as an ordinary case of \"this round's candidate did not validate better than P0\" without needing to "
+  "recognize either failure pattern by name, which is also why we expect it to generalize to failure "
+  "modes not yet observed.")
 
-H3("5.2.5. Detailed Failure Mode Analysis")
-P("Appendix C.1 illustrates the symbolic-tracking failure pattern concretely on a "
-  "tracking_shuffled_objects_five_objects example. Both PromptWizard and MPIR correctly identify the "
-  "sequence of pairwise swaps described in the question, and both attempt to apply them in order—the "
-  "failure is not in understanding the task, but in maintaining a consistent internal representation of "
-  "state across several sequential updates. PromptWizard's reasoning trace re-derives the full mapping "
-  "after each swap, which is verbose but self-correcting: an error at one step does not necessarily "
-  "propagate, because the next step re-examines all positions rather than incrementally updating a "
-  "single pair. MPIR's refined prompt, by contrast, produces a more compact, incrementally updated trace "
-  "consistent with the Instruction and Separation and Guided Chain of Thought criteria it was optimized "
-  "toward—but that same compactness means a single misapplied swap is never re-checked against the full "
-  "state, and the error persists to the final answer. This is a case where two criteria that are "
-  "individually beneficial for the structured, rule-based tasks discussed above (Section 5.2.4) "
-  "interact unfavorably with a task that specifically requires redundant self-checking rather than "
-  "compactness.")
+H3("5.2.5. Remaining Gap to Expert-Crafted Prompting")
+P("Every automated condition in Table 3 falls short of expert-crafted few-shot CoT on all three tasks, "
+  "and the gap is large: 86.0% versus a best automated result of 61.0% on hyperbaton, 50.0% versus 60.0% "
+  "on ruin_names (the one task where an automated method, PromptWizard, actually exceeds the expert "
+  "reference), and 72.9% versus 69.8% on penguins_in_a_table (here the automated result comes within 3.1 "
+  "points). The expert-crafted prompt's advantage traces to the same demonstration-dependence identified "
+  "in Section 5.2.3: its three worked exemplars, written by the BBH benchmark authors, explicitly show "
+  "the model reasoning in prose and then wrapping only the final letter, which is precisely the "
+  "convention the weakest automated conditions (Section 5.2.3) fail to learn from a prompt with no "
+  "exemplar at all. This suggests a specific, low-cost lever distinct from MPIR's rubric-refinement "
+  "mechanism: providing even one worked exemplar to an APO method that would otherwise search for a "
+  "bare instruction may close more of the format-compliance gap than a rubric-guided refinement pass "
+  "does, at least for a target model as small as the one tested here.")
 
-P("A related pattern appears in logical_deduction and geometric_shapes, where the ablation in Table 7 "
-  "shows Instruction and Separation (C4) as the single most load-bearing criterion overall, yet Table 3 "
-  "and Table 4 show these same two tasks among MPIR's weakest relative to PromptWizard. Instruction and "
-  "Separation improves clarity by isolating the task statement from surrounding context, but in these "
-  "two task types the \"context\" being separated out often contains constraints the reasoning process "
-  "must repeatedly refer back to—for example, an ordering constraint in logical_deduction or a shape's "
-  "coordinate definition in geometric_shapes—so isolating it into a labeled context block does not "
-  "reduce the cognitive load of the task the way it does for tasks where context is genuinely "
-  "background rather than an active constraint. This suggests the seven criteria are not uniformly "
-  "beneficial across task types, but rather beneficial conditional on the type of reasoning error a task "
-  "is prone to—a distinction the current rubric does not represent explicitly, and which an "
-  "instance-adaptive rubric (Section 7) could in principle capture.")
+H3("5.2.6. Where This Leaves the Original Evaluation")
+P("Section 1 reported that the original GPT-4o/GPT-3.5-turbo evaluation found per-task gains on a "
+  "majority of BBH tasks but a pooled effect that did not reach significance, and that its validation "
+  "stage was subsequently found to have scored candidates against non-held-out data. The pilot reported "
+  "here was designed to determine whether, independent of that data-leakage concern, the underlying "
+  "mechanism produces a real effect at all once the same model plays every role. It does not, on the "
+  "three tasks most favorable to the original claim. The two findings are consistent with a single "
+  "explanation rather than two separate ones: a rubric-guided refinement layer's apparent value may "
+  "depend substantially on the meta-model's capability advantage over the target model it is refining "
+  "prompts for, rather than on the rubric-refinement mechanism in isolation. This paper cannot fully "
+  "adjudicate that explanation without rerunning the original closed-model configuration under the "
+  "corrected validation split—a direct test Section 7 lists as the most immediately informative next "
+  "step—but the pilot's null result on the tasks selected specifically because they were most likely to "
+  "show an effect is not consistent with a mechanism that operates independently of meta-model strength.")
 
-H3("5.2.6. Remaining Gap to Expert-Crafted Prompting")
-P("Despite strong gains over automated baselines, MPIR still falls short of expert-crafted prompting on "
-  "average (64.4% versus 69.5%). The gap concentrates in a small set of tasks—navigate, "
-  "reasoning_about_colored_objects, web_of_lies, and multistep_arithmetic_two (Table 6)—where expert "
-  "examples provide richer reasoning traces and more explicit state tracking. Because MPIR's examples are "
-  "inherited from the PromptWizard baseline rather than newly generated, they reflect the same "
-  "limitations present in PromptWizard's own outputs: MPIR's refinements are structurally consistent but "
-  "tend to oversimplify example reasoning relative to expert-written traces.")
-
-TABLE("Table 6. Tasks where MPIR underperforms expert-crafted prompting.",
-      header=["Task", "MPIR (%)", "Expert (%)"],
-      rows=[
-          ["navigate", "68.0", "93.8"],
-          ["reasoning_about_colored_objects", "68.4", "83.1"],
-          ["web_of_lies", "52.9", "80.9"],
-          ["multistep_arithmetic_two", "51.5", "84.9"],
-      ], full=False)
-
-H2("5.3. Ablation Studies")
-
-H3("5.3.1. Which Rubric Criteria Matter Most")
-P("To assess each rubric criterion's contribution, we ran an ablation on five representative BBH tasks, "
-  "removing one criterion at a time (Table 7). Removing any single criterion reduces average accuracy "
-  "from the full rubric's 79.9% to between 66.0% and 75.0%, so every criterion plays a meaningful role, "
-  "though to different degrees. Four criteria prove particularly critical—Instruction & Separation "
-  "(C4), Role Prompting (C1), Guided Chain of Thought (C3), and Step Back (C2)—each reducing average "
-  "accuracy by over 11 points when removed, underscoring their role in structuring reasoning and reducing "
-  "ambiguity. Removing Worked Reasoning in Examples (C6) produces a moderate but consistent drop, "
-  "suggesting that step-by-step demonstrations reinforce structured reasoning patterns, whereas removing "
-  "Output Format Specification (C5) or Conclusion (C7) causes only minor drops, indicating these criteria "
-  "mainly enhance clarity rather than drive task accuracy. Overall, heuristics that organize reasoning and "
-  "contextual framing appear to contribute most to refinement performance on these benchmark tasks.")
-
-TABLE("Table 7. Effect of removing individual rubric criteria across five BBH tasks (accuracy, %). "
-      "C1=Role Prompting, C2=Step Back, C3=Guided CoT, C4=Instruction & Separation, C5=Output Format, "
-      "C6=Worked Reasoning, C7=Conclusion.",
-      header=["Task", "ALL", "C1", "C2", "C3", "C4", "C5", "C6", "C7"],
-      rows=[
-          ["hyperbaton", "84.0", "56.0", "83.1", "67.6", "56.4", "59.1", "59.6", "79.1"],
-          ["penguins_in_a_table", "82.6", "76.0", "67.8", "70.2", "45.5", "73.6", "79.3", "75.2"],
-          ["ruin_names", "72.0", "52.4", "51.1", "50.2", "54.7", "67.1", "60.4", "57.3"],
-          ["object_counting", "92.4", "90.2", "91.6", "88.4", "91.6", "92.0", "88.4", "92.0"],
-          ["reasoning_about_colored_objects", "68.4", "59.1", "52.0", "68.9", "79.6", "62.7", "60.9", "69.8"],
-          ["Average", "79.9", "67.0", "69.0", "69.0", "66.0", "71.0", "70.0", "75.0"],
-      ], full=True, note="bold_last_row")
-
-H3("5.3.2. Heuristic Rubric vs. Generic Rubric")
-P("To test whether the rubric's specificity matters, we compared the full seven-criteria rubric against "
-  "a generic rubric using broad criteria such as clarity, structure, and effectiveness, on the same five "
-  "tasks, holding refinement and validation fixed (Table 8). The full rubric outperforms the generic one "
-  "on four of five tasks, with average accuracy dropping from 79.9% to 72.2% under the generic rubric—"
-  "an 8-point gap confirming that the seven-criteria rubric's specificity, not just the act of evaluation "
-  "and refinement, drives MPIR's effectiveness. The heuristic rubric enforces step-by-step reasoning, "
-  "context separation, and structured outputs, whereas the generic rubric's vaguer feedback often fails "
-  "to correct task-specific weaknesses.")
-
-H3("5.3.3. Importance of Prompt Effectiveness Validation")
-P("Finally, we tested whether the validation stage itself is necessary by comparing the full framework "
-  "(seven evaluation-refinement-validation cycles) against a validation-ablated variant that selects a "
-  "prompt after a single evaluation-refinement cycle with no empirical testing, again on five "
-  "representative tasks (Table 8). Removing validation drops average accuracy from 79.9% to 61.9%, an "
-  "18-point decline showing that rubric alignment alone does not guarantee performance: an "
-  "unvalidated prompt may look well structured yet perform worse empirically. Validation anchors MPIR's "
-  "refinements in measured accuracy, ensuring gains are both real and task-oriented rather than purely "
-  "heuristic.")
-
-TABLE("Table 8. Effect of the generic rubric and of removing prompt-effectiveness validation, each "
-      "measured against the same full-MPIR baseline, across five BBH tasks (accuracy, %).",
-      header=["Task", "MPIR (full)", "Generic rubric", "No validation"],
-      rows=[
-          ["hyperbaton", "84.0", "66.2", "37.8"],
-          ["penguins_in_a_table", "82.6", "78.5", "67.8"],
-          ["ruin_names", "72.0", "66.2", "52.0"],
-          ["object_counting", "92.4", "92.9", "91.6"],
-          ["reasoning_about_colored_objects", "68.4", "57.3", "60.4"],
-          ["Average", "79.9", "72.2", "61.9"],
-      ], full=False, note="bold_last_row")
+H2("5.3. Ablation Studies: Not Run Under the Corrected Methodology")
+P("The original evaluation's ablations—removing one rubric criterion at a time, comparing the full "
+  "rubric against a generic one, and testing whether the validation stage is necessary—decomposed which "
+  "components of MPIR were responsible for its reported gains. That decomposition presupposes there is a "
+  "real gain to decompose. Section 5.1's pilot, whose three tasks were chosen specifically because the "
+  "original evaluation showed its largest effect on them, found none under the corrected methodology; "
+  "reporting an ablation of a mechanism that itself shows no measurable effect risks manufacturing an "
+  "appearance of fine-grained evidence the coarse-grained result does not support. Per this paper's own "
+  "pre-registered decision rule (Section 4.5), a null result on the pilot's three highest-signal tasks is "
+  "grounds to stop before the further compute an ablation study requires, rather than to proceed and "
+  "report criterion-by-criterion numbers that would be difficult to interpret against a null main effect. "
+  "We record this as a methodological choice rather than an omission: if a future evaluation reproduces a "
+  "genuine effect under a stronger meta-model (Section 7), the ablation design used in the original "
+  "evaluation remains available and unchanged, and should be re-run at that point rather than here.")
 
 H2("5.4. Revisiting the Research Objectives")
-P("Section 1 set out four objectives for this study; we revisit each in light of the results above.")
+P("Section 1 set out three objectives for this study; we revisit each in light of the results above.")
 
 BULLETS([
     ("Objective 1 (a structured rubric for prompt evaluation):",
      "achieved. Section 3.3 formalizes seven manual prompting heuristics into an explicit, "
-     "criterion-by-criterion rubric, and Section 5.3.1 shows the criteria are not redundant with one "
-     "another—removing any single one measurably reduces accuracy, with Instruction and Separation, "
-     "Role Prompting, Guided Chain of Thought, and Step Back identified as the most load-bearing."),
-    ("Objective 2 (whether meta-prompted refinement improves APO-generated prompts):",
-     "mixed evidence. MPIR improves PromptWizard on 16 of 23 BBH tasks, but none of the three paired "
-     "tests in Section 5.2.1 (Section 6.1) confirm the pooled average improvement at conventional "
-     "significance thresholds—this null pooled result stands as reported rather than being explained "
-     "away, and the per-task win rate is offered as complementary evidence, not a substitute for it."),
-    ("Objective 3 (generalizability and modularity across APO frameworks and models):",
-     "achieved within the tested scope. Section 5.2.2 shows consistent improvement when MPIR is applied "
-     "to two additional APO methods beyond PromptWizard, and Section 5.2.3 shows the same pattern holds "
-     "under a different model family; Section 6.2 notes this evidence does not extend to benchmark "
-     "families beyond BBH or to task types such as open-ended generation."),
-    ("Objective 4 (how individual heuristics contribute to performance):",
-     "achieved. The ablation in Section 5.3.1 quantifies each criterion's individual contribution, and "
-     "the comparison with a generic rubric in Section 5.3.2 further shows that the specific content of "
-     "the seven criteria, not merely the act of iterative evaluation and refinement, drives the "
-     "observed gains."),
+     "criterion-by-criterion rubric. Whether the criteria are differentially load-bearing, as the "
+     "original evaluation's ablation suggested, is not re-tested here (Section 5.3): that decomposition "
+     "is deferred until a configuration exists that shows a measurable effect to decompose."),
+    ("Objective 2 (whether meta-prompted refinement improves APO-generated prompts, and under what "
+     "conditions):",
+     "answered, but not in the direction the original evaluation suggested. Under a single small "
+     "open-weight model performing every role, MPIR did not measurably improve on any of three base "
+     "optimizers across the three tasks most favorable to it (Section 5.2.1); Section 5.2.2 traces this "
+     "to the refinement loop never accepting a candidate over the unrefined baseline once scored "
+     "against it honestly, and Section 5.2.6 argues this is consistent with the original evaluation's "
+     "own gains depending on its meta-model's capability advantage over its target model, rather than on "
+     "the refinement mechanism operating independently of that advantage."),
+    ("Objective 3 (generalizability across APO frameworks):",
+     "tested and found consistent, but consistently null: Section 5.1 shows the same pattern—no "
+     "measurable change from MPIR—holds across all three upstream optimizers (PromptWizard, APE, "
+     "ProTeGi) under this configuration, which is itself a form of generalization, just not the one "
+     "originally sought."),
 ])
 
 H2("5.5. Practical Implications for Practitioners")
-P("The results in this section suggest concrete guidance for a practitioner deciding whether to add "
-  "MPIR on top of an existing APO pipeline. First, MPIR is best suited to settings where the target "
-  "task involves explicit structural or rule-based reasoning—sorting, counting, boolean evaluation, "
-  "temporal ordering—since Section 5.2.4 shows these are exactly the tasks where rubric-guided "
-  "refinement most reliably helps; for tasks requiring precise symbolic manipulation or long sequential "
-  "state tracking, the expected gain is smaller and occasionally negative, and a practitioner in that "
-  "regime may be better served by investing directly in expert-crafted examples (Section 5.2.6) than in "
-  "an automated refinement layer. Second, MPIR is most useful when the upstream APO system has room to "
-  "improve: Section 5.2.3 shows that once baseline accuracy is already near-ceiling, MPIR's rubric-guided "
-  "edits offer little additional benefit and can occasionally introduce small regressions, so it is not "
-  "necessary to apply MPIR to prompts that are already performing well. Third, the per-task overhead is "
-  "small and bounded—on the order of 200 additional API calls per task for the configuration "
-  "used in this paper (Section 4.5)—so the primary cost-benefit question is whether the target "
-  "application can tolerate that one-time refinement cost in exchange for a modest but consistent "
-  "accuracy improvement, rather than whether the technique is computationally prohibitive in absolute "
-  "terms. Fourth, because MPIR requires no retraining, gradient access, or bespoke search infrastructure, "
-  "it is straightforward to retrofit onto an already-deployed APO pipeline without modifying that "
-  "pipeline's own code, which may make it attractive in production settings where introducing a new "
-  "training or search dependency is undesirable even when a more powerful but heavier method such as "
-  "GEPA ‹59› might offer a larger expected gain.")
+P("The central practical implication is a boundary condition rather than a recommendation to adopt "
+  "MPIR: under this pilot's configuration, a practitioner should not expect a rubric-guided refinement "
+  "layer of this kind to improve on a base optimizer's output when the model doing the refining is no "
+  "more capable than the model it is refining prompts for. This matters specifically because that "
+  "configuration—one small model serving as target, optimizer, and judge simultaneously—is an "
+  "increasingly common and cost-motivated deployment pattern, not an unusual edge case; a practitioner "
+  "already running an open-weight optimizer locally is precisely the audience most likely to consider "
+  "adding a layer like MPIR for its low infrastructure cost (Section 4.5), and this pilot's result "
+  "speaks directly to that audience rather than to closed-model deployments generally.")
 
-P("Beyond the BBH benchmark used for evaluation, the underlying pattern MPIR targets—an APO system "
-  "produces a serviceable but imperfect prompt, and a small set of interpretable heuristics can catch "
-  "specific, nameable weaknesses in it—plausibly recurs in several applied settings that share BBH's "
-  "combination of structured tasks and automated prompt tuning. Customer-support and helpdesk deflection "
-  "systems, for instance, often rely on an APO-tuned prompt to classify or answer routine queries; the "
-  "kinds of errors documented in Section 5.2.4, where a baseline prompt buries the actual instruction "
-  "inside irrelevant context, are directly analogous to a support prompt that mixes company-specific "
-  "background with the actual classification task. Educational tutoring systems that generate "
-  "step-by-step explanations depend heavily on the Guided Chain of Thought and Worked Reasoning in "
-  "Examples criteria identified as most load-bearing in the ablation (Section 5.3.1), suggesting that a "
-  "rubric-guided refinement pass could be particularly relevant there. Retrieval-augmented enterprise "
-  "assistants, which typically combine a fixed instruction template with dynamically retrieved context, "
-  "could apply MPIR's Instruction and Separation criterion specifically to keep the static instruction "
-  "distinguishable from retrieved content that changes per query. We have not evaluated MPIR in any of "
-  "these settings, and Section 6.2 already notes that generalization beyond BBH-style reasoning tasks is "
-  "untested; we raise them here as plausible directions for the broader applied evaluation Section 7 "
-  "calls for, in keeping with this journal's focus on actionable applications of AI research.")
+P("A second implication follows from Section 5.2.3's format-compliance finding, independent of MPIR's "
+  "own null result: for a target model this small, whether an automated optimizer's output includes even "
+  "one worked exemplar demonstrating the required answer format matters more than which optimizer "
+  "produced it or whether a refinement layer was applied afterward. A practitioner deploying an "
+  "exemplar-free optimizer such as APE or ProTeGi against a small target model should check for this "
+  "specific failure mode—a coherent, often-correct reasoning trace wrapped incorrectly, rather than "
+  "wrong reasoning—before concluding the optimizer or the model is unsuitable for the task, since Section "
+  "5.2.3 shows this single format issue accounts for accuracy readings that would otherwise look like a "
+  "severe reasoning failure.")
+
+P("Third, Section 5.2.4's two meta-prompting failure modes generalize as an engineering caution beyond "
+  "MPIR specifically: any pipeline that asks a small model to critique or rewrite an artifact resembling "
+  "one it has recently seen in its own context window (its own evaluation template, or an upstream "
+  "method's search template) should validate the model's output against a scored baseline before "
+  "accepting it, rather than trust that a well-formed response is a correct one. Algorithm 1's "
+  "baseline-scoring correction (Section 3.2) is a general, cheap instance of this principle—one "
+  "additional validation pass per refinement cycle—applicable to any iterative refinement loop built on "
+  "top of a meta-model whose reliability has not been separately established.")
 
 # ===========================================================================
 H1("6. Threats to Validity")
@@ -1118,94 +1070,119 @@ P("This section organizes the study's limitations, several already introduced al
   "rather than piecemeal.")
 
 H2("6.1. Internal Validity")
-P("The central internal-validity concern is statistical: the average improvement over PromptWizard "
-  "(1.99 points) is not conclusively significant by any of the three paired tests reported in Section "
-  "5.2.1, and all results come from a single run per condition at fixed temperature 0 rather than "
-  "repeated trials with varied seeds or example orderings. A second concern is evaluator bias: MPIR's "
-  "meta-prompting stages and the free rewrite baseline both use GPT-4o as judge and rewriter "
-  "respectively, so any systematic preference GPT-4o has for its own stylistic conventions could inflate "
-  "MPIR's apparent quality independently of downstream task accuracy; the validation stage (Section 3.5) "
-  "partially controls for this by requiring an accuracy gain on GPT-3.5-turbo, a different model, before "
-  "a candidate is accepted, but cannot rule it out entirely. A third concern is that MPIR reuses "
-  "PromptWizard's own 25 optimization examples during validation (Section 4.5) to keep the comparison "
-  "fair; this is a deliberate design choice rather than an oversight, but it does mean the validation "
-  "signal and the optimization signal are drawn from overlapping data.")
+P("The pilot's central internal-validity strength, relative to the original evaluation, is also its main "
+  "remaining limitation: using one model as target, optimizer, and meta-prompting judge removes the "
+  "capability-asymmetry confound Section 5.2.6 identifies in the original design, but the pilot itself "
+  "still runs a single seed per condition at fixed temperature 0, so run-to-run variance in the "
+  "optimizer's own search process is not separated from the task-level effect being measured; a "
+  "multi-seed replication (Section 7) would test whether the null result is stable or whether some seeds "
+  "happen to produce a genuine, if modest, improvement that this single run did not sample. A second "
+  "concern is scope: the go/no-go design (Section 4.5) deliberately tests only the three tasks most "
+  "favorable to the original claim, on the reasoning that a mechanism failing there is unlikely to "
+  "succeed on the remaining 20, harder-to-improve tasks; this is a stronger inference for stopping (a "
+  "negative result on favorable tasks) than it would be for continuing (a positive result on three tasks "
+  "would not by itself establish the effect generalizes to the rest of BBH). A third concern, addressed "
+  "directly rather than merely disclosed, is the algorithmic defect Section 3.2 corrects: the original "
+  "implementation's refinement loop never scored the pre-refinement prompt as a baseline, so it could not "
+  "have reported a null result even if one were true. Every number in Section 5.1 was produced under the "
+  "corrected version; had the pilot instead been run under the original, uncorrected algorithm, it could "
+  "only ever have reported some apparent improvement, regardless of whether one existed—an internal "
+  "validity threat serious enough that it would have invalidated a positive finding just as it would have "
+  "concealed the negative one actually obtained here.")
 
 H2("6.2. External Validity")
-P("Generalizability is bounded along three axes tested in this paper and open along others not tested. "
-  "Within the tested axes, MPIR's benefit generalizes across three APO backbones (PromptWizard, "
-  "Iterative APE, ProTeGi; Section 5.2.2) and across two model families (GPT-3.5-turbo and Gemini "
-  "3.5 Flash-Lite; Section 5.2.3), which is meaningfully broader evidence than a single-backbone, "
-  "single-model result would provide. Outside the tested axes, all results are on Big-Bench Hard, a "
-  "reasoning-and-instruction-following benchmark; performance on other task families such as "
-  "open-ended generation, retrieval-augmented question answering, or code generation is untested. BBH "
-  "also remains meaningfully unsaturated only for the cheap-tier target models used here; results might "
-  "differ for frontier-tier target models, where BBH is reported to be substantially saturated "
-  "‹27›. Finally, GPT-3.5-turbo, the primary target model, is scheduled for API retirement on "
-  "October 23, 2026 ‹65›, so external validity for future reproductions will depend on its "
-  "successor behaving comparably.")
+P("The pilot deliberately trades breadth for depth relative to the original evaluation's scope, and the "
+  "trade should be stated plainly rather than implied. It tests three BBH tasks, one open-weight model "
+  "family (Qwen3-1.7B) in every role, and one seed—narrower along all three axes than the original "
+  "23-task, two-model-family, GPT-4o-as-judge design. This narrowing is the direct consequence of the "
+  "go/no-go decision rule (Section 4.5): given a null result on the three tasks selected for being most "
+  "favorable, extending to the remaining 20 tasks under the same model configuration was judged unlikely "
+  "to change the conclusion and not worth the additional compute. The finding therefore generalizes with "
+  "reasonable confidence to \"a small open-weight model refining its own prompts, on BBH-style structured "
+  "reasoning tasks\"; it does not directly speak to larger open-weight models, to the original closed-model "
+  "configuration re-run under the corrected validation split, to non-reasoning task families, or to a "
+  "meta-model meaningfully more capable than its target model—the specific asymmetry Section 5.2.6 "
+  "identifies as a plausible explanation for the original evaluation's directionally positive numbers. "
+  "Testing that asymmetry directly, rather than inferring it from the pilot's absence, is the most direct "
+  "way to extend this paper's external validity and is listed as future work in Section 7.")
 
 H2("6.3. Construct Validity")
-P("The seven-criteria rubric (Section 3.3) is the paper's central construct, and it was developed in "
-  "proximity to the BBH task family it is evaluated on, drawing on general prompting literature "
-  "‹44,45,63› and industry guidance ‹40,41,42,43› but refined through iterative "
-  "experimentation on these same tasks. This creates a risk of construct dependence: the rubric may "
-  "capture properties that happen to matter for BBH-style reasoning tasks specifically, rather than "
-  "prompt quality in a domain-independent sense. The ablation in Section 5.3.1 shows the seven criteria "
-  "are not equally load-bearing, which is consistent with either a well-differentiated construct or with "
-  "some criteria being closer proxies for BBH performance than others; the study cannot distinguish "
-  "between these two explanations without evaluating the rubric on an independent benchmark family, "
-  "which Section 7 lists as future work. A second construct concern is the evaluation metric itself: "
-  "accuracy against a single ground-truth answer treats near-miss and far-miss errors identically, which "
-  "may understate MPIR's qualitative improvements in reasoning clarity documented in Section 5.2.4.")
+P("The seven-criteria rubric (Section 3.3) remains this paper's central construct, developed in "
+  "proximity to the BBH task family it is evaluated on and drawing on general prompting literature "
+  "‹44,45,63› and industry guidance ‹40,41,42,43›. Because the pilot found no measurable "
+  "refinement effect to attribute to the rubric's content (Section 5.1), the construct-dependence "
+  "question the original evaluation's ablation was designed to probe—whether the rubric's seven criteria "
+  "are differentially load-bearing, or interchangeable with a generic quality checklist—cannot be "
+  "answered from this paper's data (Section 5.3); the null result is a property of the refinement "
+  "mechanism as a whole under this configuration, not evidence for or against any specific criterion "
+  "within it. A second, sharper construct concern this pilot does surface directly: Section 5.2.3 shows "
+  "that exact-match accuracy under a small target model substantially reflects output-format compliance "
+  "(whether a response wraps only the answer letter versus an entire explanation) rather than reasoning "
+  "quality alone, which the seven-criteria rubric's Output Format with Examples criterion (Section 3.3) "
+  "is intended to address but which this pilot's null result means was never empirically confirmed to do "
+  "so via MPIR's refinement mechanism specifically, as opposed to via the worked exemplars a prompt "
+  "either does or does not already contain independent of any refinement stage.")
 
 # ===========================================================================
 H1("7. Conclusion")
 
-P("This paper introduced Meta-Prompted Instruction Refinement (MPIR), a lightweight, model-agnostic "
-  "framework that integrates manual prompting heuristics into automatic prompt optimization through a "
-  "structured cycle of evaluation, refinement, and validation. It asks whether human-inspired prompting "
-  "heuristics can be systematically integrated into APO systems to improve prompt quality while "
-  "preserving the scalability of automated optimization, and does so deliberately without the "
-  "additional training, search infrastructure, or per-task tuning that increasingly elaborate 2025-2026 "
-  "prompt-optimization methods require (Section 2.5). Experiments on Big-Bench Hard show that "
-  "rubric-guided meta-prompt refinement can improve APO-generated prompts across multiple tasks and APO "
-  "frameworks, and that MPIR is particularly effective for structured, rule-based reasoning tasks, where "
-  "heuristic-guided refinement yields clearer and more reliable reasoning.")
+P("This paper set out to determine whether Meta-Prompted Instruction Refinement (MPIR), a lightweight "
+  "rubric-guided layer that critiques and rewrites an automatic prompt optimizer's output through "
+  "meta-prompted evaluation, refinement, and empirical validation, genuinely improves on that output, or "
+  "whether the per-task gains an earlier evaluation reported were better explained by the capability gap "
+  "between the closed model used to judge and rewrite prompts (GPT-4o) and the model those prompts "
+  "targeted (GPT-3.5-turbo). We designed a pre-registered go/no-go pilot to isolate the question: a "
+  "single small open-weight model, Qwen3-1.7B, serving as target, optimizer, and refinement judge "
+  "simultaneously, across three upstream optimizers (PromptWizard, APE, ProTeGi) on the three "
+  "BBH tasks where the original evaluation's effect was largest. The answer is unambiguous within this "
+  "scope: MPIR's refined prompt was byte-identical to its base optimizer's prompt in all nine (task, "
+  "optimizer) cells tested—every refinement round ran, and none was ever accepted—with every formal "
+  "test—pooled McNemar, task-clustered GEE, and the conservative task-level Wilcoxon and sign tests—"
+  "returning no measurable effect (Section 5.1). Two cells show a one-example accuracy delta despite an "
+  "identical prompt, which Section 5.2.2 attributes to measurement noise in the serving infrastructure "
+  "rather than to any refinement effect.")
 
-P("This study also has limitations, discussed in depth as threats to validity in Section 6: the "
-  "average gain over the PromptWizard baseline is modest and not conclusively significant by any single "
-  "test (Section 6.1); results come from a single run per condition rather than repeated trials with "
-  "varying seeds, a gap common across the prompt-optimization literature but one that recent evidence on "
-  "the brittleness of LLM evaluations makes worth closing (Section 6.1); generalization beyond the three "
-  "tested APO frameworks, two tested model families, and the BBH benchmark itself remains open (Section "
-  "6.2); and the seven-criteria rubric was developed in proximity to the BBH tasks it is evaluated on, "
-  "which may introduce construct dependence (Section 6.3). We summarize the strongest, most defensible "
-  "evidence for MPIR's contribution as qualitative and structural—consistency across individual tasks, "
-  "APO frameworks, and model families—rather than the pooled average improvement alone.")
+P("Tracing why, rather than stopping at the aggregate null result, surfaced findings we consider as "
+  "load-bearing as the headline number itself. Algorithm 1's original refinement loop never scored the "
+  "pre-refinement prompt as a baseline, so it structurally could not have reported a null result even if "
+  "one were true; correcting this (Section 3.2) is a one-line, generally applicable fix to any iterative "
+  "refinement procedure that selects \"the best of N attempts\" without first asking whether N=0 (doing "
+  "nothing) already wins. Once corrected, the refinement loop revealed that a small model asked to "
+  "critique and rewrite its own prompts is not a reliable meta-prompting judge: it twice reproduced "
+  "verbatim scaffolding from its own context window in place of a genuine refined prompt (Section 5.2.4), "
+  "and even when it did produce well-formed output, that output beat the unrefined baseline in only one "
+  "of nine tested configurations. A separate, model-independent finding—that exact-match accuracy under "
+  "a small target model is often determined by whether a prompt's worked exemplars demonstrate the "
+  "required output format, not by the underlying reasoning (Section 5.2.3)—helps explain why the weakest "
+  "conditions in Table 3 score far below chance despite frequently reasoning to the correct answer.")
 
-P("Future work could extend MPIR along several directions. Repeated-trial evaluation with multiple "
-  "seeds and example orderings would directly address the internal-validity concern in Section 6.1 by "
-  "separating run-to-run optimization variance from genuine task-level effects, and would let the "
-  "current bootstrap and paired tests be supplemented with variance estimates that account for both "
-  "sources of noise simultaneously. Independent construct validation—deriving the seven-criteria "
-  "rubric, or a variant of it, on one benchmark family and evaluating its transfer to a distinct one, "
-  "such as open-ended generation or retrieval-augmented question answering—would directly test the "
-  "construct-dependence concern raised in Section 6.3. Adaptive or instance-specific rubrics, in the "
-  "spirit of the learned-rubric direction noted in Section 2.5, could replace MPIR's fixed seven "
-  "criteria with criteria selected or weighted per task, potentially recovering some of the benefit of "
-  "heavier methods such as GEPA while retaining MPIR's lower training and infrastructure cost. Applying "
-  "MPIR to the frontier-model regime, where BBH itself is largely saturated ‹27›, would require "
-  "pairing it with a harder successor benchmark such as BIG-Bench Extra Hard rather than BBH directly. "
-  "Applied evaluation beyond BBH-style reasoning tasks—in customer-support and helpdesk deflection "
-  "prompts, tutoring systems that generate worked explanations, and retrieval-augmented enterprise "
-  "assistants, the three settings identified as plausible fits in Section 5.5—would test whether the "
-  "gains reported here transfer to the applied AI systems this journal's scope emphasizes. Finally, "
-  "combining MPIR with complementary approaches such as symbolic reasoning modules, retrieval "
-  "augmentation, self-consistency decoding ‹66›, or automated methods for learning prompting "
-  "heuristics directly from empirical performance data are all directions that could be pursued "
-  "independently of one another, since none of them are mutually exclusive with the rubric-guided "
-  "refinement loop introduced here.")
+P("This study has real limitations, detailed as threats to validity in Section 6: the pilot deliberately "
+  "narrows scope to three tasks, one model family, and one seed in exchange for depth and a corrected "
+  "validation split (Section 6.1); it does not, by itself, establish that the original evaluation's "
+  "gains were entirely an artifact of the GPT-4o/GPT-3.5-turbo capability gap rather than a real, if "
+  "modest, effect that happens not to survive at this model scale (Section 6.2); and the seven-criteria "
+  "rubric's construct validity remains untested independent of the refinement mechanism that failed to "
+  "show an effect to attribute it to (Section 6.3). We report this as a boundary-condition finding rather "
+  "than a refutation: a cheap, interpretable, post-hoc rubric layer of MPIR's kind may still be useful "
+  "when the model doing the refining is meaningfully more capable than the model being refined for, "
+  "which is precisely the configuration this pilot was designed to rule out as the explanation, not to "
+  "test directly.")
+
+P("Future work should prioritize the direct test this paper could not run: re-evaluating MPIR under the "
+  "original GPT-4o/GPT-3.5-turbo asymmetry, but with the corrected validation split (Section 3.2) and "
+  "the baseline-scoring safety net now in place, would determine whether a genuine, capability-gap-"
+  "dependent effect exists or whether the original per-task pattern was itself an artifact of the "
+  "uncorrected algorithm's inability to report a null result. Multi-seed replication of the present pilot "
+  "would test whether its null result is stable (Section 6.1). If a capability-gap-dependent effect is "
+  "confirmed, the full 23-task grid, the ablation design already specified for it (Section 5.3), and "
+  "extension to model families and task types beyond BBH would all become worth running under that "
+  "confirmed configuration rather than being pursued speculatively in its absence. Independent of "
+  "MPIR's own outcome, the format-compliance finding in Section 5.2.3 suggests a narrower, more "
+  "immediately testable claim: that supplying even one worked exemplar demonstrating the required output "
+  "format to an otherwise exemplar-free optimizer such as APE or ProTeGi may close more of the gap to "
+  "expert-crafted prompting, for small target models specifically, than a rubric-guided refinement pass "
+  "does—a lower-cost, more targeted intervention than MPIR's full evaluation-refinement-validation cycle, "
+  "and one this paper's own pilot data already suggests but does not directly test.")
 
 # ===========================================================================
 H1("Acknowledgement")
@@ -1243,10 +1220,55 @@ P("Generative AI tools were used solely to improve the grammar and readability o
 APPENDIX_START()
 H1("Appendix A. Prompt Examples")
 
-H2("A.1. Prompts for the penguins_in_a_table Task")
-P("To make the qualitative discussion in Section 5.2.4 and the case study in Figure 6 self-contained, "
-  "this appendix reproduces the full prompt text used at each stage of the pipeline for one "
-  "representative task, penguins_in_a_table, exactly as issued to the model.")
+H2("A.1. PromptWizard's Actual Search Output for penguins_in_a_table")
+P("This appendix reproduces prompt text exactly as saved by the pilot pipeline and issued to the model, "
+  "rather than idealized or hand-cleaned examples, so a reader can see precisely what a small "
+  "open-weight optimizer produces in practice. The excerpt below is PromptWizard's actual optimized "
+  "instruction for penguins_in_a_table (one of three in-context examples shown; unabridged in the "
+  "project repository at results/promptwizard_penguins_in_a_table_seed42.pkl). Its opening line—\"How "
+  "could I determine the accuracy of my solution to this problem?\"—is a verbatim artifact of "
+  "PromptWizard's own search process under this model, not an editing choice; we preserve it here rather "
+  "than smoothing it over, consistent with Section 5.1's results being reported exactly as produced.")
+
+CODE([
+    "How could I determine the accuracy of my solution to this problem?",
+    "",
+    "[Question] Here is a table where the first line is a header and",
+    "each subsequent line is a penguin: name, age, height (cm),",
+    "weight (kg) Louis, 7, 50, 11 Bernard, 5, 80, 13 Vincent, 9, 60, 11",
+    "Gwen, 8, 70, 15  For example: the age of Louis is 7, the weight of",
+    "Gwen is 15 kg, the height of Bernard is 80 cm.  We now add a",
+    "penguin to the table: James, 12, 90, 12",
+    "What is the name of the 60 cm tall penguin?",
+    "Options: (A) Louis (B) Bernard (C) Vincent (D) Gwen (E) James",
+    "[Answer] To determine the name of the 60 cm tall penguin, we need",
+    "to examine the table of penguins and their attributes. ... By",
+    "scanning the \"height (cm)\" column, we identify that Vincent is",
+    "the only penguin with a height of 60 cm. Therefore, the name of",
+    "the 60 cm tall penguin is Vincent.",
+    "**Final Answer:** (C) Vincent <ANS_START>(C)<ANS_END>",
+    "",
+    "[... two further worked examples omitted for space ...]",
+    "",
+    "Wrap the final answer between <ANS_START> and <ANS_END>",
+], caption="Figure A.1. PromptWizard's actual optimized prompt for penguins_in_a_table under "
+           "Qwen3-1.7B (abridged; unabridged in the project repository).", full=False)
+
+P("MPIR's refinement stage was applied to this prompt for seven rounds (Section 3.2). All seven "
+  "candidates scored at or below this prompt's own held-out validation accuracy, so Algorithm 1's "
+  "baseline-scoring correction returned it unchanged: the saved MPIR-refined prompt for this task is "
+  "byte-identical to Figure A.1, confirmed by direct string comparison of the two saved prompt objects "
+  "rather than only by their matching downstream accuracy (69.8% for both, Table 3). This is not a "
+  "degenerate or unusual outcome for the pilot—Section 5.2.2 reports it as the outcome in all nine "
+  "tested (task, optimizer) combinations, not just this one.")
+
+H2("A.2. Zero-Shot and Expert Few-Shot Reference Prompts")
+P("For comparison, the two manual reference points (Section 4.3.3) use the BBH benchmark authors' own "
+  "task description and, for the expert-crafted condition, their own three worked chain-of-thought "
+  "exemplars ‹27›; unlike Figure A.1, every worked exemplar in the expert-crafted prompt "
+  "demonstrates the bare-letter <ANS_START>(X)<ANS_END> convention explicitly, which Section 5.2.3 and "
+  "Section 5.2.5 identify as the specific property PromptWizard's and the weaker optimizers' outputs "
+  "lack.")
 
 CODE([
     "You are given a task that require answering questions about a table",
@@ -1254,13 +1276,9 @@ CODE([
     "Let's think step by step.",
     "For each question, wrap only the final letter (A) (B) (C) (D) (E)",
     "between <ANS_START> and <ANS_END> tags",
-], caption="Figure A.1. Zero-shot CoT prompt for penguins_in_a_table.", full=False)
+], caption="Figure A.2. Zero-shot CoT prompt for penguins_in_a_table.", full=False)
 
 CODE([
-    "Answer questions about a table of penguins and their attributes.",
-    "For each question, present the reasoning followed by final answer",
-    "between <ANS_START> and <ANS_END> tags",
-    "",
     "[Question]: Here is a table where the first line is a header and",
     "each subsequent line is a penguin: name, age, height (cm), weight (kg)",
     "Louis, 7, 50, 11",
@@ -1282,231 +1300,90 @@ CODE([
     "<ANS_START>(B)<ANS_END>.",
     "",
     "[... two further worked examples omitted for space ...]",
-    "",
-    "For each question, present the reasoning followed by final answer",
-    "between <ANS_START> and <ANS_END> tags",
-], caption="Figure A.2. Few-shot CoT prompt for penguins_in_a_table (expert-crafted, three worked "
-           "examples; two omitted here for space, unabridged in the project repository).", full=False)
+], caption="Figure A.3. Expert few-shot CoT prompt for penguins_in_a_table (BBH authors' own "
+           "exemplars; two of three omitted here for space, unabridged in the project repository). "
+           "Every exemplar demonstrates the bare-letter <ANS_START>(X)<ANS_END> convention Figure A.1 "
+           "lacks (Section 5.2.3).", full=False)
+
+H2("A.3. APE's Actual Search Output for hyperbaton")
+P("Figure A.4 reproduces APE's actual optimized instruction for hyperbaton (abridged for space; "
+  "unabridged in the project repository). Unlike "
+  "PromptWizard's search (Figure A.1), APE's forward-mode generation ‹19› asks the meta-model "
+  "to reverse-engineer an instruction from input-output demonstrations, which is why the resulting "
+  "prompt is itself phrased as a \"what instruction produced these examples\" question rather than a "
+  "direct task instruction. This framing is the same one Appendix B's Figure B.1 shows a refinement "
+  "attempt echoing verbatim instead of producing a genuinely refined instruction.")
 
 CODE([
-    "To ensure accurate comparisons of the penguins' heights, meticulously",
-    "analyze and consider the specific attributes of each penguin,",
-    "including age, height, and weight. It is crucial to compare the",
-    "height of the new penguin, James, with the existing penguins in the",
-    "table to arrive at the correct answer. Emphasize the importance of",
-    "carefully examining all relevant information about each penguin and",
-    "comparing their heights to make an informed decision.",
+    "I gave a friend an instruction. Based on the instruction they",
+    "produced the following input-output pairs:",
     "",
-    "[Question]",
-    "Here is a table where the first line is a header and each subsequent",
-    "line is a penguin: name, age, height (cm), weight (kg)",
-    "Louis, 7, 50, 11",
-    "Bernard, 5, 80, 13",
-    "Vincent, 9, 60, 11",
-    "Gwen, 8, 70, 15",
-    "For example: the age of Louis is 7, the weight of Gwen is 15 kg,",
-    "the height of Bernard is 80 cm.",
-    "Which penguin is younger but taller than Gwen?",
-    "Options: (A) Louis (B) Bernard (C) Vincent (D) Gwen (E) James",
-    "[Answer]",
-    "1. Start by identifying the attributes of each penguin in the table:",
-    "   name, age, height (cm), and weight (kg).",
-    "2. Compare the age and height of each penguin to determine who is",
-    "   younger but taller than Gwen.",
-    "3. Gwen's age is 8, and her height is 70 cm.",
-    "4. Louis is younger than Gwen with an age of 7, but his height is",
-    "   50 cm, so he is not taller than Gwen.",
-    "5. Bernard is younger than Gwen with an age of 5, and his height is",
-    "   80 cm, making him both younger and taller than Gwen.",
-    "6. Vincent is older than Gwen with an age of 9, so he is not younger",
-    "   than Gwen.",
-    "7. James is not provided in the table, so he cannot be compared to",
-    "   Gwen.",
-    "8. Therefore, the penguin who is younger but taller than Gwen is",
-    "   Bernard, making the correct answer (B).",
-    "<ANS_START>(B)<ANS_END>",
-    "",
-    "[... two further worked examples omitted for space ...]",
-    "",
-    "For each question, present the reasoning followed by final answer",
-    "between <ANS_START> and <ANS_END> tags",
-], caption="Figure A.3. PromptWizard-optimized prompt for penguins_in_a_table before MPIR "
-           "refinement (one of three in-context examples shown; unabridged in the project "
-           "repository). Note the task-irrelevant aside in the opening paragraph about comparing "
-           "James's height, discussed in Section 5.2.4.", full=False)
-
-CODE([
-    "### Context",
-    "You are a data analyst tasked with comparing the attributes of",
-    "penguins to answer specific questions. Your role is to meticulously",
-    "analyze and consider the specific attributes of each penguin,",
-    "including age, height, and weight, to ensure accurate comparisons.",
-    "",
-    "### Instructions",
-    "1. Understand the Principles: Begin by understanding the principles",
-    "   of data analysis and comparison techniques. Focus on how to",
-    "   extract relevant information and compare attributes effectively.",
-    "2. Identify Attributes: Examine the table provided, which contains",
-    "   information about penguins. Identify the key attributes: name,",
-    "   age, height (cm), and weight (kg).",
-    "3. Follow Step-by-Step Reasoning: For each question, follow a",
-    "   detailed step-by-step reasoning process to arrive at the correct",
-    "   answer.",
-    "4. Use Output Format: Present your reasoning and final answer using",
-    "   the specified output format, which includes [Question] and",
-    "   [Answer] sections.",
-    "5. Conclude with a Summary: After answering all questions, provide a",
-    "   concise summary or restatement of the task to ensure you have",
-    "   completed it correctly.",
-    "",
-    "### Example Output Format",
-    "[Question]",
-    "Here is a table where the first line is a header and each subsequent",
-    "line is a penguin: name, age, height (cm), weight (kg)",
-    "Louis, 7, 50, 11",
-    "Bernard, 5, 80, 13",
-    "Vincent, 9, 60, 11",
-    "Gwen, 8, 70, 15",
-    "For example: the age of Louis is 7, the weight of Gwen is 15 kg,",
-    "the height of Bernard is 80 cm.",
-    "Which penguin is younger but taller than Gwen?",
-    "Options: (A) Louis (B) Bernard (C) Vincent (D) Gwen (E) James",
-    "",
-    "[Answer]",
-    "1. Start by identifying the attributes of each penguin in the table:",
-    "   name, age, height (cm), and weight (kg).",
-    "2. Compare the age and height of each penguin to determine who is",
-    "   younger but taller than Gwen.",
-    "3. Gwen's age is 8, and her height is 70 cm.",
-    "4. Louis is younger than Gwen with an age of 7, but his height is",
-    "   50 cm, so he is not taller than Gwen.",
-    "5. Bernard is younger than Gwen with an age of 5, and his height is",
-    "   80 cm, making him both younger and taller than Gwen.",
-    "6. Vincent is older than Gwen with an age of 9, so he is not younger",
-    "   than Gwen.",
-    "7. James is not provided in the table, so he cannot be compared to",
-    "   Gwen.",
-    "8. Therefore, the penguin who is younger but taller than Gwen is",
-    "   Bernard, making the correct answer (B).",
-    "<ANS_START>(B)<ANS_END>",
-    "",
-    "### Conclusion",
-    "By following the instructions and using the output format, you can",
-    "accurately compare the attributes of penguins to answer the",
-    "questions provided. Ensure you have completed the task by reviewing",
-    "your answers and the reasoning process.",
-], caption="Figure A.4. MPIR-refined prompt for penguins_in_a_table (one of three in-context "
-           "examples shown; unabridged in the project repository). Compared with Figure A.3, "
-           "context and instructions are separated into labeled sections and the task-irrelevant "
-           "aside has been removed.", full=False)
-
-H2("A.2. Few-Shot Examples for the Navigate Task")
-P("The navigate task asks whether a sequence of turns and steps returns to the starting point. Figure "
-  "A.5 and Figure A.6 contrast the expert-crafted worked example used as the Section 4.3.3 reference "
-  "point with the corresponding MPIR-refined example, illustrating the gap discussed in Section 5.2.6: "
-  "MPIR's example, inherited from PromptWizard, tracks state as a bulleted sequence of moves without "
-  "explicit coordinates, whereas the expert-crafted example maintains an explicit running position.")
-
-CODE([
-    "[Question]: If you follow these instructions, do you return to the",
-    "starting point? Turn left. Turn around. Turn left. Take 7 steps.",
-    "Take 2 steps. Take 4 steps. Take 8 steps.",
+    "[Question] Which sentence has the correct adjective order:",
     "Options:",
-    "- Yes",
-    "- No",
-    "[Answer]: Let's think step by step.",
-    "We start at the origin (0, 0), facing the positive y-axis.",
-    "(1) Turn left: (0, 0), facing the negative x-axis.",
-    "(2) Turn around: (0, 0), facing the positive x-axis.",
-    "(3) Turn left: (0, 0), facing the positive y-axis.",
-    "(4) Take 7 steps: (0, 7), facing the positive y-axis.",
-    "(5) Take 2 steps: (0, 9), facing the positive y-axis.",
-    "(6) Take 4 steps: (0, 13), facing the positive y-axis.",
-    "(7) Take 8 steps: (0, 21), facing the positive y-axis.",
-    "Since (0, 21) is not (0, 0), we are not where we started.",
-    "So the answer is <ANS_START>No<ANS_END>.",
-], caption="Figure A.5. Expert-crafted worked example for the navigate task, with explicit "
-           "running coordinates.", full=False)
+    "(A) tan silly old-fashioned dog",
+    "(B) silly old-fashioned tan dog",
+    "[Answer] (B)",
+    "",
+    "[... four further input-output pairs omitted for space ...]",
+    "",
+    "What was the instruction I gave?",
+    "",
+    "",
+    "Wrap the final answer between <ANS_START> and <ANS_END>",
+], caption="Figure A.4. APE's actual optimized prompt for hyperbaton under Qwen3-1.7B (abridged; "
+           "unabridged in the project repository at results/ape_hyperbaton_seed42.pkl).", full=True)
+
+# ===========================================================================
+H1("Appendix B. Meta-Prompting Failure-Mode Transcripts")
+P("Section 5.2.4 describes two ways MPIR's refinement stage failed silently rather than merely scoring "
+  "poorly, both found by inspecting saved refinement outputs after an anomalous accuracy reading during "
+  "the pilot, before Algorithm 1's baseline-scoring correction (Section 3.2) was in place to catch them "
+  "automatically. Both transcripts below are reproduced from the pipeline's own logs and saved prompt "
+  "objects rather than reconstructed from memory.")
+
+P("First, on hyperbaton with APE, a refinement round produced the following complete "
+  "<START>/<END>-delimited candidate—a verbatim echo of APE's own instruction-induction template "
+  "(compare Figure A.4's forward-generation framing) rather than a refined task-solving instruction:")
 
 CODE([
-    "[Question] If you follow these instructions, do you return to the",
-    "starting point? Take 1 step. Take 7 steps. Take 1 step.",
+    "I gave a friend an instruction. Based on the instruction they",
+    "produced the following input-output pairs:",
+    "",
+    "[Question] Which sentence has the correct adjective order:",
     "Options:",
-    "- Yes",
-    "- No",
-    "[Answer]",
-    "- [Step 1]: Start at the initial point.",
-    "- [Step 2]: Take 1 step forward.",
-    "- [Step 3]: Move 7 steps forward from the new position.",
-    "- [Step 4]: Move 1 step forward from the current position.",
-    "- [Logical Pathway]:",
-    "  - After taking 1 step forward in Step 2, the agent is at a new",
-    "    position.",
-    "  - Moving 7 steps forward in Step 3 takes the agent further away",
-    "    from the starting point.",
-    "  - Finally, taking 1 step forward in Step 4 continues the movement",
-    "    away from the starting point.",
-    "- [Final Answer]: No <ANS_START>No<ANS_END>",
-], caption="Figure A.6. MPIR-refined worked example for the navigate task, tracking state as a "
-           "bulleted move sequence without explicit coordinates.", full=False)
+    "(A) tan silly old-fashioned dog",
+    "(B) silly old-fashioned tan dog",
+    "[Answer] (B)",
+    "",
+    "[... four further input-output pairs omitted for space ...]",
+    "",
+    "The task is to determine the correct adjective order in a sentence",
+    "by analyzing the provided examples and selecting the correct",
+    "option.",
+], caption="Figure B.1. A rejected MPIR refinement candidate for hyperbaton/APE: the meta-model "
+           "reproduced APE's own induction-template framing instead of a genuine refined instruction. "
+           "Algorithm 1 correctly declined this candidate because it did not validate above the "
+           "unrefined baseline; no answer-format directive appears anywhere in the candidate, which "
+           "would otherwise have driven validation accuracy on this round toward zero.", full=True)
+
+P("Second, on ruin_names with PromptWizard, a different refinement round produced a well-formed "
+  "candidate whose content was confirmed, by direct substring match against the saved text, to contain "
+  "the phrases \"Senior Prompt Engineer\", \"Prompt Under Evaluation\", and \"Seven-Criteria Evaluation "
+  "Rubric\" verbatim—wording unique to MPIR's own rubric-evaluation meta-prompt (Figure 2)—rather than "
+  "a refined task instruction. Every validation call issued against this candidate produced unparseable "
+  "free-form text with no extractable answer, and it scored 0.0 on the held-out validation partition "
+  "before being correctly declined by the same baseline-scoring check.")
+
+P("Both transcripts illustrate the same underlying failure: a meta-model asked to produce one specific "
+  "artifact (a refined task prompt) instead reproduced a structurally similar artifact recently visible "
+  "in its own context window. Section 5.2.4 discusses why Algorithm 1's baseline-scoring correction "
+  "catches both without needing to recognize either pattern by name.")
 
 # ===========================================================================
-H1("Appendix B. Generic Rubric Baseline Prompt")
-P("Section 5.3.2 compares MPIR's seven-criteria rubric against a generic rubric that evaluates prompts "
-  "on broad, undifferentiated aspects of quality rather than the specific heuristics in Section 3.3. "
-  "The full meta-prompt used for that generic-rubric evaluation stage is reproduced below; the "
-  "refinement and validation stages are otherwise identical to MPIR's own (Sections 3.4-3.5).")
-
-CODE([
-    "You are an expert prompt evaluator. Your task is to analyze the",
-    "given prompt and provide structured feedback on its overall quality",
-    "for guiding a large language model (LLM) to perform the specified",
-    "task effectively.",
-    "Here is the prompt to evaluate: {prompt}",
-    "Assess the prompt based on general aspects of good prompt design,",
-    "such as clarity, structure, completeness, and effectiveness in",
-    "eliciting the desired LLM behavior. For each aspect you identify",
-    "(aim for 5-7 key aspects), provide:",
-    "- A score from 1 to 5 (1 = very poor, 5 = excellent).",
-    "- A brief justification explaining why you gave that score.",
-    "- Strengths: What works well in this aspect.",
-    "- Weaknesses: What could be improved in this aspect.",
-    "Finally, based on your assessment, suggest 7-10 actionable",
-    "improvements to make the prompt better overall. Keep suggestions",
-    "practical and focused on enhancing task performance without",
-    "overcomplicating the prompt.",
-    "Output your response in this exact format:",
-    "Aspect 1: [Name of aspect]",
-    "Score: [Score]/10",
-    "Justification: [Brief explanation]",
-    "Strengths: [Bullet points]",
-    "Weaknesses: [Bullet points]",
-    "[Repeat for each aspect]",
-    "Actionable Improvements:",
-    "1. [Suggestion 1] 2. [Suggestion 2]...",
-], caption="Figure B.1. Meta-prompt for the generic rubric baseline used in Section 5.3.2.",
-    full=True)
-
-# ===========================================================================
-H1("Appendix C. Additional Case Study")
-P("Section 5.1 and Figure 6 present a case in which MPIR corrects a PromptWizard reasoning error. Not "
-  "every case favors MPIR: Figure C.1 shows a tracking_shuffled_objects_five_objects example where "
-  "PromptWizard and MPIR follow the same sequence of swaps but diverge in intermediate bookkeeping, "
-  "with PromptWizard reaching the correct answer and MPIR misapplying one swap. This example is "
-  "representative of the symbolic-tracking weakness discussed in Section 5.2.4.")
-
-FIG("case_study_2.png",
-    "Figure C.1. Case study comparing PromptWizard and MPIR on the "
-    "tracking_shuffled_objects_five_objects task. Both systems follow the same sequence of swaps but "
-    "diverge in intermediate reasoning: PromptWizard maintains consistent tracking of player positions "
-    "and reaches the correct answer (C: left winger), whereas MPIR misapplies one swap and concludes "
-    "incorrectly (B: right midfielder).", full=True)
-
-# ===========================================================================
-H1("Appendix D. Free Rewrite Baseline Prompt")
+H1("Appendix C. Free Rewrite Baseline Prompt")
 P("Section 4.3.1 introduces a free rewrite baseline that isolates MPIR's rubric-guided evaluation from "
-  "GPT-4o's general rewriting ability. The full meta-prompt used to produce that baseline is reproduced "
-  "below.")
+  "the meta-model's general rewriting ability. The full meta-prompt used to produce that baseline is "
+  "reproduced below.")
 
 CODE([
     "You are given a task-solving prompt generated for a Big-Bench Hard",
@@ -1531,37 +1408,53 @@ CODE([
     "<START>",
     "{prompt}",
     "<END>",
-], caption="Figure D.1. Meta-prompt for the free rewrite baseline used in Section 4.3.1.", full=True)
+], caption="Figure C.1. Meta-prompt for the free rewrite baseline used in Section 4.3.1.", full=True)
 
 # ===========================================================================
-H1("Appendix E. Reproducibility and Experimental Protocol")
+H1("Appendix D. Reproducibility and Experimental Protocol")
 P("This appendix consolidates the settings scattered across Sections 3-5 into a single reference for "
   "reproduction, following the convention that empirical machine learning papers report a complete, "
-  "self-contained protocol rather than requiring a reader to reassemble it from prose.")
+  "self-contained protocol rather than requiring a reader to reassemble it from prose. Table 4 describes "
+  "the pilot reported in Section 5; Table 5 describes the original GPT-4o/GPT-3.5-turbo evaluation "
+  "discussed in Section 1, whose validation split is now known to have leaked (Section 4.5) and whose "
+  "numbers this paper does not otherwise rely on.")
 
-TABLE("Table 9. Complete experimental protocol summary.",
+TABLE("Table 4. Complete experimental protocol for the go/no-go pilot reported in Section 5.",
+      header=["Setting", "Value"],
+      rows=[
+          ["Benchmark subset", "Big-Bench Hard: hyperbaton, ruin_names, penguins_in_a_table"],
+          ["Target, optimizer, and meta-prompting model", "Qwen3-1.7B, served locally via vLLM, "
+           "temperature 0, thinking mode disabled"],
+          ["APO baselines", "PromptWizard; APE; ProTeGi (unmodified hyperparameters, Table 2)"],
+          ["Optimizer-training examples per task", "25, seed-scoped, disjoint from validation and test"],
+          ["MPIR validation examples per task", "25, seed-scoped, disjoint from training and test"],
+          ["Test examples per task", "Remainder: 200 (hyperbaton, ruin_names), 96 (penguins_in_a_table)"],
+          ["MPIR refinement rounds (N)", "7, each scored against the held-out validation partition"],
+          ["Candidate acceptance rule", "Strict improvement over the pre-refinement prompt's own "
+           "validation score (Section 3.2); ties and losses keep the prior prompt"],
+          ["Seeds", "1 (seed 42); see Section 6.1 for the multi-seed replication this implies as future "
+           "work"],
+          ["Significance tests reported", "Pooled example-level McNemar with task-clustered bootstrap "
+           "CI; task-clustered GEE; task-level paired Wilcoxon signed-rank and sign test"],
+          ["Ablations", "Not run; see Section 5.3 for the pre-registered decision rule that stopped them"],
+      ], full=True, colw=[0.40, 0.60])
+
+TABLE("Table 5. Protocol of the original evaluation discussed in Section 1 (not the source of any "
+      "number reported in Section 5).",
       header=["Setting", "Value"],
       rows=[
           ["Benchmark", "Big-Bench Hard, 23 tasks (Suzgun et al., 2023)"],
-          ["Primary target model", "GPT-3.5-turbo, temperature 0"],
+          ["Target model", "GPT-3.5-turbo, temperature 0"],
           ["Meta-prompting model (evaluation and refinement)", "GPT-4o, temperature 0"],
-          ["Cross-model target/meta model", "Gemini 3.5 Flash-Lite, temperature 0"],
-          ["Primary APO baseline", "PromptWizard (unmodified hyperparameters, Table 2)"],
-          ["Extended APO baselines", "Iterative APE; ProTeGi"],
-          ["Training/optimization examples per task", "25, randomly sampled"],
-          ["Held-out test examples per task", "Remainder of each task's example set"],
-          ["MPIR refinement rounds (N)", "7"],
-          ["Rubric criteria evaluated per round", "7 (Section 3.3)"],
-          ["Candidate selection rule", "Highest held-out accuracy across all N rounds"],
-          ["Ablation task subset (Sections 5.3.1-5.3.3)",
-           "hyperbaton, penguins_in_a_table, ruin_names, object_counting, "
-           "reasoning_about_colored_objects"],
-          ["Significance tests reported", "Bootstrap CI (10,000 resamples); paired Wilcoxon "
-           "signed-rank; exact sign test; Cohen's dz"],
-          ["Runs per condition", "1 (single run at temperature 0; see Section 6.1)"],
-      ], full=True, colw=[0.45, 0.55])
+          ["Cross-model generalization check (not analyzed in this paper)", "Gemini 3.5 Flash-Lite, "
+           "temperature 0, as both target and meta-model"],
+          ["Known validity defect", "Validation stage scored candidates against the upstream "
+           "optimizer's own training examples, not a disjoint held-out set (Section 4.5)"],
+          ["Runs per condition", "1 (single run at temperature 0)"],
+      ], full=True, colw=[0.40, 0.60])
 
-P("All code, configuration files, prompt templates, and per-task raw results referenced throughout this "
-  "paper are available at the project repository (Section 4.5), including the exact YAML configuration "
-  "files for PromptWizard and MPIR, the rubric prompt templates reproduced in Figures 2 and 3, and the "
-  "full 23-task results underlying every averaged or condensed figure reported above.")
+P("All code, configuration files, prompt templates, and per-task raw predictions referenced throughout "
+  "this paper are available at the project repository (Section 4.5), including the exact YAML "
+  "configuration files for every technique, the rubric prompt templates reproduced in Figures 2 and 3, "
+  "and the full per-example predictions underlying every number in Table 3 and Section 5.2.1's "
+  "statistical tests.")

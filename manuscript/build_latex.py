@@ -89,6 +89,50 @@ def strip_appendix_label(text):
     return _APPENDIX_NUM_RE.sub("", text, count=1)
 
 
+_SECTION_NUM_RE = re.compile(r"^(?:\d+(?:\.\d+)*|[A-Z](?:\.\d+)+)\.\s+")
+
+
+def strip_section_number(text):
+    """content_blocks.py's H1/H2/H3 calls are hand-numbered for the DOCX build
+    ("1. Introduction", "2.1. Prompting as...", "A.1. Prompts for..."), but LaTeX's
+    \\section/\\subsection/\\subsubsection auto-number via the section-counter
+    hierarchy (including within \\appendix, where it auto-prefixes "A", "B", ...).
+    Confirmed live in a compiled PDF that every single heading in the document was
+    rendering doubled ("1. 1. Introduction", "2.1. 2.1. Prompting as...", "A.2. A.2.
+    Zero-Shot...") before this fix -- strip_appendix_label alone only handled the H1
+    "Appendix X. " form, leaving every numbered H1/H2/H3 elsewhere untouched."""
+    return _SECTION_NUM_RE.sub("", text, count=1)
+
+
+_LETTER_NUM_RE = re.compile(r"^(Figure|Table)\s+[A-Z]\.\d+\.\s")
+
+
+def is_letter_numbered(caption_text):
+    """True for a hand-numbered appendix caption ("Figure A.1.", "Table B.2.") as
+    opposed to a main-text one ("Figure 3.", "Table 2.")."""
+    return bool(_LETTER_NUM_RE.match(caption_text))
+
+
+def caption_command(caption_text):
+    """\\caption{...} for a digit-numbered caption ("Figure 3.") so LaTeX's own
+    auto-numbering matches the stripped prefix. Letter-numbered appendix captions
+    must NOT go through this function at all -- see plain_caption below and its
+    callers, which avoid the float/caption system entirely for those."""
+    return f"\\caption{{{resolve_citations(strip_manual_number(caption_text))}}}"
+
+
+def plain_caption(caption_text):
+    """For a letter-numbered appendix caption ("Figure A.1.", "Table B.2."): tried
+    routing these through the `caption` package's \\caption*{} (unnumbered) first,
+    but this document class's own caption handling still prepended LaTeX's normal
+    auto-number even with the star form -- confirmed live in a compiled PDF, e.g.
+    "Figure 5: Figure A.1. ...". Sidestepping the float/caption system entirely is
+    the robust fix: callers must NOT wrap the content in \\begin{figure}/\\caption at
+    all for these, only in this plain bold paragraph, so no float counter is ever
+    touched."""
+    return f"\\par\\noindent\\textbf{{{resolve_citations(caption_text)}}}"
+
+
 def resolve_citations(text):
     def _sub(m):
         keys = [REFKEY_TO_BIBKEY[f"reference_{n.strip()}"] for n in m.group(1).split(",")]
@@ -104,11 +148,11 @@ def latex_body():
         if t == "appendix_start":
             out.append(r"\appendix")
         elif t == "h1":
-            out.append(f"\\section{{{esc(strip_appendix_label(b['text']))}}}")
+            out.append(f"\\section{{{esc(strip_section_number(strip_appendix_label(b['text'])))}}}")
         elif t == "h2":
-            out.append(f"\\subsection{{{esc(b['text'])}}}")
+            out.append(f"\\subsection{{{esc(strip_section_number(b['text']))}}}")
         elif t == "h3":
-            out.append(f"\\subsubsection{{{esc(b['text'])}}}")
+            out.append(f"\\subsubsection{{{esc(strip_section_number(b['text']))}}}")
         elif t == "p":
             out.append(resolve_citations(b["text"]))
         elif t == "bullets":
@@ -125,22 +169,33 @@ def latex_body():
             abs_path = os.path.join(FIGDIR, b["path"])
             path = os.path.relpath(abs_path, LATEX_DIR).replace(os.sep, "/")
             width = r"\linewidth" if b["full"] else r"0.85\linewidth"
-            out.append(r"\begin{figure}[htbp]")
+            lettered = is_letter_numbered(b["caption"])
+            if not lettered:
+                out.append(r"\begin{figure}[htbp]")
             out.append(r"\centering")
             out.append(f"\\includegraphics[width={width}]{{{path}}}")
-            out.append(f"\\caption{{{resolve_citations(strip_manual_number(b['caption']))}}}")
-            out.append(r"\end{figure}")
+            if lettered:
+                out.append(plain_caption(b["caption"]))
+            else:
+                out.append(caption_command(b["caption"]))
+            if not lettered:
+                out.append(r"\end{figure}")
         elif t == "code":
-            out.append(r"\begin{figure}[htbp]")
+            lettered = b.get("caption") and is_letter_numbered(b["caption"])
+            if not lettered:
+                out.append(r"\begin{figure}[htbp]")
             out.append(r"\centering")
             out.append(r"\begin{quote}\ttfamily\small")
             for ln in b["lines"]:
                 safe = _escape_plain(ln) if ln.strip() else "~"
                 out.append(safe + r"\\{}")
             out.append(r"\end{quote}")
-            if b.get("caption"):
-                out.append(f"\\caption{{{resolve_citations(strip_manual_number(b['caption']))}}}")
-            out.append(r"\end{figure}")
+            if lettered:
+                out.append(plain_caption(b["caption"]))
+            elif b.get("caption"):
+                out.append(caption_command(b["caption"]))
+            if not lettered:
+                out.append(r"\end{figure}")
         elif t == "algo":
             out.append(latex_algo(b))
         elif t == "table":
@@ -195,7 +250,7 @@ def latex_table(b):
     lines = [r"\begin{table}[htbp]",
              r"\centering",
              r"\small",
-             f"\\caption{{{resolve_citations(strip_manual_number(b['caption']))}}}",
+             caption_command(b["caption"]),
              r"\resizebox{\linewidth}{!}{%" if not b.get("colw") else "",
              f"\\begin{{tabular}}{{{colspec}}}",
              r"\toprule"]
@@ -260,6 +315,7 @@ TEMPLATE = r"""\documentclass[a4paper,fleqn]{{cas-sc}}
 \usepackage{{algorithm}}
 \usepackage{{algpseudocode}}
 \usepackage{{booktabs}}
+\usepackage{{caption}}
 
 \begin{{document}}
 
