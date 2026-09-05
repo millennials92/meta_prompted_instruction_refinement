@@ -553,7 +553,7 @@ P("Each criterion is grounded in an established prompting technique: Role Prompt
   "‹14,15›. Consolidating these techniques operationalizes established manual heuristics into a "
   "systematic rubric that the next section applies to APO-generated prompts.")
 
-H2("3.3.1. Illustrative Application of the Rubric")
+H3("3.3.1. Illustrative Application of the Rubric")
 P("To make the abstract rubric concrete before Section 3.4 formalizes how it is applied automatically, "
   "this subsection walks through how the seven criteria assess the real PromptWizard-optimized prompt "
   "for penguins_in_a_table reproduced in full in Appendix A.1, without reporting fabricated numeric "
@@ -1150,8 +1150,9 @@ P("Tracing why, rather than stopping at the aggregate null result, surfaced find
   "nothing) already wins. Once corrected, the refinement loop revealed that a small model asked to "
   "critique and rewrite its own prompts is not a reliable meta-prompting judge: it twice reproduced "
   "verbatim scaffolding from its own context window in place of a genuine refined prompt (Section 5.2.4), "
-  "and even when it did produce well-formed output, that output beat the unrefined baseline in only one "
-  "of nine tested configurations. A separate, model-independent finding—that exact-match accuracy under "
+  "and even when it produced well-formed, uncontaminated output, that output never once beat the "
+  "unrefined baseline across all nine tested configurations. A separate, model-independent finding—that "
+  "exact-match accuracy under "
   "a small target model is often determined by whether a prompt's worked exemplars demonstrate the "
   "required output format, not by the underlying reasoning (Section 5.2.3)—helps explain why the weakest "
   "conditions in Table 3 score far below chance despite frequently reasoning to the correct answer.")
