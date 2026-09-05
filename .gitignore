@@ -37,6 +37,14 @@ manuscript/latex/*.abs
 manuscript/latex/*.fls
 manuscript/latex/*.fdb_latexmk
 manuscript/latex/*.synctex.gz
+manuscript/latex_ieee/*.aux
+manuscript/latex_ieee/*.bbl
+manuscript/latex_ieee/*.blg
+manuscript/latex_ieee/*.log
+manuscript/latex_ieee/*.out
+manuscript/latex_ieee/*.fls
+manuscript/latex_ieee/*.fdb_latexmk
+manuscript/latex_ieee/*.synctex.gz
 
 # OS
 .DS_Store
