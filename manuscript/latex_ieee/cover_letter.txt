@@ -1,0 +1,61 @@
+Cover Letter
+
+Manuscript title: Meta-Prompted Instruction Refinement: Bridging Manual Prompting Techniques
+and Automatic Prompt Optimization
+Manuscript type: Negative Result
+Corresponding author: Quang-Vinh Dang (British University Vietnam), vinh.dq4@buv.edu.vn
+
+Dear Editor,
+
+We submit our manuscript, "Meta-Prompted Instruction Refinement: Bridging Manual Prompting
+Techniques and Automatic Prompt Optimization," for consideration by IEEE Access under the
+"Negative Result" manuscript type.
+
+The paper reports a pre-registered go/no-go pilot testing Meta-Prompted Instruction Refinement
+(MPIR), a rubric-guided layer intended to refine automatic-prompt-optimization (APO) output for
+large language models. An initial evaluation using a closed, more capable model (GPT-4o) to judge
+and refine prompts for a weaker target model (GPT-3.5-turbo) reported per-task gains on a majority
+of Big-Bench Hard tasks, but a pooled effect that did not reach statistical significance -- and a
+subsequent audit found its validation stage had scored candidates against non-held-out data. To
+determine whether the apparent gains reflected the refinement mechanism itself or the closed
+model's capability advantage over its target, we reran the pilot with a single small open-weight
+model (Qwen3-1.7B) performing every role -- target, optimizer, and refinement judge -- on the three
+tasks where the original evaluation's effect was largest. The effect did not reproduce: across all
+nine tested (optimizer, task) configurations, the refinement stage's output was byte-identical to
+the unrefined baseline, and formal statistical tests (McNemar, GEE) returned no measurable effect
+in any of them.
+
+We believe this fits IEEE Access and its "Negative Result" category specifically, for three
+reasons. First, the finding is a rigorously established boundary condition, not merely an
+unremarkable absence of effect: we trace the null result to a general defect in the refinement
+algorithm itself (it never scored the pre-refinement prompt as a baseline, so it could not have
+reported a null result even where one existed) and to two concrete failure modes in how a small
+model handles meta-prompting, each confirmed against live model output rather than assumed.
+Second, the result is directly actionable for practitioners: it identifies a specific, common
+deployment pattern (a single small open-weight model serving multiple roles) under which a
+popular class of cheap refinement layers should not be expected to help, and it identifies a
+narrower, lower-cost alternative (supplying a single worked exemplar to an otherwise exemplar-free
+optimizer) that our own pilot data suggests may close more of the accuracy gap than the
+refinement layer under test. Third, the paper documents seven real correctness defects found only
+by running the pipeline against a live model rather than a mocked one, each of general relevance to
+anyone building similar meta-prompting or refinement pipelines.
+
+For full transparency: an earlier version of this work, evaluated under a different (closed-model)
+configuration later found to have a validation-data leak, was submitted to and desk-rejected by a
+different journal (AI Open) prior to this rebuild. The manuscript submitted here is a substantially
+revised and independently re-evaluated version reporting a different, corrected finding, not a
+resubmission of that earlier draft.
+
+All code, configuration files, and per-example predictions underlying every number reported in
+this paper are publicly available at
+https://github.com/millennials92/meta_prompted_instruction_refinement, consistent with IEEE
+Access's emphasis on replicability.
+
+We confirm that this manuscript is not currently under review at any other venue, and that all
+authors have approved its submission to IEEE Access.
+
+Thank you for your consideration.
+
+On behalf of all authors,
+Quang-Vinh Dang
+Corresponding author
