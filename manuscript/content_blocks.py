@@ -630,16 +630,18 @@ CODE([
 
 P("The refinement meta-prompt in Figure 3 asks the LLM to return the revised prompt wrapped between "
   "<START> and <END> delimiters, which the implementation then extracts programmatically. A weaker "
-  "meta-model does not always comply, and Section 5.2.4 reports two concrete ways it failed to during "
-  "the pilot: no delimited candidate at all, or a well-formed delimited candidate whose content was "
-  "itself a verbatim echo of a meta-prompting template the model had recently seen in its own context "
-  "window (Appendix B), rather than a genuine refined instruction. The implementation guards against "
-  "both before a candidate ever reaches validation: an empty extraction result falls back to the "
-  "pre-refinement prompt unchanged, and a candidate containing verbatim phrases unique to MPIR's own "
-  "evaluation template (Figure 2) is rejected on the same grounds. Neither check depends on recognizing "
-  "a specific failure by name, and Section 3.2's baseline-scoring correction provides a further, more "
-  "general safety net behind both: even a well-formed, uncontaminated candidate is only adopted if it "
-  "empirically outperforms the prompt it was meant to improve.")
+  "meta-model does not always comply. Earlier in pilot development this surfaced as a missing delimiter "
+  "entirely—no wrapped candidate at all in the meta-model's response—which the implementation guards "
+  "against by falling back to the pre-refinement prompt unchanged rather than raising an error. Once that "
+  "guard was in place, a second, better-formed failure appeared during the pilot itself: a candidate "
+  "correctly wrapped in <START>/<END> delimiters whose content was nonetheless a verbatim echo of a "
+  "meta-prompting template the model had recently seen in its own context window, rather than a genuine "
+  "refined instruction—the two occurrences Section 5.2.4 documents in detail (Appendix B). A candidate "
+  "containing verbatim phrases unique to MPIR's own evaluation template (Figure 2) is rejected on the "
+  "same grounds before validation. Neither check depends on recognizing a specific failure by name, and "
+  "Section 3.2's baseline-scoring correction provides a further, more general safety net behind both: "
+  "even a well-formed, uncontaminated candidate is only adopted if it empirically outperforms the prompt "
+  "it was meant to improve.")
 
 P("Evaluation and refinement together form a feedback-driven process for improving prompts, but "
   "refinement alone does not guarantee performance gains; MPIR therefore adds a validation stage to "
@@ -758,7 +760,7 @@ H3("4.3.2. Extended APO baselines")
 P("To further evaluate generalization, MPIR is also applied to APE ‹19› and ProTeGi "
   "‹20›. Since neither method generates few-shot reasoning examples the way PromptWizard does, "
   "both use the same three chain-of-thought exemplars written by the BBH benchmark authors "
-  "‹29›; the resulting prompts are refined with MPIR and evaluated under identical conditions.")
+  "‹27›; the resulting prompts are refined with MPIR and evaluated under identical conditions.")
 
 H3("4.3.3. Reference points")
 BULLETS([
@@ -828,6 +830,19 @@ P("Each task's examples are partitioned three ways, not two: 25 examples for opt
   "reproducibility. The implementation of MPIR, including the corrected validation split and the APE and "
   "ProTeGi implementations added during this rebuild, is publicly available at "
   "https://github.com/millennials92/meta_prompted_instruction_refinement.")
+
+P("Running the pilot against a live, locally-served model rather than a mocked one surfaced six further "
+  "correctness bugs beyond the refinement-algorithm defect Section 3.2 describes, each invisible to "
+  "unit-level testing precisely because it depended on the target model's actual behavior: response "
+  "truncation from an under-provisioned context window, an answer-normalization gap between bare-letter "
+  "and parenthesized option labels, a delimiter-convention mismatch between the expert-crafted exemplars "
+  "and the model's own output, a mismatched evaluation template between an optimizer's own harness and "
+  "MPIR's, and the two meta-prompting contamination patterns Section 5.2.4 documents in depth. The first "
+  "four are data-pipeline and prompt-formatting defects that would recur under any target model asked to "
+  "follow this delimiter convention, not properties specific to Qwen3-1.7B; only the latter two bear "
+  "directly on this paper's central question and are therefore the ones discussed at length in Section "
+  "5.2.4 rather than here. Each is documented in full, with the exact failure observed and the fix "
+  "applied, in the project repository's own engineering log rather than repeated in prose here.")
 
 TABLE("Table 2. Hyperparameter settings of PromptWizard.",
       header=["Hyperparameter", "Description", "Default"],
