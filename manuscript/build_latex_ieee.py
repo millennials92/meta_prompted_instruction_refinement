@@ -97,23 +97,24 @@ def ieee_acknowledgment():
 
 def author_bio_placeholders():
     """IEEE Access requires a short biography (photo optional) for every
-    author, placed after the references. Real biographical content about
-    named individuals should not be fabricated -- these are explicit
-    placeholders (affiliation only, drawn from the manuscript's own author
-    block) for the authors to complete before submission."""
-    aff_by_author = []
-    for a in C.AUTHORS:
-        affs = [C.AFFILIATIONS[i - 1] for i in a["affil_idx"]]
-        aff_by_author.append("; ".join(affs))
+    author, placed after the references. Role/institution supplied directly
+    by the corresponding author; kept to what was actually provided rather
+    than expanded with invented degree history, dates, or research-interest
+    claims."""
+    bios = {
+        "Linh Nguyen": "is a Master's student in the Master of Artificial Intelligence program at "
+                       "RMIT University Vietnam, Ho Chi Minh City, Vietnam.",
+        "Quang-Vinh Dang": "is a Senior Lecturer at British University Vietnam, Hung Yen, Vietnam.",
+        "Minh Ngoc Dinh": "is Dean of the School of Information Technology and Data Science, "
+                          "Millenia Education, Ho Chi Minh City, Vietnam.",
+        "Thuy Nguyen": "is a Senior Lecturer at RMIT University Vietnam, Ho Chi Minh City, Vietnam.",
+    }
 
     lines = []
-    for a, aff in zip(C.AUTHORS, aff_by_author):
+    for a in C.AUTHORS:
+        bio = bios.get(a["name"], "")
         lines.append(f"\\begin{{IEEEbiographynophoto}}{{{BL.esc(a['name'])}}}")
-        lines.append(
-            f"[PLACEHOLDER -- author to complete before submission] {BL.esc(a['name'])} is affiliated "
-            f"with {BL.esc(aff)}. [Add: degrees held, institution/year; prior or current role; "
-            f"research interests; any relevant honors or memberships.]"
-        )
+        lines.append(f"{BL.esc(a['name'])} {BL.esc(bio)}")
         lines.append(r"\end{IEEEbiographynophoto}")
         lines.append("")
     return "\n".join(lines)
