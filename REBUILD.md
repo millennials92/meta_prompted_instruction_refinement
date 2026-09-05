@@ -623,3 +623,23 @@ an honest measurement of how much a cheap post-hoc rubric layer buys, with the a
 being 'less than the field assumes'." Next: manuscript surgery per §6, targeting TMLR
 per §7, **not** the full 23-task grid in §4.1 — running 20 more tasks cannot revive an
 effect that failed to appear on the three tasks most favorable to it.
+
+### 2026-09-05 — Manuscript rewritten and submitted to IEEE Access
+
+Manuscript surgery (§6) completed: abstract, introduction, results, threats to
+validity, conclusion, and appendices rewritten around the honest null finding, through
+four rounds of independent review-and-fix (fabricated "one exception" narrative
+corrected to all nine cells byte-identical; dangling references, mis-numbered
+sections, a wrong citation, and two document-wide LaTeX numbering bugs found and
+fixed). Venue retargeted from TMLR (§7's original recommendation) to **IEEE Access**
+per the user's priority on fast, low-desk-reject-risk publication given the topic's
+time sensitivity — manuscript type **Negative Result**.
+
+Full IEEE Access LaTeX port added (`manuscript/build_latex_ieee.py`,
+`manuscript/latex_ieee/`), reusing `build_latex.py`'s tested block-rendering logic via
+monkey-patched citation resolution rather than forking it. Author biographies
+(real content, not fabricated), a 244-word IEEE-compliant abstract, ORCID, and a cover
+letter (disclosing the earlier AI Open desk rejection for transparency) were added
+ahead of submission.
+
+**Submitted to IEEE Access.** Awaiting review.
