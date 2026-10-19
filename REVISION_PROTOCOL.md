@@ -111,3 +111,15 @@ The GPT-4o / GPT-3.5-turbo configuration is not re-run (no paid API access in th
 the original per-task numbers are reported from the saved spreadsheet with the leak flagged.
 No human rating of rubric quality is collected; the judge is compared with a stronger
 open-weight reference judge only. One model family (Qwen3) is used.
+
+## 5. Amendments (dated; made after the protocol commit, before any result was inspected)
+
+* 2026-10-20: the serving stack is vLLM 0.28.0 under WSL2 on one RTX 5000 Ada (16 GB), shared with
+  other desktop workloads. Measured aggregate throughput is about 1.2k generated tokens/s, so the
+  compute plan was reduced: oracle test scoring of every validated candidate is done for MPIR
+  sampling seed 1 only (seeds 2 and 3 are scored on the validation split and, for the final prompt,
+  on test); the main grid G1 records one validation score per candidate instead of three repeats
+  (the three-repeat scoring is kept in G2/G3, where the acceptance-rule sensitivity analysis needs it).
+* 2026-10-20: V2L (original rubric text) uses MPIR seed 1 only.
+* 2026-10-20: the extra-seed and random-task base prompts (P0) are produced by the same optimizer
+  implementations and hyperparameters as the pilot (no changes to APE, ProTeGi or PromptWizard code).

@@ -1,0 +1,218 @@
+{
+ "hyperbaton_ape_42": {
+  "n": 200,
+  "strict": 0.515,
+  "lenient": 0.635,
+  "contains_gold": 0.64,
+  "has_delimiters": 1.0,
+  "long_span": 0.24
+ },
+ "hyperbaton_ape_mpir_42": {
+  "n": 200,
+  "strict": 0.52,
+  "lenient": 0.615,
+  "contains_gold": 0.635,
+  "has_delimiters": 1.0,
+  "long_span": 0.23
+ },
+ "hyperbaton_expert_few_shot_cot_42": {
+  "n": 200,
+  "strict": 0.86,
+  "lenient": 0.895,
+  "contains_gold": 1.0,
+  "has_delimiters": 0.93,
+  "long_span": 0.0
+ },
+ "hyperbaton_free_rewrite_42": {
+  "n": 200,
+  "strict": 0.61,
+  "lenient": 0.61,
+  "contains_gold": 0.61,
+  "has_delimiters": 1.0,
+  "long_span": 0.0
+ },
+ "hyperbaton_promptwizard_42": {
+  "n": 200,
+  "strict": 0.58,
+  "lenient": 0.58,
+  "contains_gold": 0.58,
+  "has_delimiters": 1.0,
+  "long_span": 0.0
+ },
+ "hyperbaton_promptwizard_mpir_42": {
+  "n": 200,
+  "strict": 0.58,
+  "lenient": 0.58,
+  "contains_gold": 0.58,
+  "has_delimiters": 1.0,
+  "long_span": 0.0
+ },
+ "hyperbaton_protegi_42": {
+  "n": 200,
+  "strict": 0.17,
+  "lenient": 0.59,
+  "contains_gold": 0.705,
+  "has_delimiters": 0.8,
+  "long_span": 0.455
+ },
+ "hyperbaton_protegi_mpir_42": {
+  "n": 200,
+  "strict": 0.17,
+  "lenient": 0.59,
+  "contains_gold": 0.705,
+  "has_delimiters": 0.8,
+  "long_span": 0.455
+ },
+ "hyperbaton_zero_shot_cot_42": {
+  "n": 200,
+  "strict": 0.51,
+  "lenient": 0.58,
+  "contains_gold": 0.645,
+  "has_delimiters": 0.945,
+  "long_span": 0.17
+ },
+ "penguins_in_a_table_ape_42": {
+  "n": 96,
+  "strict": 0.17708333333333334,
+  "lenient": 0.6458333333333334,
+  "contains_gold": 0.6666666666666666,
+  "has_delimiters": 0.9270833333333334,
+  "long_span": 0.010416666666666666
+ },
+ "penguins_in_a_table_ape_mpir_42": {
+  "n": 96,
+  "strict": 0.16666666666666666,
+  "lenient": 0.59375,
+  "contains_gold": 0.6041666666666666,
+  "has_delimiters": 0.9375,
+  "long_span": 0.010416666666666666
+ },
+ "penguins_in_a_table_expert_few_shot_cot_42": {
+  "n": 96,
+  "strict": 0.7291666666666666,
+  "lenient": 0.7291666666666666,
+  "contains_gold": 0.7395833333333334,
+  "has_delimiters": 1.0,
+  "long_span": 0.010416666666666666
+ },
+ "penguins_in_a_table_free_rewrite_42": {
+  "n": 96,
+  "strict": 0.5520833333333334,
+  "lenient": 0.5520833333333334,
+  "contains_gold": 0.5520833333333334,
+  "has_delimiters": 0.9895833333333334,
+  "long_span": 0.010416666666666666
+ },
+ "penguins_in_a_table_promptwizard_42": {
+  "n": 96,
+  "strict": 0.6979166666666666,
+  "lenient": 0.6979166666666666,
+  "contains_gold": 0.6979166666666666,
+  "has_delimiters": 1.0,
+  "long_span": 0.0
+ },
+ "penguins_in_a_table_promptwizard_mpir_42": {
+  "n": 96,
+  "strict": 0.6979166666666666,
+  "lenient": 0.6979166666666666,
+  "contains_gold": 0.6979166666666666,
+  "has_delimiters": 1.0,
+  "long_span": 0.0
+ },
+ "penguins_in_a_table_protegi_42": {
+  "n": 96,
+  "strict": 0.020833333333333332,
+  "lenient": 0.46875,
+  "contains_gold": 0.5,
+  "has_delimiters": 1.0,
+  "long_span": 0.9583333333333334
+ },
+ "penguins_in_a_table_protegi_mpir_42": {
+  "n": 96,
+  "strict": 0.020833333333333332,
+  "lenient": 0.4895833333333333,
+  "contains_gold": 0.5104166666666666,
+  "has_delimiters": 1.0,
+  "long_span": 0.9375
+ },
+ "penguins_in_a_table_zero_shot_cot_42": {
+  "n": 96,
+  "strict": 0.0625,
+  "lenient": 0.375,
+  "contains_gold": 0.3854166666666667,
+  "has_delimiters": 0.9270833333333334,
+  "long_span": 0.5104166666666666
+ },
+ "ruin_names_ape_42": {
+  "n": 200,
+  "strict": 0.41,
+  "lenient": 0.425,
+  "contains_gold": 0.96,
+  "has_delimiters": 1.0,
+  "long_span": 0.015
+ },
+ "ruin_names_ape_mpir_42": {
+  "n": 200,
+  "strict": 0.41,
+  "lenient": 0.425,
+  "contains_gold": 0.96,
+  "has_delimiters": 1.0,
+  "long_span": 0.015
+ },
+ "ruin_names_expert_few_shot_cot_42": {
+  "n": 200,
+  "strict": 0.5,
+  "lenient": 0.5,
+  "contains_gold": 0.99,
+  "has_delimiters": 1.0,
+  "long_span": 0.0
+ },
+ "ruin_names_free_rewrite_42": {
+  "n": 200,
+  "strict": 0.445,
+  "lenient": 0.445,
+  "contains_gold": 0.99,
+  "has_delimiters": 1.0,
+  "long_span": 0.0
+ },
+ "ruin_names_promptwizard_42": {
+  "n": 200,
+  "strict": 0.6,
+  "lenient": 0.6,
+  "contains_gold": 0.99,
+  "has_delimiters": 1.0,
+  "long_span": 0.0
+ },
+ "ruin_names_promptwizard_mpir_42": {
+  "n": 200,
+  "strict": 0.6,
+  "lenient": 0.6,
+  "contains_gold": 0.99,
+  "has_delimiters": 1.0,
+  "long_span": 0.0
+ },
+ "ruin_names_protegi_42": {
+  "n": 200,
+  "strict": 0.045,
+  "lenient": 0.345,
+  "contains_gold": 0.56,
+  "has_delimiters": 0.975,
+  "long_span": 0.86
+ },
+ "ruin_names_protegi_mpir_42": {
+  "n": 200,
+  "strict": 0.045,
+  "lenient": 0.345,
+  "contains_gold": 0.56,
+  "has_delimiters": 0.975,
+  "long_span": 0.86
+ },
+ "ruin_names_zero_shot_cot_42": {
+  "n": 200,
+  "strict": 0.37,
+  "lenient": 0.43,
+  "contains_gold": 0.88,
+  "has_delimiters": 0.995,
+  "long_span": 0.11
+ }
+}
