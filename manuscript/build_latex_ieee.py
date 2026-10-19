@@ -181,9 +181,9 @@ def build():
 
     doc = TEMPLATE.format(
         title=BL.esc(C.TITLE),
-        shorttitle="Meta-Prompted Instruction Refinement: A Boundary-Condition Finding",
+        shorttitle="Rubric-Guided Prompt Refinement: A Pre-Specified Negative Result",
         authors=authors,
-        abstract=BL.resolve_citations(IEEE_ABSTRACT),
+        abstract=BL.resolve_citations(C.ABSTRACT),
         keywords=keywords,
         body=body,
         acknowledgment=acknowledgment,
@@ -209,8 +209,10 @@ TEMPLATE = r"""\documentclass{{ieeeaccess}}
 
 \begin{{document}}
 
-\history{{Date of publication xxxx 00, 0000, date of current version xxxx 00, 0000.}}
-\doi{{10.1109/ACCESS.2026.0000000}}
+\vol{{14}}
+\year{{2026}}
+\history{{Manuscript received August 2026; revised October 20, 2026.}}
+\doi{{to be assigned by IEEE upon acceptance}}
 
 \title{{{title}}}
 

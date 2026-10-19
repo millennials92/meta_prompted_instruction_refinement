@@ -36,6 +36,13 @@ _ESCAPE_MAP = {
     "∞": r"$\infty$",
     "Σ": r"$\Sigma$",
     "▷": r"$\triangleright$",
+    "∪": r"$\cup$",
+    "∈": r"$\in$",
+    "Δ": r"$\Delta$",
+    "τ": r"$\tau$",
+    "α": r"$\alpha$",
+    "θ": r"$\theta$",
+    "ρ": r"$\rho$",
 }
 
 _COMBINING_HAT_RE = re.compile(r"(.)̂")
@@ -242,16 +249,22 @@ def latex_algo(b):
 def latex_table(b):
     ncols = len(b["header"])
     if b.get("colw"):
+        unit = "\\textwidth" if (b.get("full") and ncols >= 6) else "\\linewidth"
         colspec = "".join(
-            f">{{\\raggedright\\arraybackslash}}p{{{w}\\linewidth}}" for w in b["colw"]
+            f">{{\\raggedright\\arraybackslash}}p{{{w}{unit}}}" for w in b["colw"]
         )
     else:
         colspec = "l" + "c" * (ncols - 1)
-    lines = [r"\begin{table}[htbp]",
+    # Tables with six or more columns span both IEEE columns (table*) at the width of the text block, so
+    # their cell text stays legible instead of being shrunk to a single column's width.
+    star = bool(b.get("full")) and ncols >= 6
+    env = "table*" if star else "table"
+    width = r"\textwidth" if star else r"\linewidth"
+    lines = [r"\begin{" + env + r"}[htbp]",
              r"\centering",
-             r"\small",
+             r"\footnotesize" if star else r"\small",
              caption_command(b["caption"]),
-             r"\resizebox{\linewidth}{!}{%" if not b.get("colw") else "",
+             r"\resizebox{" + width + r"}{!}{%" if not b.get("colw") else "",
              f"\\begin{{tabular}}{{{colspec}}}",
              r"\toprule"]
     lines.append(" & ".join(f"\\textbf{{{esc(h)}}}" for h in b["header"]) + r" \\")
@@ -270,7 +283,7 @@ def latex_table(b):
         lines.append("}")
     if b.get("note") and b["note"] not in ("bold_last_row",):
         lines.append(r"\par\footnotesize " + esc(b["note"]))
-    lines.append(r"\end{table}")
+    lines.append(r"\end{" + env + "}")
     return "\n".join(line for line in lines if line != "")
 
 

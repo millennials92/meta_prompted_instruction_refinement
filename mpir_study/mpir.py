@@ -20,7 +20,8 @@ from .templates import (ANSWER_FORMAT, CORRECTED_RUBRIC, ECHO_MARKERS, FREE_REWR
                         final_prompt_template, parse_rubric_total)
 
 ROUNDS_DIR = REPO / "results" / "revision" / "rounds"
-TEMPERATURE, TOP_P = 0.7, 0.95
+GEN_DIR = REPO / "results" / "revision" / "gen_cache"
+TEMPERATURE = 0.7  # plain temperature sampling; top-p was dropped (vLLM's non-flashinfer top-p path is ~3x slower)
 EVAL_MAX_TOKENS, REFINE_MAX_TOKENS = 1500, 3000
 HISTORY_KEEP, HISTORY_CHARS = 4, 800
 VALIDATION_REPS = 3
@@ -64,9 +65,29 @@ def _history_block(entries: list[dict]) -> str:
 
 
 def _generate(spec: RunSpec, refiner: Endpoint, source: str, round_no: int, history: list[dict]) -> dict:
+    """Cached wrapper: a generation is stored per (spec, round) so scoring can be decoupled from the refiner."""
+    path = GEN_DIR / f"{spec.key}__t{round_no}.json"
+    if path.exists():
+        return json.loads(path.read_text(encoding="utf-8"))
+    generated = _generate_uncached(spec, refiner, source, round_no, history)
+    GEN_DIR.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(generated), encoding="utf-8")
+    return generated
+
+
+def generate_independent(spec: RunSpec) -> None:
+    """Generation-only pass for the independent variants (they never depend on validation scores), so a
+    large refiner can be served alone and the target scored afterwards."""
+    assert spec.variant in ("v0", "v1", "v3")
+    p0 = load_p0(spec.cell)
+    for round_no in range(1, spec.rounds + 1):
+        _generate(spec, REFINERS[spec.refiner], p0, round_no, [])
+
+
+def _generate_uncached(spec: RunSpec, refiner: Endpoint, source: str, round_no: int, history: list[dict]) -> dict:
     """One evaluate+refine (or free-rewrite) call chain; returns judge/refine texts and the raw candidate."""
     sampled = spec.variant != "v0"
-    kwargs = {"temperature": TEMPERATURE, "top_p": TOP_P} if sampled else {"temperature": 0.0}
+    kwargs = {"temperature": TEMPERATURE if sampled else 0.0}
     if spec.variant == "v3":
         raw = chat(refiner, [{"role": "user", "content": FREE_REWRITE_PROMPT.format(prompt=source, variant_instruction="")}],
                    max_tokens=REFINE_MAX_TOKENS, seed=_seed(spec, round_no, 1), **kwargs)

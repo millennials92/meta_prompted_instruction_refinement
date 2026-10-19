@@ -6,8 +6,8 @@ import time
 import traceback
 from concurrent.futures import ThreadPoolExecutor
 
-from .data import tier1_cells, tier2_cells
-from .mpir import RunSpec, run_refinement
+from .data import DEMOS, TIER1_TASKS, tier1_cells, tier2_cells
+from .mpir import RunSpec, generate_independent, run_refinement
 from .scoring import Scorer
 
 
@@ -15,12 +15,15 @@ def specs_for(group: str, mseeds: tuple[int, ...]) -> list[tuple[RunSpec, bool]]
     """(spec, oracle) pairs for a protocol group."""
     pilot_cells = [c for c in tier1_cells() if c.seed == 42]
     if group == "g1":
-        return [(RunSpec(c, "v2", "1.7b", m, val_reps=1), False) for c in tier1_cells() + tier2_cells() for m in mseeds]
+        # Tier-1 seed-42 cells are covered by G2 (same V2 runs, with oracle scoring and three validation repeats).
+        cells = [c for c in tier1_cells() + tier2_cells() if not (c.seed == 42 and c.task in TIER1_TASKS)]
+        return [(RunSpec(c, "v2", "1.7b", m, val_reps=1), False) for c in cells for m in mseeds]
     if group == "g2":
         out: list[tuple[RunSpec, bool]] = []
         for variant in ("v0", "v1", "v2", "v2l", "v3"):
-            seeds = (1,) if variant == "v0" else mseeds
-            out += [(RunSpec(c, variant, "1.7b", m), m == 1) for c in pilot_cells for m in seeds]
+            seeds = (1,) if variant in ("v0", "v2l") else mseeds
+            oracle = variant in ("v1", "v2", "v3")
+            out += [(RunSpec(c, variant, "1.7b", m), oracle and m == 1) for c in pilot_cells for m in seeds]
         return out
     if group == "g3-4b":
         return [(RunSpec(c, v, "4b", m), m == 1) for c in pilot_cells for v in ("v1", "v2") for m in mseeds]
@@ -34,14 +37,26 @@ def main() -> None:
     parser.add_argument("--group", required=True)
     parser.add_argument("--mseeds", default="1,2,3")
     parser.add_argument("--workers", type=int, default=10)
+    parser.add_argument("--generate-only", action="store_true",
+                        help="only run the refiner (independent variants); score later with the refiner server down")
     args = parser.parse_args()
     mseeds = tuple(int(s) for s in args.mseeds.split(","))
-    todo = [(s, o) for s, o in specs_for(args.group, mseeds) if not s.path.exists()]
+    def has_p0(spec: RunSpec) -> bool:
+        return (DEMOS / "results" / f"{spec.cell.optimizer}_{spec.cell.task}_seed{spec.cell.seed}.pkl").exists()
+
+    todo = [(s, o) for s, o in specs_for(args.group, mseeds) if has_p0(s) and not s.path.exists()]
     print(f"{args.group}: {len(todo)} runs to do", flush=True)
     scorers: dict[str, Scorer] = {}
 
     def work(item):
         spec, oracle = item
+        if args.generate_only:
+            try:
+                generate_independent(spec)
+                print(f"GENERATED {spec.key}", flush=True)
+            except Exception:
+                print(f"FAILED {spec.key}\n{traceback.format_exc()}", flush=True)
+            return
         scorer = scorers.setdefault(spec.cell.key, Scorer(spec.cell))
         started = time.time()
         try:

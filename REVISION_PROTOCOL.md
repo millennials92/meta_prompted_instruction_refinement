@@ -32,7 +32,7 @@ experiments use two corrected variants, both with the validation gate unchanged
 (strict improvement over the baseline score of P0 on the 25-item validation split):
 
 * V1 `indep`: every round refines P0 independently; the meta-model samples at
-  temperature 0.7 (top-p 0.95) with a per-round seed, so rounds are genuinely distinct draws.
+  temperature 0.7 (plain temperature sampling, no top-p) with a per-round seed, so rounds are genuinely distinct draws.
 * V2 `chained` (the corrected MPIR, primary): round t refines the current incumbent
   (best validated prompt so far, initially P0) and the meta-prompt carries the history of
   every earlier candidate with its validation score and the judge's critique; temperature 0.7.
@@ -123,3 +123,7 @@ open-weight reference judge only. One model family (Qwen3) is used.
 * 2026-10-20: V2L (original rubric text) uses MPIR seed 1 only.
 * 2026-10-20: the extra-seed and random-task base prompts (P0) are produced by the same optimizer
   implementations and hyperparameters as the pilot (no changes to APE, ProTeGi or PromptWizard code).
+* 2026-10-20: refiner sampling uses temperature 0.7 without top-p (the protocol text said top-p 0.95);
+  vLLM's top-p path was measured to be about 3x slower on this stack.
+* 2026-10-20: the Tier-1 seed-42 cells are run only in G2 (which includes the V2 runs with oracle
+  scoring); G1 covers the remaining 36 cells. V2L (original rubric text) is not oracle-scored.
