@@ -4,9 +4,6 @@
 external review. Editor's stated grounds: "insufficient novelty, lack of experimental
 validation, or issues with the overall presentation."
 
-**Interactive version of this document:**
-https://claude.ai/code/artifact/477f4c7e-4401-41cc-bf46-c94b9818ee7e
-
 This file is the durable record. It covers (1) why the manuscript was rejected,
 (2) two code-level defects found while planning the rebuild that are more serious than
 anything either prior review round caught, (3) the rebuild plan, (4) what must not slip.
