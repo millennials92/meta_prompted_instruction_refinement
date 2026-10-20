@@ -54,3 +54,7 @@ Thumbs.db
 .vscode/*
 !.vscode/settings.json
 .idea/
+results/revision/score_cache/
+logs_search/
+logs_study/
+results/revision/judge_scores_gpt6luna.backup.json

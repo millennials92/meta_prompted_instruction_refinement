@@ -25,6 +25,15 @@ def specs_for(group: str, mseeds: tuple[int, ...]) -> list[tuple[RunSpec, bool]]
             oracle = variant in ("v1", "v2", "v3")
             out += [(RunSpec(c, variant, "1.7b", m), oracle and m == 1) for c in pilot_cells for m in seeds]
         return out
+    if group == "g3-api":
+        # Stronger refiners through OpenRouter; the target stays the local 1.7B model.
+        return [(RunSpec(c, "v2", r, m), m == 1) for r in ("gpt6luna", "qwen235") for c in pilot_cells
+                for m in mseeds]
+    if group == "g3-follow":
+        # Exploratory follow-up (not in the original protocol): after the Qwen3-235B refiner showed gains,
+        # (a) the rubric-free gated rewrite with the same refiner, and (b) a second MPIR seed.
+        return ([(RunSpec(c, "v3", "qwen235", 1), True) for c in pilot_cells]
+                + [(RunSpec(c, "v2", "qwen235", 2, val_reps=1), False) for c in pilot_cells])
     if group == "g3-4b":
         return [(RunSpec(c, v, "4b", m), m == 1) for c in pilot_cells for v in ("v1", "v2") for m in mseeds]
     if group == "g3-8b":
@@ -44,7 +53,9 @@ def main() -> None:
     def has_p0(spec: RunSpec) -> bool:
         return (DEMOS / "results" / f"{spec.cell.optimizer}_{spec.cell.task}_seed{spec.cell.seed}.pkl").exists()
 
-    todo = [(s, o) for s, o in specs_for(args.group, mseeds) if has_p0(s) and not s.path.exists()]
+    # MPIR seed 1 for every variant first, then seeds 2 and 3, so the run can be stopped at any point.
+    todo = sorted(((s, o) for s, o in specs_for(args.group, mseeds) if has_p0(s) and not s.path.exists()),
+                  key=lambda item: item[0].mseed)
     print(f"{args.group}: {len(todo)} runs to do", flush=True)
     scorers: dict[str, Scorer] = {}
 

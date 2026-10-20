@@ -127,3 +127,15 @@ open-weight reference judge only. One model family (Qwen3) is used.
   vLLM's top-p path was measured to be about 3x slower on this stack.
 * 2026-10-20: the Tier-1 seed-42 cells are run only in G2 (which includes the V2 runs with oracle
   scoring); G1 covers the remaining 36 cells. V2L (original rubric text) is not oracle-scored.
+* 2026-10-20 (capability experiment, D2): the local Qwen3-4B/8B refiners were not run because the shared
+  local GPU is too slow for the extra server swaps. The stronger refiners are instead reached through
+  OpenRouter: openai/gpt-6-luna (reasoning effort minimal) as the strongest and qwen/qwen3-235b-a22b-2507 as
+  an intermediate open-weight rung, using the chained variant V2 on the nine Tier-1 seed-42 cells with
+  MPIR seed 1 (oracle-scored) and further seeds if time allows. D2 is evaluated with gpt-6-luna in the
+  role the protocol gave to the 8B refiner. GPT-6 Luna is not the original GPT-4o, so this does not
+  replicate the first evaluation's configuration; the target model stays Qwen3-1.7B.
+* 2026-10-21 (exploratory follow-up, NOT pre-specified): after the main grid, the mechanism group and the
+  capability group finished, the Qwen3-235B refiner showed gains in 4 of 9 Tier-1 seed-42 cells. Two further runs
+  were added to examine that signal: (a) V3 (rubric-free gated rewrite) with the same refiner, oracle-scored, to
+  separate the rubric from rewriting by a stronger model; (b) a second MPIR seed of V2 with that refiner.
+  These were decided after seeing the results and are reported as exploratory.

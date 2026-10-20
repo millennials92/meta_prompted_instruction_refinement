@@ -1,0 +1,1790 @@
+{
+ "1.7b": {
+  "158624ce284476a5": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "c6f8558bffabbf11": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "aff00cbd786da771": {
+   "total": 16.0,
+   "out_of": 35
+  },
+  "fd4a0363a5d6aacd": {
+   "total": 21.0,
+   "out_of": 35
+  },
+  "05dcbe093616fbd4": {
+   "total": 32.0,
+   "out_of": 35
+  },
+  "54dc95aaa0cb9a90": {
+   "total": 33.0,
+   "out_of": 35
+  },
+  "efae40d7d180b1b6": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "8dda62b4b4737f38": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "73bccf152a5e8398": {
+   "total": 25.0,
+   "out_of": 35
+  },
+  "f08e5b182913f2bc": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "e169930b6ccb4a74": {
+   "total": null,
+   "out_of": null
+  },
+  "f7342e7e2d4f3baa": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "bee2d21584424f54": {
+   "total": null,
+   "out_of": null
+  },
+  "ff1acba7f405066d": {
+   "total": null,
+   "out_of": null
+  },
+  "dce1cf76f0a49e07": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "3a1c97b49fd884c9": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "43eaab8f141d703b": {
+   "total": 25.0,
+   "out_of": 35
+  },
+  "edd01624526c4f59": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "7f0cc53a59a6de64": {
+   "total": null,
+   "out_of": null
+  },
+  "b267ae196dab5bea": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "4bb9d0e58b955bfe": {
+   "total": 25.0,
+   "out_of": 35
+  },
+  "d754af0e1c0bb5f3": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "784b77692b3a8572": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "a6c8251bc56efde9": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "7a5676a3f101964e": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "0b694e6101202554": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "185aafb41f174975": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "f27093bde631a51d": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "e43a0c97060bfcba": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "2fe8c4074a953e9c": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "203e31a3e9b6ed8f": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "a816a9da19f6a9d3": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "bf5f5e836ea0cf2c": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "e06b9d6e3f456b33": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "a61c5332d1d91e96": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "e6f7569d46b94b36": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "e9208ee8ad8584ee": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "e465e84b6718bff9": {
+   "total": 25.0,
+   "out_of": 35
+  },
+  "9083dba933bdeefb": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "ea15b2bd8120b21b": {
+   "total": 34.0,
+   "out_of": 35
+  },
+  "b20b1522c357c84b": {
+   "total": 32.0,
+   "out_of": 35
+  },
+  "b27d2b017cc3c93d": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "9d882ff0ce9dfc73": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "51cd1c0cf1dbbb26": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "a4c7cf7946fb846b": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "2d7ad6ad97ba3daf": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "958339d8a5d8f322": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "951c591be700187e": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "70189da9a8afbd96": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "3bab902b3f1c4474": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "fe5535671b99c409": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "a8b67457b8845fb5": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "cba03ca007165457": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "9180b33579157193": {
+   "total": 14.0,
+   "out_of": 35
+  },
+  "a2a12e125708ef71": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "513120804663bf53": {
+   "total": 22.0,
+   "out_of": 35
+  },
+  "85ac9936f72edc52": {
+   "total": 1.0,
+   "out_of": 35
+  },
+  "8abcf89b9c223d40": {
+   "total": 26.0,
+   "out_of": 35
+  },
+  "edd8566ef5bb4987": {
+   "total": 17.0,
+   "out_of": 35
+  },
+  "70e3f8be5e1757b2": {
+   "total": 15.0,
+   "out_of": 35
+  },
+  "0718fc434ec61363": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "52a90316849c93a5": {
+   "total": 19.0,
+   "out_of": 25
+  },
+  "9a416d2df34f5b52": {
+   "total": 15.0,
+   "out_of": 35
+  },
+  "685f3c6dafe865b4": {
+   "total": 24.0,
+   "out_of": 35
+  },
+  "ee1600a18d86c1fc": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "31189c14f73201b3": {
+   "total": 22.0,
+   "out_of": 35
+  },
+  "8c2ea099944d3f77": {
+   "total": 28.0,
+   "out_of": 35
+  },
+  "67c6b5aa82236664": {
+   "total": 25.0,
+   "out_of": 35
+  },
+  "634cd371a4114385": {
+   "total": 22.0,
+   "out_of": 35
+  },
+  "0ce3d5bd82e2e260": {
+   "total": 21.0,
+   "out_of": 35
+  },
+  "de714aa2dea381ca": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "659a5d54a438cb77": {
+   "total": 1.0,
+   "out_of": 35
+  },
+  "384d5e1c10ff51db": {
+   "total": 14.0,
+   "out_of": 35
+  },
+  "9bb9350d0fed4f13": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "d9a292244c5f9f3e": {
+   "total": 22.0,
+   "out_of": 35
+  },
+  "20e2bb89c18499ee": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "e4478c64cdedafea": {
+   "total": 1.0,
+   "out_of": 35
+  },
+  "f5985813dc32b37b": {
+   "total": 1.0,
+   "out_of": 35
+  },
+  "a24860bfd51cf4c9": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "3cb76b4240f4a72e": {
+   "total": 15.0,
+   "out_of": 35
+  },
+  "4932596e51c0f0cc": {
+   "total": 15.0,
+   "out_of": 35
+  },
+  "bb403df9741c5b45": {
+   "total": 15.0,
+   "out_of": 35
+  },
+  "35a08077f5462861": {
+   "total": null,
+   "out_of": null
+  },
+  "20c8899ebebce98d": {
+   "total": 26.0,
+   "out_of": 35
+  },
+  "307df18381c75e74": {
+   "total": 4.0,
+   "out_of": 35
+  },
+  "3de8fd3f8edb46d1": {
+   "total": 16.0,
+   "out_of": 35
+  },
+  "188faab9a4cc5900": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "767edae42ffa2617": {
+   "total": 24.0,
+   "out_of": 35
+  },
+  "b500b24305be8191": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "ac2b09caddd7b02c": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "e58c86a3c63ce831": {
+   "total": 24.0,
+   "out_of": 35
+  },
+  "99ec914ce183f2d7": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "071874c26bff7af4": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "fc237e16c1698c5f": {
+   "total": 25.0,
+   "out_of": 35
+  },
+  "97e9a07d9b03dc90": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "74f65168366856b3": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "5c4803270f29113c": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "03b1b0b8d3b56b6d": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "0519ed3373ef1abe": {
+   "total": 25.0,
+   "out_of": 35
+  },
+  "1923f46026b4ece4": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "8a0e79bf54d880c0": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "f041914b8312aa4d": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "4b3ecfe6504d6e33": {
+   "total": null,
+   "out_of": null
+  },
+  "9c9899abec2be3d9": {
+   "total": null,
+   "out_of": null
+  },
+  "25a1a01dd984df26": {
+   "total": null,
+   "out_of": null
+  },
+  "bca337e05351c637": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "4b9ead97db7aa1a6": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "cda92de191aaab5e": {
+   "total": null,
+   "out_of": null
+  },
+  "387f7f20dd79de5a": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "4ce3e39390d78f71": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "cfbae40ba216e6c0": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "2d0ebb391a6a55f4": {
+   "total": 1.0,
+   "out_of": 35
+  },
+  "926bdc4b36aafb4b": {
+   "total": 22.0,
+   "out_of": 35
+  },
+  "14949e1d4b9fa82a": {
+   "total": 28.0,
+   "out_of": 35
+  },
+  "c8cf6bfdd51fb4d5": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "3761f2da886deaa4": {
+   "total": 1.0,
+   "out_of": 35
+  },
+  "1ec340d0badc9b44": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "bfaf9014dcb7e567": {
+   "total": 26.0,
+   "out_of": 35
+  },
+  "2abef0ad72c7287d": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "2ce8e025de12ff54": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "9b447233936e24ae": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "7b05f9be52374c68": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "3098294389273215": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "800653e9f383835e": {
+   "total": 3.0,
+   "out_of": 35
+  },
+  "fcf9c7ec9d3d719c": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "b8aacc8ba8239752": {
+   "total": null,
+   "out_of": null
+  },
+  "ab794a5c3be82072": {
+   "total": 25.0,
+   "out_of": 35
+  },
+  "26b32620f4bd1e56": {
+   "total": 2.0,
+   "out_of": 35
+  },
+  "e26017e324488ae5": {
+   "total": 2.0,
+   "out_of": 35
+  },
+  "ddbfe9e94904ab62": {
+   "total": 25.0,
+   "out_of": 35
+  },
+  "4dceae3614ed7ba7": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "aa65507d0e90708e": {
+   "total": 1.0,
+   "out_of": 35
+  },
+  "fcab175c686c90da": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "4e87948b124a8cd9": {
+   "total": 10.0,
+   "out_of": 35
+  },
+  "fed1b192ef75bfb6": {
+   "total": 25.0,
+   "out_of": 35
+  },
+  "cdd995f97ddb3fc7": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "99ba5ac55362e3df": {
+   "total": 15.0,
+   "out_of": 35
+  },
+  "832b32844361766d": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "83f00eb256b391f1": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "3a89ac95c60fff08": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "064cd6d4b8e29202": {
+   "total": 25.0,
+   "out_of": 35
+  },
+  "50b2fcad5da0a8ef": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "cfb4705556c6498a": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "8c96803bca5041f6": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "ecf983a860eed792": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "d029f8aaaf31b0f4": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "3112717ca04a8748": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "d6e50e3c2ca1b543": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "5d8bb1a5bc924f16": {
+   "total": 27.0,
+   "out_of": 30
+  },
+  "3f115309a545a534": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "52fbf79acd798318": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "76736b11a889f049": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "3d8f1e0f16f525fc": {
+   "total": null,
+   "out_of": null
+  },
+  "9b3dceae1c0a6a83": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "ccc1fb9926bb88fa": {
+   "total": 25.0,
+   "out_of": 35
+  },
+  "d9e03f5ffdf9087b": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "62d89d559f8a189b": {
+   "total": null,
+   "out_of": null
+  },
+  "552a6cda13d2e3be": {
+   "total": 25.0,
+   "out_of": 35
+  },
+  "80a26ab171a287e4": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "8c757c2a4942de40": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "6dda8fa2c82b32d8": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "639724f951caa833": {
+   "total": 25.0,
+   "out_of": 35
+  },
+  "49b8f1c35d1cc6fa": {
+   "total": null,
+   "out_of": null
+  },
+  "aeccba37b0d4cb2d": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "31f50f9e9c11f81f": {
+   "total": 28.0,
+   "out_of": 35
+  },
+  "ceaf6c8cff0a203e": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "d87568aa102de0c8": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "b3ecbcadb6764012": {
+   "total": 1.0,
+   "out_of": 35
+  },
+  "36950f1ba5c83982": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "7f47681d0e3b4464": {
+   "total": 1.0,
+   "out_of": 35
+  },
+  "23c1a9abf77f3c8e": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "1b94c0e8f2648094": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "95358f8a9ba083d6": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "e7906cee3ded0b00": {
+   "total": 5.0,
+   "out_of": 35
+  },
+  "e5bd1d31927cea8b": {
+   "total": 26.0,
+   "out_of": 35
+  },
+  "64df584d86a92988": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "c5bcf2375cdd2466": {
+   "total": 15.0,
+   "out_of": 35
+  },
+  "e86eb162feca3122": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "6ad8ec0cfb0a7410": {
+   "total": 25.0,
+   "out_of": 35
+  },
+  "76570d4c14d257bb": {
+   "total": 28.0,
+   "out_of": 35
+  },
+  "27ddd1bf87b4d3c4": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "922b2c455ef19fe0": {
+   "total": 28.0,
+   "out_of": 35
+  },
+  "f06aafc1567a8792": {
+   "total": 25.0,
+   "out_of": 35
+  },
+  "1c63787497aa222a": {
+   "total": 32.0,
+   "out_of": 35
+  },
+  "64af12f94ecee9fa": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "8bb995e1d1c40a2c": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "830036ddf0f5f07b": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "c6e9c1541654b152": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "0a909cdc5fcdf005": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "ed6b78fe9e7f753b": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "649466ead5f94761": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "08ee62b9ce257ae2": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "bdf42a7331e8f024": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "9e34ddebc6cc0ac1": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "547983b1fe1c31a4": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "75ba6b7660ace1ff": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "4dab174c5e39b325": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "00e8cb2b520ec053": {
+   "total": 12.0,
+   "out_of": 15
+  },
+  "9d45e731bfe27e07": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "4004ab73505c0711": {
+   "total": 30.0,
+   "out_of": 30
+  },
+  "fb478cf91a10d94d": {
+   "total": 30.0,
+   "out_of": 30
+  },
+  "cccb9d1fe8723143": {
+   "total": null,
+   "out_of": null
+  },
+  "aafcc525875d0a7d": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "1ba93ebd0110c958": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "439387a2a1f12559": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "bd5c41310cc6b04d": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "6a0bf04a6e1fc903": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "78c50304bbca897b": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "51b3686257f32d06": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "fba8e7c029472b45": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "5774930a5cd98b9f": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "8d96286c53a5663b": {
+   "total": null,
+   "out_of": null
+  },
+  "13d26f9507dbe661": {
+   "total": null,
+   "out_of": null
+  },
+  "fc8be73200d8c76a": {
+   "total": 28.0,
+   "out_of": 35
+  },
+  "eb4cbde43929e74a": {
+   "total": 32.0,
+   "out_of": 35
+  },
+  "0d23a59728199c58": {
+   "total": 32.0,
+   "out_of": 35
+  },
+  "ff70558f451a6cd1": {
+   "total": 28.0,
+   "out_of": 35
+  },
+  "3b754fe6f7b3f01d": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "c356be5482415ad9": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "54ec5543bd9aa031": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "e8e66671b6620e0a": {
+   "total": 35.0,
+   "out_of": 35
+  },
+  "dcb85d505fccf4d7": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "3c118e51ea263cb4": {
+   "total": 35.0,
+   "out_of": 35
+  }
+ },
+ "gpt6luna": {
+  "158624ce284476a5": {
+   "total": 11.0,
+   "out_of": 35
+  },
+  "c6f8558bffabbf11": {
+   "total": 15.0,
+   "out_of": 35
+  },
+  "aff00cbd786da771": {
+   "total": 8.0,
+   "out_of": 35
+  },
+  "fd4a0363a5d6aacd": {
+   "total": 7.0,
+   "out_of": 35
+  },
+  "05dcbe093616fbd4": {
+   "total": 14.0,
+   "out_of": 35
+  },
+  "54dc95aaa0cb9a90": {
+   "total": 10.0,
+   "out_of": 35
+  },
+  "efae40d7d180b1b6": {
+   "total": 17.0,
+   "out_of": 35
+  },
+  "8dda62b4b4737f38": {
+   "total": 14.0,
+   "out_of": 35
+  },
+  "73bccf152a5e8398": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "f08e5b182913f2bc": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "e169930b6ccb4a74": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "f7342e7e2d4f3baa": {
+   "total": 24.0,
+   "out_of": 35
+  },
+  "bee2d21584424f54": {
+   "total": 26.0,
+   "out_of": 35
+  },
+  "ff1acba7f405066d": {
+   "total": 26.0,
+   "out_of": 35
+  },
+  "dce1cf76f0a49e07": {
+   "total": 29.0,
+   "out_of": 35
+  },
+  "3a1c97b49fd884c9": {
+   "total": 24.0,
+   "out_of": 35
+  },
+  "43eaab8f141d703b": {
+   "total": 22.0,
+   "out_of": 35
+  },
+  "edd01624526c4f59": {
+   "total": 22.0,
+   "out_of": 35
+  },
+  "7f0cc53a59a6de64": {
+   "total": 26.0,
+   "out_of": 35
+  },
+  "b267ae196dab5bea": {
+   "total": 22.0,
+   "out_of": 35
+  },
+  "4bb9d0e58b955bfe": {
+   "total": 24.0,
+   "out_of": 35
+  },
+  "d754af0e1c0bb5f3": {
+   "total": 22.0,
+   "out_of": 35
+  },
+  "784b77692b3a8572": {
+   "total": 10.0,
+   "out_of": 35
+  },
+  "a6c8251bc56efde9": {
+   "total": 11.0,
+   "out_of": 35
+  },
+  "7a5676a3f101964e": {
+   "total": 11.0,
+   "out_of": 35
+  },
+  "0b694e6101202554": {
+   "total": 10.0,
+   "out_of": 35
+  },
+  "185aafb41f174975": {
+   "total": 13.0,
+   "out_of": 35
+  },
+  "f27093bde631a51d": {
+   "total": 16.0,
+   "out_of": 35
+  },
+  "e43a0c97060bfcba": {
+   "total": 14.0,
+   "out_of": 35
+  },
+  "2fe8c4074a953e9c": {
+   "total": 16.0,
+   "out_of": 35
+  },
+  "203e31a3e9b6ed8f": {
+   "total": 14.0,
+   "out_of": 35
+  },
+  "a816a9da19f6a9d3": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "bf5f5e836ea0cf2c": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "e06b9d6e3f456b33": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "a61c5332d1d91e96": {
+   "total": 29.0,
+   "out_of": 35
+  },
+  "e6f7569d46b94b36": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "e9208ee8ad8584ee": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "e465e84b6718bff9": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "9083dba933bdeefb": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "ea15b2bd8120b21b": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "b20b1522c357c84b": {
+   "total": 28.0,
+   "out_of": 35
+  },
+  "b27d2b017cc3c93d": {
+   "total": 29.0,
+   "out_of": 35
+  },
+  "9d882ff0ce9dfc73": {
+   "total": 19.0,
+   "out_of": 35
+  },
+  "51cd1c0cf1dbbb26": {
+   "total": 32.0,
+   "out_of": 35
+  },
+  "a4c7cf7946fb846b": {
+   "total": 15.0,
+   "out_of": 35
+  },
+  "2d7ad6ad97ba3daf": {
+   "total": 16.0,
+   "out_of": 35
+  },
+  "958339d8a5d8f322": {
+   "total": 21.0,
+   "out_of": 35
+  },
+  "951c591be700187e": {
+   "total": 15.0,
+   "out_of": 35
+  },
+  "70189da9a8afbd96": {
+   "total": 14.0,
+   "out_of": 35
+  },
+  "3bab902b3f1c4474": {
+   "total": 8.0,
+   "out_of": 35
+  },
+  "fe5535671b99c409": {
+   "total": 12.0,
+   "out_of": 35
+  },
+  "a8b67457b8845fb5": {
+   "total": 13.0,
+   "out_of": 35
+  },
+  "cba03ca007165457": {
+   "total": 16.0,
+   "out_of": 35
+  },
+  "9180b33579157193": {
+   "total": 8.0,
+   "out_of": 35
+  },
+  "a2a12e125708ef71": {
+   "total": 15.0,
+   "out_of": 35
+  },
+  "513120804663bf53": {
+   "total": 11.0,
+   "out_of": 35
+  },
+  "85ac9936f72edc52": {
+   "total": 7.0,
+   "out_of": 35
+  },
+  "8abcf89b9c223d40": {
+   "total": 8.0,
+   "out_of": 35
+  },
+  "edd8566ef5bb4987": {
+   "total": 13.0,
+   "out_of": 35
+  },
+  "70e3f8be5e1757b2": {
+   "total": 24.0,
+   "out_of": 35
+  },
+  "0718fc434ec61363": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "52a90316849c93a5": {
+   "total": 28.0,
+   "out_of": 35
+  },
+  "9a416d2df34f5b52": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "685f3c6dafe865b4": {
+   "total": 26.0,
+   "out_of": 35
+  },
+  "ee1600a18d86c1fc": {
+   "total": 29.0,
+   "out_of": 35
+  },
+  "31189c14f73201b3": {
+   "total": 7.0,
+   "out_of": 35
+  },
+  "8c2ea099944d3f77": {
+   "total": 9.0,
+   "out_of": 35
+  },
+  "67c6b5aa82236664": {
+   "total": 8.0,
+   "out_of": 35
+  },
+  "634cd371a4114385": {
+   "total": 7.0,
+   "out_of": 35
+  },
+  "0ce3d5bd82e2e260": {
+   "total": 8.0,
+   "out_of": 35
+  },
+  "de714aa2dea381ca": {
+   "total": 13.0,
+   "out_of": 35
+  },
+  "659a5d54a438cb77": {
+   "total": 7.0,
+   "out_of": 35
+  },
+  "384d5e1c10ff51db": {
+   "total": 12.0,
+   "out_of": 35
+  },
+  "9bb9350d0fed4f13": {
+   "total": 18.0,
+   "out_of": 35
+  },
+  "d9a292244c5f9f3e": {
+   "total": 18.0,
+   "out_of": 35
+  },
+  "20e2bb89c18499ee": {
+   "total": 17.0,
+   "out_of": 35
+  },
+  "e4478c64cdedafea": {
+   "total": 10.0,
+   "out_of": 35
+  },
+  "f5985813dc32b37b": {
+   "total": 15.0,
+   "out_of": 35
+  },
+  "a24860bfd51cf4c9": {
+   "total": 11.0,
+   "out_of": 35
+  },
+  "3cb76b4240f4a72e": {
+   "total": 24.0,
+   "out_of": 35
+  },
+  "4932596e51c0f0cc": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "bb403df9741c5b45": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "35a08077f5462861": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "20c8899ebebce98d": {
+   "total": 28.0,
+   "out_of": 35
+  },
+  "307df18381c75e74": {
+   "total": 26.0,
+   "out_of": 35
+  },
+  "3de8fd3f8edb46d1": {
+   "total": 8.0,
+   "out_of": 35
+  },
+  "188faab9a4cc5900": {
+   "total": 22.0,
+   "out_of": 35
+  },
+  "767edae42ffa2617": {
+   "total": 7.0,
+   "out_of": 35
+  },
+  "b500b24305be8191": {
+   "total": 7.0,
+   "out_of": 35
+  },
+  "ac2b09caddd7b02c": {
+   "total": 8.0,
+   "out_of": 35
+  },
+  "e58c86a3c63ce831": {
+   "total": 7.0,
+   "out_of": 35
+  },
+  "99ec914ce183f2d7": {
+   "total": 10.0,
+   "out_of": 35
+  },
+  "071874c26bff7af4": {
+   "total": 9.0,
+   "out_of": 35
+  },
+  "fc237e16c1698c5f": {
+   "total": 7.0,
+   "out_of": 35
+  },
+  "97e9a07d9b03dc90": {
+   "total": 8.0,
+   "out_of": 35
+  },
+  "74f65168366856b3": {
+   "total": 28.0,
+   "out_of": 35
+  },
+  "5c4803270f29113c": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "03b1b0b8d3b56b6d": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "0519ed3373ef1abe": {
+   "total": 22.0,
+   "out_of": 35
+  },
+  "1923f46026b4ece4": {
+   "total": 33.0,
+   "out_of": 35
+  },
+  "8a0e79bf54d880c0": {
+   "total": 28.0,
+   "out_of": 35
+  },
+  "f041914b8312aa4d": {
+   "total": 25.0,
+   "out_of": 35
+  },
+  "4b3ecfe6504d6e33": {
+   "total": 14.0,
+   "out_of": 35
+  },
+  "9c9899abec2be3d9": {
+   "total": 17.0,
+   "out_of": 35
+  },
+  "25a1a01dd984df26": {
+   "total": 16.0,
+   "out_of": 35
+  },
+  "bca337e05351c637": {
+   "total": 17.0,
+   "out_of": 35
+  },
+  "4b9ead97db7aa1a6": {
+   "total": 18.0,
+   "out_of": 35
+  },
+  "cda92de191aaab5e": {
+   "total": 16.0,
+   "out_of": 35
+  },
+  "387f7f20dd79de5a": {
+   "total": 19.0,
+   "out_of": 35
+  },
+  "4ce3e39390d78f71": {
+   "total": 22.0,
+   "out_of": 35
+  },
+  "cfbae40ba216e6c0": {
+   "total": 16.0,
+   "out_of": 35
+  },
+  "2d0ebb391a6a55f4": {
+   "total": 8.0,
+   "out_of": 35
+  },
+  "926bdc4b36aafb4b": {
+   "total": 12.0,
+   "out_of": 35
+  },
+  "14949e1d4b9fa82a": {
+   "total": 19.0,
+   "out_of": 35
+  },
+  "c8cf6bfdd51fb4d5": {
+   "total": 12.0,
+   "out_of": 35
+  },
+  "3761f2da886deaa4": {
+   "total": 9.0,
+   "out_of": 35
+  },
+  "1ec340d0badc9b44": {
+   "total": 26.0,
+   "out_of": 35
+  },
+  "bfaf9014dcb7e567": {
+   "total": 23.0,
+   "out_of": 35
+  },
+  "2abef0ad72c7287d": {
+   "total": 24.0,
+   "out_of": 35
+  },
+  "2ce8e025de12ff54": {
+   "total": 24.0,
+   "out_of": 35
+  },
+  "9b447233936e24ae": {
+   "total": 24.0,
+   "out_of": 35
+  },
+  "7b05f9be52374c68": {
+   "total": 23.0,
+   "out_of": 35
+  },
+  "3098294389273215": {
+   "total": 24.0,
+   "out_of": 35
+  },
+  "800653e9f383835e": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "fcf9c7ec9d3d719c": {
+   "total": 29.0,
+   "out_of": 35
+  },
+  "b8aacc8ba8239752": {
+   "total": 29.0,
+   "out_of": 35
+  },
+  "ab794a5c3be82072": {
+   "total": 26.0,
+   "out_of": 35
+  },
+  "26b32620f4bd1e56": {
+   "total": 29.0,
+   "out_of": 35
+  },
+  "e26017e324488ae5": {
+   "total": 28.0,
+   "out_of": 35
+  },
+  "ddbfe9e94904ab62": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "4dceae3614ed7ba7": {
+   "total": 7.0,
+   "out_of": 35
+  },
+  "aa65507d0e90708e": {
+   "total": 8.0,
+   "out_of": 35
+  },
+  "fcab175c686c90da": {
+   "total": 19.0,
+   "out_of": 35
+  },
+  "4e87948b124a8cd9": {
+   "total": 8.0,
+   "out_of": 35
+  },
+  "fed1b192ef75bfb6": {
+   "total": 25.0,
+   "out_of": 35
+  },
+  "cdd995f97ddb3fc7": {
+   "total": 17.0,
+   "out_of": 35
+  },
+  "99ba5ac55362e3df": {
+   "total": 15.0,
+   "out_of": 35
+  },
+  "832b32844361766d": {
+   "total": 11.0,
+   "out_of": 35
+  },
+  "83f00eb256b391f1": {
+   "total": 11.0,
+   "out_of": 35
+  },
+  "3a89ac95c60fff08": {
+   "total": 13.0,
+   "out_of": 35
+  },
+  "064cd6d4b8e29202": {
+   "total": 26.0,
+   "out_of": 35
+  },
+  "50b2fcad5da0a8ef": {
+   "total": 28.0,
+   "out_of": 35
+  },
+  "cfb4705556c6498a": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "8c96803bca5041f6": {
+   "total": 24.0,
+   "out_of": 35
+  },
+  "ecf983a860eed792": {
+   "total": 29.0,
+   "out_of": 35
+  },
+  "d029f8aaaf31b0f4": {
+   "total": 28.0,
+   "out_of": 35
+  },
+  "3112717ca04a8748": {
+   "total": 28.0,
+   "out_of": 35
+  },
+  "d6e50e3c2ca1b543": {
+   "total": 25.0,
+   "out_of": 35
+  },
+  "5d8bb1a5bc924f16": {
+   "total": 23.0,
+   "out_of": 35
+  },
+  "3f115309a545a534": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "52fbf79acd798318": {
+   "total": 29.0,
+   "out_of": 35
+  },
+  "76736b11a889f049": {
+   "total": 20.0,
+   "out_of": 35
+  },
+  "3d8f1e0f16f525fc": {
+   "total": 24.0,
+   "out_of": 35
+  },
+  "9b3dceae1c0a6a83": {
+   "total": 8.0,
+   "out_of": 35
+  },
+  "ccc1fb9926bb88fa": {
+   "total": 14.0,
+   "out_of": 35
+  },
+  "d9e03f5ffdf9087b": {
+   "total": 13.0,
+   "out_of": 35
+  },
+  "62d89d559f8a189b": {
+   "total": 28.0,
+   "out_of": 35
+  },
+  "552a6cda13d2e3be": {
+   "total": 28.0,
+   "out_of": 35
+  },
+  "80a26ab171a287e4": {
+   "total": 26.0,
+   "out_of": 35
+  },
+  "8c757c2a4942de40": {
+   "total": 29.0,
+   "out_of": 35
+  },
+  "6dda8fa2c82b32d8": {
+   "total": 32.0,
+   "out_of": 35
+  },
+  "639724f951caa833": {
+   "total": 14.0,
+   "out_of": 35
+  },
+  "49b8f1c35d1cc6fa": {
+   "total": 18.0,
+   "out_of": 35
+  },
+  "aeccba37b0d4cb2d": {
+   "total": 13.0,
+   "out_of": 35
+  },
+  "31f50f9e9c11f81f": {
+   "total": 8.0,
+   "out_of": 35
+  },
+  "ceaf6c8cff0a203e": {
+   "total": 16.0,
+   "out_of": 35
+  },
+  "d87568aa102de0c8": {
+   "total": 21.0,
+   "out_of": 35
+  },
+  "b3ecbcadb6764012": {
+   "total": 12.0,
+   "out_of": 35
+  },
+  "36950f1ba5c83982": {
+   "total": 17.0,
+   "out_of": 35
+  },
+  "7f47681d0e3b4464": {
+   "total": 10.0,
+   "out_of": 35
+  },
+  "23c1a9abf77f3c8e": {
+   "total": 11.0,
+   "out_of": 35
+  },
+  "1b94c0e8f2648094": {
+   "total": 12.0,
+   "out_of": 35
+  },
+  "95358f8a9ba083d6": {
+   "total": 10.0,
+   "out_of": 35
+  },
+  "e7906cee3ded0b00": {
+   "total": 28.0,
+   "out_of": 35
+  },
+  "e5bd1d31927cea8b": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "64df584d86a92988": {
+   "total": 28.0,
+   "out_of": 35
+  },
+  "c5bcf2375cdd2466": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "e86eb162feca3122": {
+   "total": 29.0,
+   "out_of": 35
+  },
+  "6ad8ec0cfb0a7410": {
+   "total": 8.0,
+   "out_of": 35
+  },
+  "76570d4c14d257bb": {
+   "total": 16.0,
+   "out_of": 35
+  },
+  "27ddd1bf87b4d3c4": {
+   "total": 8.0,
+   "out_of": 35
+  },
+  "922b2c455ef19fe0": {
+   "total": 15.0,
+   "out_of": 35
+  },
+  "f06aafc1567a8792": {
+   "total": 8.0,
+   "out_of": 35
+  },
+  "1c63787497aa222a": {
+   "total": 16.0,
+   "out_of": 35
+  },
+  "64af12f94ecee9fa": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "8bb995e1d1c40a2c": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "830036ddf0f5f07b": {
+   "total": 29.0,
+   "out_of": 35
+  },
+  "c6e9c1541654b152": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "0a909cdc5fcdf005": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "ed6b78fe9e7f753b": {
+   "total": 29.0,
+   "out_of": 35
+  },
+  "649466ead5f94761": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "08ee62b9ce257ae2": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "bdf42a7331e8f024": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "9e34ddebc6cc0ac1": {
+   "total": 26.0,
+   "out_of": 35
+  },
+  "547983b1fe1c31a4": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "75ba6b7660ace1ff": {
+   "total": 23.0,
+   "out_of": 35
+  },
+  "4dab174c5e39b325": {
+   "total": 32.0,
+   "out_of": 35
+  },
+  "00e8cb2b520ec053": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "9d45e731bfe27e07": {
+   "total": 26.0,
+   "out_of": 35
+  },
+  "4004ab73505c0711": {
+   "total": 21.0,
+   "out_of": 35
+  },
+  "fb478cf91a10d94d": {
+   "total": 22.0,
+   "out_of": 35
+  },
+  "cccb9d1fe8723143": {
+   "total": 25.0,
+   "out_of": 35
+  },
+  "aafcc525875d0a7d": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "1ba93ebd0110c958": {
+   "total": 32.0,
+   "out_of": 35
+  },
+  "439387a2a1f12559": {
+   "total": 31.0,
+   "out_of": 35
+  },
+  "bd5c41310cc6b04d": {
+   "total": 33.0,
+   "out_of": 35
+  },
+  "6a0bf04a6e1fc903": {
+   "total": 29.0,
+   "out_of": 35
+  },
+  "78c50304bbca897b": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "51b3686257f32d06": {
+   "total": 32.0,
+   "out_of": 35
+  },
+  "fba8e7c029472b45": {
+   "total": 30.0,
+   "out_of": 35
+  },
+  "5774930a5cd98b9f": {
+   "total": 32.0,
+   "out_of": 35
+  },
+  "8d96286c53a5663b": {
+   "total": 26.0,
+   "out_of": 35
+  },
+  "13d26f9507dbe661": {
+   "total": 28.0,
+   "out_of": 35
+  },
+  "fc8be73200d8c76a": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "eb4cbde43929e74a": {
+   "total": 25.0,
+   "out_of": 35
+  },
+  "0d23a59728199c58": {
+   "total": 25.0,
+   "out_of": 35
+  },
+  "ff70558f451a6cd1": {
+   "total": 32.0,
+   "out_of": 35
+  },
+  "3b754fe6f7b3f01d": {
+   "total": 25.0,
+   "out_of": 35
+  },
+  "c356be5482415ad9": {
+   "total": 27.0,
+   "out_of": 35
+  },
+  "54ec5543bd9aa031": {
+   "total": 28.0,
+   "out_of": 35
+  },
+  "e8e66671b6620e0a": {
+   "total": 23.0,
+   "out_of": 35
+  },
+  "dcb85d505fccf4d7": {
+   "total": 29.0,
+   "out_of": 35
+  },
+  "3c118e51ea263cb4": {
+   "total": 31.0,
+   "out_of": 35
+  }
+ }
+}

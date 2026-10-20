@@ -32,13 +32,21 @@ def call_gemini_api(messages, model_name):
     return response.text
 
 
-def call_local_api(messages, model_name=None, seed=None):
-    from openai import OpenAI
+_LOCAL_CLIENT = None
 
-    client = OpenAI(
-        base_url=os.environ["LOCAL_OPENAI_BASE_URL"],
-        api_key="EMPTY",
-    )
+
+def _local_client():
+    # One shared client (and its connection pool) per process: constructing a client per call leaked a
+    # socket per request and, at scale, exhausted the WSL2 localhost relay's file descriptors.
+    global _LOCAL_CLIENT
+    if _LOCAL_CLIENT is None:
+        from openai import OpenAI
+        _LOCAL_CLIENT = OpenAI(base_url=os.environ["LOCAL_OPENAI_BASE_URL"], api_key="EMPTY", max_retries=0)
+    return _LOCAL_CLIENT
+
+
+def call_local_api(messages, model_name=None, seed=None):
+    client = _local_client()
     model = model_name or os.environ["LOCAL_MODEL_NAME"]
     kwargs = {}
     if seed is not None:

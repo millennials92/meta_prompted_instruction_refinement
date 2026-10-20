@@ -1,0 +1,1 @@
+{"judge_text": null, "refine_text": "<START>\nYour task is to wrap the final answer between <ANS_START> and <ANS_END>. Please provide the answer in the specified format.\n<END>", "raw_candidate": "<START>\nYour task is to wrap the final answer between <ANS_START> and <ANS_END>. Please provide the answer in the specified format.\n<END>"}

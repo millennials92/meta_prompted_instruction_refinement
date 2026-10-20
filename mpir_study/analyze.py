@@ -287,7 +287,7 @@ def legacy_acceptance(runs: list[dict], variant="v1", refiner="1.7b") -> dict:
 # ---------------------------------------------------------------------------------------------- A5 capability
 def capability(runs: list[dict]) -> dict:
     out = {}
-    for refiner in ("1.7b", "4b", "8b"):
+    for refiner in ("1.7b", "4b", "8b", "qwen235", "gpt6luna"):
         for variant in ("v1", "v2"):
             group = [r for r in runs_where(runs, variant=variant, refiner=refiner) if r["spec"]["cell"]["seed"] == 42
                      and r["spec"]["cell"]["task"] in TIER1_TASKS]
@@ -423,6 +423,68 @@ def judge_validity(rows: list[dict]) -> dict:
     return out
 
 
+# ---------------------------------------------------------------------------------------------- tables for the paper
+def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
+    if n == 0:
+        return 0.0, 0.0
+    p = k / n
+    d = 1 + z * z / n
+    centre = (p + z * z / (2 * n)) / d
+    half = z * np.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d
+    return float(centre - half), float(centre + half)
+
+
+def p0_landscape(cells: Iterable[Cell]) -> dict:
+    """Strict and lenient accuracy of every P0 with Wilson intervals and the chance level of its task."""
+    from .data import load_p0, load_split
+    from .scoring import prompt_hash
+    out = {}
+    for cell in cells:
+        try:
+            p0 = load_p0(cell)
+        except FileNotFoundError:
+            continue
+        hit = cell_cache(cell.key, with_outputs=True).get((prompt_hash(p0), "test", 0))
+        if hit is None:
+            continue
+        correct, outputs = hit
+        gold = [ex["answer"] for ex in load_split(cell.task, cell.seed, "test")]
+        lenient = [is_correct_lenient(o, g) for o, g in zip(outputs, gold)]
+        k, n = int(sum(correct)), len(correct)
+        lo, hi = wilson(k, n)
+        out[cell.key] = {"task": cell.task, "optimizer": cell.optimizer, "seed": cell.seed, "n": n,
+                         "strict": k / n, "lo": lo, "hi": hi, "lenient": float(np.mean(lenient)),
+                         "chance": 1 / len(set(gold)), "with_delims": float(np.mean(["<ANS_START>" in o and "<ANS_END>" in o for o in outputs]))}
+    return out
+
+
+def reference_conditions() -> dict:
+    """Pilot reference conditions (zero-shot, expert few-shot, ungated free rewrite), seed 42, with intervals."""
+    path_dir = REPO / "demos" / "results" / "predictions"
+    out = {}
+    for task in TIER1_TASKS:
+        for cond in ("zero_shot_cot", "expert_few_shot_cot", "free_rewrite"):
+            path = path_dir / f"{task}_{cond}_42.jsonl"
+            if not path.exists():
+                continue
+            rows = [json.loads(l) for l in open(path, encoding="utf-8") if l.strip()]
+            k, n = sum(r["is_correct"] for r in rows), len(rows)
+            lo, hi = wilson(k, n)
+            out[f"{task}|{cond}"] = {"acc": k / n, "lo": lo, "hi": hi, "n": n,
+                                     "lenient": float(np.mean([is_correct_lenient(r["llm_output"], r["actual"]) for r in rows]))}
+    return out
+
+
+def grid_by_task_optimizer(grid: dict) -> dict:
+    out: dict = {}
+    for c in grid["cells"].values():
+        key = f"{c['task']}|{c['optimizer']}"
+        out.setdefault(key, []).append(c)
+    return {k: {"cells": len(v), "mean_diff": float(np.mean([c["diff"] for c in v])),
+                "accepted_runs": int(sum(c["accepted_runs"] for c in v)), "seeds": int(sum(c["seeds"] for c in v))}
+            for k, v in sorted(out.items())}
+
+
 # ---------------------------------------------------------------------------------------------- driver
 def main() -> None:
     runs = load_runs()
@@ -431,9 +493,9 @@ def main() -> None:
     summary["main_grid"] = main_grid(runs)
     rows = candidate_table(runs)
     summary["oracle"] = {f"{v}|{ref}": oracle_summary(rows, v, ref) for v in ("v1", "v2", "v2l", "v3")
-                         for ref in ("1.7b", "4b", "8b") if any(r["variant"] == v and r["refiner"] == ref for r in rows)}
+                         for ref in ("1.7b", "4b", "8b", "qwen235", "gpt6luna") if any(r["variant"] == v and r["refiner"] == ref for r in rows)}
     summary["acceptance_rules"] = {f"{v}|{ref}": acceptance_rules(rows, v, ref) for v in ("v1", "v2", "v3")
-                                   for ref in ("1.7b", "4b", "8b") if any(
+                                   for ref in ("1.7b", "4b", "8b", "qwen235", "gpt6luna") if any(
                                        r["variant"] == v and r["refiner"] == ref and r["mseed"] == 1 for r in rows)}
     summary["val_test_corr"] = {"all": val_test_correlation(rows)} if rows else {}
     summary["legacy"] = legacy_acceptance(runs)
@@ -441,6 +503,9 @@ def main() -> None:
     summary["noise"] = noise_floor()
     from .data import tier1_cells, tier2_cells
     summary["p0_parsing"] = p0_parsing(tier1_cells() + tier2_cells())
+    summary["p0_landscape"] = p0_landscape(tier1_cells() + tier2_cells())
+    summary["reference_conditions"] = reference_conditions()
+    summary["grid_by_task_optimizer"] = grid_by_task_optimizer(summary["main_grid"])
     summary["exemplar"] = exemplar()
     summary["judge_repeat"] = judge_repeatability(runs)
     summary["judge_validity"] = judge_validity(rows)

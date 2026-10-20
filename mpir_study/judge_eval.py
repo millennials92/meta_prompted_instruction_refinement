@@ -35,7 +35,7 @@ def prompts_to_judge() -> dict[str, str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--judge", required=True, choices=["1.7b", "4b", "8b"])
+    parser.add_argument("--judge", required=True, choices=list(REFINERS))
     parser.add_argument("--workers", type=int, default=16)
     args = parser.parse_args()
     endpoint = REFINERS[args.judge]
@@ -54,7 +54,10 @@ def main() -> None:
     with ThreadPoolExecutor(args.workers) as pool:
         for h, result in pool.map(judge, todo.items()):
             done[h] = result
-    OUT.write_text(json.dumps(store, indent=1))
+    # Re-read before writing so concurrent judge processes do not overwrite each other's scores.
+    latest = json.loads(OUT.read_text()) if OUT.exists() else {}
+    latest.setdefault(args.judge, {}).update(done)
+    OUT.write_text(json.dumps(latest, indent=1))
     print("wrote", OUT)
 
 
