@@ -1,7 +1,8 @@
 IEEE Access resubmission, Access-2026-44920. Which file goes into which field of the Upload Manuscript page:
 
 REQUIRED
-  Main Manuscript            -> 1_Main_Manuscript_LaTeX_and_PDF.zip   (LaTeX source, bibliography, class files, figure and the compiled PDF in one archive)
+  Main Manuscript (LaTeX)    -> 1a_Main_Manuscript_LaTeX_source.zip   (LaTeX source, bibliography, class files and figure; no PDF inside)
+  Main Manuscript (PDF)      -> 1b_Main_Manuscript.pdf                (compiled clean PDF)
   Author Response            -> 2_Author_Response.docx                 (point-by-point response, IEEE template)
   Conflict of Interest       -> 3_Conflict_of_Interest.pdf             (none to disclose)
 

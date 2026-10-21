@@ -14,7 +14,7 @@ U = "submission_revision/upload_ready"
 os.makedirs(U, exist_ok=True)
 MAIN = "submission_revision/_main_pkg"
 
-with zipfile.ZipFile(f"{U}/1_Main_Manuscript_LaTeX_and_PDF.zip", "w", zipfile.ZIP_DEFLATED) as z:
+with zipfile.ZipFile(f"{U}/1a_Main_Manuscript_LaTeX_source.zip", "w", zipfile.ZIP_DEFLATED) as z:
     for root, _, files in os.walk(MAIN):
         for f in files:
             p = os.path.join(root, f)
