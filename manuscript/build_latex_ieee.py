@@ -85,7 +85,7 @@ def ieee_acknowledgment():
     return (
         r"\section*{Acknowledgment}" + "\n"
         + BL.resolve_citations(
-            "The authors thank the reviewers for their constructive comments on earlier drafts of "
+            "The authors thank the reviewers for their constructive comments on the first submission of "
             "this manuscript. Generative AI tools were used to assist with improving the grammar "
             "and readability of the manuscript text and to generate initial code snippets during "
             "development; all AI-assisted text and code were reviewed, verified, and adapted by the "
@@ -181,7 +181,7 @@ def build():
 
     doc = TEMPLATE.format(
         title=BL.esc(C.TITLE),
-        shorttitle="Rubric-Guided Prompt Refinement: A Pre-Specified Negative Result",
+        shorttitle="Does Rubric-Guided Refinement Improve Optimized Prompts?",
         authors=authors,
         abstract=BL.resolve_citations(C.ABSTRACT),
         keywords=keywords,
@@ -208,10 +208,13 @@ TEMPLATE = r"""\documentclass{{ieeeaccess}}
 \usepackage{{url}}
 
 \begin{{document}}
+\renewcommand{{\thesection}}{{\arabic{{section}}}}
+\renewcommand{{\thesubsection}}{{\thesection.\arabic{{subsection}}}}
+\renewcommand{{\thesubsubsection}}{{\thesubsection.\arabic{{subsubsection}}}}
 
 \vol{{14}}
 \year{{2026}}
-\history{{Manuscript received August 2026; revised October 20, 2026.}}
+\history{{Manuscript received September 5, 2026; revised October 21, 2026.}}
 \doi{{to be assigned by IEEE upon acceptance}}
 
 \title{{{title}}}

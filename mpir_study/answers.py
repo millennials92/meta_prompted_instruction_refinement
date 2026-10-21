@@ -43,6 +43,8 @@ def contains_gold(output: str, gold: str) -> bool:
 def is_correct_lenient(output: str, gold: str) -> bool:
     """Lenient parse: the delimited span if present (else the last 300 characters) names exactly
     one option and it is the gold option; for non-lettered gold strings, the span must contain gold."""
+    if is_correct_strict(output, gold):
+        return True  # lenient is a superset of strict (a bare letter inside the tags is accepted by both)
     span = extract_final_answer(output) or output[-300:]
     gold_letter = _OPTION_TOKEN.fullmatch(gold.strip())
     if gold_letter:

@@ -1,0 +1,2965 @@
+
+=== PAGE 1 ===
+Manuscript received August 2026; revised October 20, 2026.
+Digital Object Identifier to be assigned by IEEE upon acceptance
+Does Rubric-Guided Refinement Improve
+Automatically Optimized Prompts? A
+Pre-Specified Negative-Result Study with Small
+Open-Weight Models
+LINH NGUYEN1, QUANG-VINH DANG2, MINH NGOC DINH3, AND THUY NGUYEN1
+1School of Science, Engineering & Technology, RMIT University Vietnam, 702 Nguyen Van Linh Boulevard, Ho Chi Minh
+City 700000, Vietnam
+2British University Vietnam, Hung Yen, Vietnam
+3Millenia Education, Ho Chi Minh City, Vietnam
+Corresponding author: Quang-Vinh Dang (e-mail: vinh.dq4@buv.edu.vn)
+This research received no specic grant from any funding agency in the public, commercial, or not-for-prot sectors.
+ABSTRACT
+Meta-Prompted Instruction Renement (MPIR) is a post-hoc layer that asks a
+language model to score an automatically optimized prompt against a seven-criteria rubric, rewrite
+it, and keep the rewrite only if it beats the original on held-out questions. A rst evaluation with
+a closed rener reported mixed gains, but later audits found a validation leak and an unscored
+baseline, and a pilot with a single small model showed no eect while leaving its renement rounds,
+statistics and harness open to criticism. We report a pre-specied re-test. We repaired the renement
+loop so that rounds are distinct, logged every round, and ran 45 base prompts (PromptWizard,
+APE and ProTeGi on nine Big-Bench Hard tasks, up to three seeds) with Qwen3-1.7B as target
+and rener. The layer changed the prompt in 1 of 80 runs and won in 0 of 45 cells. Candidates
+were on average worse than the original prompt, the validation gate tracked test accuracy, and
+the uncorrected loop would have cost about 14 accuracy points. Identical prompts disagree on 6%
+of examples between scorings, and a single answer-format exemplar outperformed any renement.
+With a 235B-parameter rener the layer won in 4 of 9 cells, but the gains coincide with a repaired
+answer format, so they do not isolate the rubric. Conclusions are limited to Qwen3 targets, nine
+tasks and the optimizers tested.
+INDEX TERMS
+Big-Bench Hard, Prompt engineering, automatic prompt optimization, large
+language models, meta-prompting, negative results
+1. INTRODUCTION
+The prompt is the specication, the interface and the
+test xture of an LLM-based component at once, and
+unlike source code it cannot be checked by a compiler.
+Large language models (LLMs) perform strongly on
+tasks such as translation [1], summarization [2] and
+question answering [3] (see [4] for a survey), yet small
+changes in phrasing or formatting can change their ac-
+curacy substantially [5], [6]. Prompt design has therefore
+become a bottleneck for reliable deployment in domains
+such as law and medicine [7], [8].
+Two families of approaches address that bottleneck.
+Manual prompting applies heuristics distilled from prac-
+tice, such as chain-of-thought reasoning [9], role assign-
+ment [10] and few-shot demonstration [11]; these are
+interpretable but need expertise and trial and error [12],
+[13]. Automatic prompt optimization (APO) searches
+the space of prompts with the help of an LLM, using
+critique, mutation, evolution or optimizer-style proposal
+loops [14][18]; it scales but may forfeit the structure
+that human-written prompts carry [19]. A natural idea,
+which we call Meta-Prompted Instruction Renement
+(MPIR), is to add a cheap post-hoc stage after any APO
+run: ask an LLM to score the optimized prompt against a
+rubric of manual heuristics, ask it to rewrite the prompt
+accordingly, and keep the rewrite only if it scores better
+on held-out validation questions.
+This paper does not propose MPIR as a new method.
+VOLUME 14, 2026
+1
+
+
+=== PAGE 2 ===
+Nguyen et al.: Rubric-Guided Prompt Refinement: A Pre-Specified Negative Result
+It reports a pre-specied test of whether that idea works
+when the same small open-weight model plays every role,
+and what the evidence does and does not allow us to
+conclude. The study has a history that readers need in
+order to weigh it. An earlier evaluation used GPT-4o
+as the rening model and GPT-3.5-turbo as the target
+on 23 Big-Bench Hard (BBH) tasks [20]. It reported
+per-task gains over PromptWizard [18] on a majority
+of tasks but a pooled gain that was not statistically
+signicant (Appendix D reproduces those numbers).
+A later code audit found two defects: the validation
+stage scored candidate prompts on the optimizer's own
+training examples, and the renement loop never scored
+the unrened prompt, so a renement was always ac-
+cepted whatever it scored. A manuscript describing that
+evaluation was desk-rejected by another journal without
+external review. The numbers in it should be treated as
+exploratory and are not used as evidence here.
+We therefore asked a narrower question that the rst
+evaluation could not answer: are the apparent gains
+attributable to the rubric-guided renement mechanism,
+or to the rening model being more capable than the
+model it renes for? A rst pilot with Qwen3-1.7B
+in every role found the rened prompt byte-identical
+to the base prompt in all nine (task, optimizer) cells.
+Review of that pilot, however, exposed weaknesses that
+we take seriously: the seven renement rounds were not
+independent attempts, the composition of the outcomes
+was not reported, the statistics were degenerate, the
+task choice was biased, the capability-gap explanation
+was untested, and the evaluation harness oored several
+baselines. This revision answers each of them with new
+experiments, specied in a version-controlled protocol
+before they were run (Section 4.1).
+We ask four research questions. RQ1: with the rene-
+ment loop repaired so that rounds are genuinely distinct
+attempts, does gated MPIR improve a base optimizer's
+prompt over many tasks, optimizers and seeds? RQ2: is
+the failure to improve a property of the candidates or
+of the coarse validation gate? RQ3: does a more capable
+rening model change the answer? RQ4: does the rubric
+judge measure anything related to accuracy? In brief:
+with a 1.7B rener the layer changed the prompt in 1
+of 80 runs and won in 0 of 45 cells (RQ1); the gate is
+not the cause (RQ2); a much larger rener can help in
+some cells, but where it does the gains coincide with a
+repaired answer format (RQ3); and the rubric score is
+only weakly related to accuracy (RQ4).
+The contributions are:
+• A repaired and instrumented renement loop.
+Rounds dier by sampling and, in the chained
+variant, by the history of rejected candidates; every
+round is logged with an outcome category (fallback,
+echo-rejected, duplicate, validated), its validation
+and test scores, and the judge's rubric total.
+• A pre-specied, multi-seed, multi-task evaluation.
+45 base prompts (three optimizers, nine tasks, up
+to three seeds), with decision rules xed in a time-
+stamped protocol and a random, documented choice
+of six tasks to complement the three pilot tasks.
+• Diagnostics that make a null result interpretable.
+Oracle scoring of all candidates on the test split,
+acceptance-rule sensitivity, a serving-noise oor and
+minimum detectable eect, a gated free-rewrite
+control, an uncorrected-algorithm comparison, and
+a judge-validity analysis against a stronger reference
+judge.
+• Harness ndings. Strict answer extraction oors
+some baselines; lenient re-scoring of the saved raw
+outputs and a catalogue of the pipeline defects, with
+serving conguration, are reported (Appendix C).
+Section 2 reviews related work. Section 3 describes the
+layer under test. Section 4 gives the design and statistics.
+Section 5 reports results, Section 6 discusses what they
+support and their limits, and Section 7 concludes. Code,
+per-example predictions and per-round logs are public.
+2. RELATED WORK
+A. MANUAL PROMPTING HEURISTICS
+Prompting steers an LLM through in-context learning
+without changing its weights [11], [21], and has been
+described as a form of natural-language programming
+[13]. Non-expert authors struggle because they get no
+structural feedback and over-t to the few examples
+they try [12]. Experienced authors rely on heuristics.
+Few-shot demonstrations help [11], [22], though Min et
+al. show that format, label space and input distribu-
+tion matter more than label correctness [23]. Chain-of-
+thought prompting decomposes multistep problems [9],
+[24], and coherent, relevant reasoning steps matter more
+than length [25], [26]. Role prompting assigns a persona
+to guide reasoning [10], but its benet is inconsistent:
+poorly aligned personas can hurt [27], and a large
+study found that adding personas to system prompts
+does not reliably improve performance [28]. Step-back
+prompting abstracts key principles before solving [29];
+a behavioural benchmark of 35 LLMs found that it fos-
+ters model-based behaviour in sequential decision tasks
+[30], which is weaker support for knowledge-intensive
+reasoning than the original step-back evidence. Models
+attend unevenly to information in long contexts [31],
+[32], and vendor guidance reports recency eects [33];
+whether either matters for the short prompts studied
+here is an empirical question rather than a premise. Self-
+consistency, a decoding-time heuristic, samples several
+reasoning paths and votes [34]; MPIR does not use it.
+B. AUTOMATIC PROMPT OPTIMIZATION AND
+META-PROMPTING
+APO methods generate, evaluate and select prompts
+iteratively [19]. APE induces instructions from input-
+2
+VOLUME 14, 2026
+
+
+=== PAGE 3 ===
+Nguyen et al.: Rubric-Guided Prompt Refinement: A Pre-Specified Negative Result
+output demonstrations [14]; ProTeGi treats LLM cri-
+tique as a textual gradient and runs a beam search [15];
+EvoPrompt applies evolutionary operators [16]; OPRO
+conditions an LLM on a trajectory of scored prompts
+[17]; PromptWizard combines critique-based renement,
+example selection and self-generated reasoning [18].
+DSPy, TextGrad, Self-Rene and Reexion generalize
+the idea of optimizing or rening text with LLM feed-
+back [20], [35][37]. Meta-prompting supplies an LLM
+with a template that structures the critique (see [38] for
+a survey): PE2 uses a step-by-step diagnosis template
+[39], dual-phase methods add a meta-instruction-guided
+initialization [40], and PROPEL injects expert-derived
+principles as priors [41]. Closest in spirit to MPIR,
+a two-stage approach for few-shot relation extraction
+rst searches and then locally edits the winner [42].
+More recent work explores evolutionary reection [43],
+error taxonomies [44], format optimization [45], debate-
+based tness [46] and RL over edits [47], and several
+studies target small or open-weight models: gradient-
+guided optimization with small models [48], minimal-
+edit optimization for on-device models [49], and error-
+driven optimization of arithmetic reasoning [50]. Others
+distill reasoning behaviour into prompts [51], regularize
+prompts for token eciency [52], question what drives
+optimizer gains [53], or codify principled instructions
+[54].
+C. LIMITS OF SELF-REFINEMENT AND OF LLM JUDGES
+MPIR asks a model to critique and rewrite its own
+prompt, which places it in the self-renement family [36],
+[37]. Evidence on intrinsic self-correction is sobering:
+LLMs cannot reliably self-correct reasoning without
+external feedback [55], and small models need strong
+veriers to benet from correction [56]. MPIR's critic
+is also an LLM judge, and LLM judges show position,
+verbosity and self-preference biases [57][59]. Finally,
+benchmark accuracy depends on prompt format and on
+how answers are extracted [6], [60], [61], which matters
+here because MPIR's gate and our metrics both rely on a
+delimiter-based extraction. These strands predict that a
+1.7B model rening its own prompts may fail for reasons
+unrelated to the rubric, which is why our design varies
+the rener, validates the judge and re-scores answers
+leniently.
+D. REPORTING NEGATIVE RESULTS
+Reproducibility programmes [62] and guidance on re-
+porting experimental results [63] call for budgets, vari-
+ance and full protocols. Variance across seeds and data
+splits can exceed the eect of a method [64], signicance
+testing in NLP needs care [65], and small test sets leave
+studies under-powered [66]. We follow this guidance by
+xing decision rules in advance, reporting per-cell paired
+dierences with intervals rather than tests that cannot
+be informative, and quantifying the noise oor and the
+minimum detectable eect.
+E. POSITIONING
+Table 1 contrasts how the methods above propose and
+select candidates. It states design dierences, not evi-
+dence of superiority: whether any of them outperforms
+the others is not tested here.
+TABLE 1: Design comparison of MPIR with represen-
+tative methods. The table describes design dierences
+only; it reports no empirical comparison.
+Method
+Candidate
+generation
+Selection
+Role
+relative to
+an APO
+run
+APE
+19
+Induction from
+demonstrations
+Execution
+accuracy
+Optimizer
+ProTeGi
+20
+Textual-
+gradient edits
+Beam search
+on minibatches
+Optimizer
+EvoPrompt
+21
+Crossover and
+mutation
+Fitness per
+generation
+Optimizer
+OPRO
+22
+LLM proposal
+given score
+history
+Best of
+trajectory
+Optimizer
+PromptWizard
+23
+Critique and
+sequential
+re-optimization
+Scores on
+training
+batches
+Optimizer
+PE2 24
+Structured
+diagnosis
+template
+Held-out
+scoring
+Optimizer
+PROPEL
+26
+Expert
+principles as
+priors
+Implicit in the
+priors
+Optimizer
+GEPA
+59
+Evolution with
+reection
+Reection-
+guided
+selection
+Optimizer
+MPIR
+(tested
+here)
+Rubric-guided
+critique and
+rewrite
+Validation
+accuracy vs.
+the unrened
+prompt
+Post-hoc
+layer
+What distinguishes MPIR in this table is its role, not
+a mechanism: it adds one more critique-rewrite-validate
+cycle on top of whatever an upstream method produced.
+That makes it cheap and optimizer-agnostic, but also
+means its mechanism is close to existing critique-and-
+revise loops [15], [36], [39]; we do not claim novelty
+beyond the combination of an explicit rubric with a post-
+hoc, gated role.
+3. THE MPIR LAYER UNDER TEST
+MPIR is a three-stage cycle applied to a prompt P0
+that an upstream APO method has already produced:
+(1) a language model scores P0 against a seven-criteria
+rubric of manual prompting heuristics and recommends
+improvements; (2) it rewrites P0 accordingly; (3) the
+rewrite is scored on validation questions and kept only
+if it beats the incumbent (Figure 1). We describe it here
+as the object under test, not as a contribution.
+VOLUME 14, 2026
+3
+
+
+=== PAGE 4 ===
+Nguyen et al.: Rubric-Guided Prompt Refinement: A Pre-Specified Negative Result
+A. PROBLEM FORMULATION
+Let (Qv, Av) = {(qi, ai)}, i = 1..M, be a validation set of
+M question-answer pairs and A(L, P) the accuracy of the
+target model L on it under prompt P. Let R(P0) be the
+set of renements that the rening model L' produces
+from P0. MPIR returns
+Pnal = argmax over P' in {P0} ∪R(P0) of A(L, P'),
+with ties resolved in favour of P0 (a candidate must
+be strictly better). Including P0 in the candidate set is
+what makes it possible for the procedure to conclude
+that no renement helps.
+B. ALGORITHM AND VARIANTS
+Algorithm 1 is the repaired loop. It scores P0 rst, so
+the incumbent score Abest starts at A(L, P0) instead of
+minus innity. In the original implementation the incum-
+bent score started at minus innity, so the rst round's
+candidate was accepted whatever it scored, which is the
+defect Section 5.8 quanties. Choosing among {P0} ∪
+candidates by held-out score is standard in APO loops,
+so we regard this as an implementation defect of ours,
+not as a general property of the method.
+Algorithm 1 MPIR with a validation gate (repaired)
+Require: L: target LLM; L': rening LLM; Meval, Mre-
+ne: meta-prompts; R: rubric; P0: prompt from an
+APO run; (Qv, Av): validation set; N: rounds; mode
+in {independent, chained}; τ: sampling temperature
+Ensure: Pnal
+1: Pbest ←P0; Abest ←Validate(L, P0, (Qv, Av)); H
+←empty list
+▷score the baseline rst
+2: for t = 1 to N do
+3:
+Psrc ←P0 if mode = independent else Pbest
+4:
+S ←Evaluate(Meval, L', Psrc, R; τ)
+▷rubric
+critique
+5:
+P' ←Rene(Mrene, L', Psrc, S, H; τ)
+▷H is
+empty when independent
+6:
+outcome ←Classify(P')
+▷fallback, echo,
+duplicate or validated
+7:
+if outcome = validated then
+8:
+A' ←Validate(L, P', (Qv, Av)); append (P',
+A') to H
+9:
+if A' > Abest then Pbest ←P'; Abest ←A'
+end if
+▷strict: a tie keeps the incumbent
+10:
+end if
+11: end for
+12: return Pbest
+The pilot ran what we call the legacy loop: Psrc
+= P0 in every round, H empty and τ = 0. Because
+Evaluate and Rene then receive identical input in every
+round, the seven rounds were one request repeated, up
+to serving non-determinism, and 'seven rounds without
+acceptance' meant roughly one distinct attempt per cell.
+The repaired loop diers between rounds in two ways:
+independent mode samples at τ = 0.7 so each round
+is a fresh draw, and chained mode renes the current
+incumbent and shows the model the earlier candidates
+with their validation scores, as OPRO does with its
+trajectory [17]. We study ve variants (Table 2).
+TABLE 2: Renement variants studied. All use the
+same gate (strict improvement over the incumbent on
+25 validation questions) and N = 7 rounds.
+Variant
+Renes
+History
+Sampling Rubric
+text
+V0 legacy (as
+in the pilot)
+P0
+none
+greedy
+original
+V1
+independent
+P0
+none
+τ =
+0.7
+corrected
+V2 chained
+(primary)
+incumbentscored
+candidates
+τ =
+0.7
+corrected
+V2L chained
+incumbentscored
+candidates
+τ =
+0.7
+original
+V3 gated free
+rewrite
+P0
+none
+τ =
+0.7
+none (no
+rubric)
+C. THE SEVEN-CRITERIA RUBRIC
+The rubric was assembled from the prompting literature
+[67], [68], industry guidance [33], [69][71] and iterative
+experimentation on BBH-style tasks. It scores a prompt
+from 1 to 5 on: (1) Role Prompting, (2) Step-Back Rea-
+soning, (3) Guided Chain of Thought, (4) Instruction
+and Separation, (5) Output Format with Examples, (6)
+Worked Reasoning in Examples and (7) Conclusion, for
+a total out of 35. The evidence behind the criteria is
+uneven. Chain-of-thought and demonstrations are well
+supported [9], [23], [26]. Role prompting is the least
+supported, since its benet is inconsistent [27], [28]. The
+Conclusion criterion extrapolates positional-bias results
+from long contexts [31], [32] to short prompts, and
+the vendor page we cite for it states that instruction
+placement made no dierence for GPT-4-class models
+[33]. Industry sources are practitioner guidance rather
+than empirical evidence; they are living documents, so
+the reference list gives archived copies and access dates.
+The rubric text used in the pilot was internally incon-
+sistent: it announced 've dened criteria', asked for 'all
+6 criteria' and 'Total Score: X/25' while listing seven
+criteria. We found this during the audit. The primary
+variants use a corrected text (seven criteria, X/35);
+variant V2L keeps the original text as a sensitivity check.
+D. EVALUATION, REFINEMENT AND OUTPUT GUARDS
+The evaluation meta-prompt (Figure 2) asks the rening
+model to apply the rubric to the prompt and report
+scores, strengths, weaknesses and 7-10 suggestions. The
+renement request (Figure 3) asks for a rewrite wrapped
+in <START> and <END>; in chained mode it also lists
+the earlier candidates with their validation accuracy and
+asks the model not to repeat them. Three output guards
+exist, and each outcome is logged per round. A response
+4
+VOLUME 14, 2026
+
+
+=== PAGE 5 ===
+Nguyen et al.: Rubric-Guided Prompt Refinement: A Pre-Specified Negative Result
+without delimiters is a fallback: it cannot be validated,
+and the pilot's code returned P0 in that case, which
+ties the baseline by construction. A candidate contain-
+ing phrases verbatim from the evaluation template, or
+APE's induction template, is an echo and is rejected
+before validation. A candidate textually identical to
+the incumbent, to P0 or to an earlier candidate is a
+duplicate. Only the remaining candidates are validated.
+### Task Overview
+You are a Senior Prompt Engineer with
+two main tasks:
+1. Evaluate prompts using a
+7-criteria rubric. 2. Refine prompts
+by applying evaluation feedback.
+### Prompt Under Evaluation
+[Prompt]: {prompt}
+### Instructions
+1. Review Prompt 2. Apply Rubric
+(seven defined criteria)
+3. Score & Justify: score 1-5, one
+strength, one weakness, a rationale
+per criterion
+4. Calculate Total: cumulative score
+out of 35
+5. Recommend 7-10 actionable
+improvements 6. Report in the
+standardized format
+### Seven-Criteria Evaluation Rubric
+1. Role Prompting 2. Step Back
+3. Guided Chain of Thought 4.
+Instruction & Separation
+5. Output Format with Examples 6.
+Worked Reasoning in Examples 7.
+Conclusion
+### Output Format
+1. Role Prompting - X/5 - Strength:
+... - Improvement: ... - Rationale:
+...
+(continue for all 7 criteria) **Total
+Score: X/35** Refinement Summary: ...
+FIGURE 1: Evaluation meta-prompt (corrected text;
+abridged from the repository le).
+Refine the prompt by applying all
+suggestions from the evaluation.
+Make sure to wrap the refined prompt
+with <START> and <END>
+[chained mode adds: Earlier
+refinement attempts ... did NOT beat
+the current best prompt on the
+validation questions; do not repeat
+them: Attempt k (validation accuracy
+a vs current best b): ...]
+FIGURE 2: Renement request used by the independent
+(top) and chained (bottom) variants.
+E. THE VALIDATION GATE
+A candidate is accepted only if its accuracy on the 25
+validation questions strictly exceeds the incumbent's.
+With 25 questions accuracy moves in steps of 4 per-
+centage points, and one question of serving noise equals
+a step, so acceptance is rare by design. Whether the
+gate or the candidates explain the absence of accepted
+renements is research question RQ2, which we answer
+by scoring every candidate on the full test split (the
+oracle analysis) and by re-applying other acceptance
+rules oine (Section 5.4).
+4. EXPERIMENTAL DESIGN
+A. PRE-SPECIFICATION AND DECISION RULES
+The rst pilot's go/no-go rule was written in the
+project's planning document (REBUILD.md, commit
+7612aa0, 2026-09-03) before the pilot ran. It was a
+version-controlled plan, not an entry in a public registry,
+and the pilot was not pre-registered in the strict sense
+in which we used that word in the rst submission.
+Several pipeline xes were also made while the pilot was
+running (Appendix C). For this revision we wrote the
+protocol in REVISION_PROTOCOL.md and commit-
+ted it (commit 8fd1397, 2026-10-19) before running any
+revised experiment; its commit time-stamps the rules
+below, which are reproduced from it. Dated amendments
+are listed in Appendix F. This is also not a registry entry.
+• D1 (RQ1). Primary outcome per cell: paired dif-
+ference in test accuracy between the nal MPIR
+prompt and P0 (10,000-resample paired bootstrap,
+95% percentile interval); a cell is a win if the
+dierence is positive and the interval excludes zero.
+The eect 'reproduces' if at least 15 of 45 cells are
+wins and the mean cell dierence is at least +2.0
+points; it is 'null' if at most 2 of 45 are wins and
+the mean lies within ±1.0 point; otherwise 'mixed'.
+• D2 (RQ3). Capability dependence is supported if
+the mean cell dierence with the 8B rener exceeds
+that with the 1.7B rener by at least 2.0 points and
+at least 3 of 9 cells are wins with the 8B rener.
+• D3 (RQ2). The gate is limiting if the best oracle
+candidate beats P0 on test by at least 3.0 points in
+at least 3 of 9 cells although the gated nal prompt
+did not.
+McNemar, GEE and Wilcoxon tests on identical
+prompts cannot be informative, and the Wilcoxon test
+on three tasks cannot go below p = 0.25, so none
+is reported as inference. Rubric-accuracy correlations,
+lenient parsing, the uncorrected-algorithm comparison,
+the noise oor and the minimum detectable eect are
+descriptive.
+B. DATA, SPLITS AND TASK SELECTION
+BBH has 23 tasks in 27 task les, about 6,511 ex-
+amples [20]. Each task is split three ways with ran-
+dom.Random(seed).sample over the original example
+order: 25 optimizer-training examples, 25 validation
+examples for the gate, and the remainder as test (200
+VOLUME 14, 2026
+5
+
+
+=== PAGE 6 ===
+Nguyen et al.: Rubric-Guided Prompt Refinement: A Pre-Specified Negative Result
+examples for every task used here except penguins_in_
+a_table, which has 96). The partition is stored with the
+original example indices, is shared by all optimizers and
+conditions for a given (task, seed), and no stage touches
+test data during optimization or renement. Tier 1 is the
+three pilot tasks (hyperbaton, ruin_names, penguins_
+in_a_table) at seeds 42, 43 and 44. They were chosen
+because the leaked rst evaluation showed the largest
+gains there, so they are a biased sample and may be
+subject to winner's-curse eects. Tier 2 is six tasks
+drawn uniformly at random, without replacement, from
+the other 24 task les with random.Random(20261019):
+temporal_sequences, movie_recommendation, disam-
+biguation_qa, geometric_shapes, salient_translation_
+error_detection and sports_understanding, at seed 42.
+In total there are 45 cells, one per (task, optimizer, seed),
+each with its own P0.
+C. MODELS AND SERVING
+The target model is Qwen3-1.7B [72] with thinking
+disabled and greedy decoding, at most 1024 new tokens.
+The rening model is the same model in the main
+grid and Qwen3-4B-AWQ or Qwen3-8B-AWQ in the
+capability experiment; meta-prompt calls allow 1500
+(evaluation) and 3000 (renement) new tokens. Rener
+sampling uses temperature 0.7. Everything is served
+with vLLM 0.28.0 under WSL2 on one 16 GB RTX 5000
+Ada GPU, bf16 weights for the 1.7B model, a maximum
+context of 8192 tokens (Appendix C). Greedy decoding
+is not bit-reproducible under continuous batching, so we
+measure the resulting noise (Section 5.7).
+D. BASE OPTIMIZERS AND CONDITIONS
+APE and ProTeGi are clean-room implementations of
+the published algorithms [14], [15], run with few_shot_
+count = 0, hence exemplar-free; ProTeGi scores every
+successor on a full minibatch instead of using the original
+bandit scheme. PromptWizard [18] is run with synthetic-
+example generation disabled; its three in-context ex-
+amples are drawn from the 25 training examples with
+model-generated reasoning, and its generated expert
+identity is not used at evaluation. Hyperparameters
+are in Table 3. Only the expert few-shot condition
+uses the three BBH-author exemplars [20]; the rst
+manuscript's statement that APE and ProTeGi also
+used them was wrong. Reference conditions are zero-
+shot CoT [24] and expert few-shot CoT. The free-rewrite
+control (Appendix A.3) rewrites P0 with no rubric; V3
+adds the gate.
+E. METRICS
+Accuracy is the share of test examples whose delimited
+answer equals the gold answer after removing paren-
+theses, whitespace and case (strict extraction, as in
+the pilot). Because strict extraction penalizes correct
+reasoning that is wrapped badly, we add a lenient
+TABLE 3: Hyperparameters of the base optimizers and
+of MPIR as actually used.
+ComponentParameter
+Description
+Value
+used
+PromptWizard
+mutate_
+rene_
+iterations
+Outer rounds of
+mutate-then-rene
+over the task
+description
+3
+PromptWizard
+mutation_
+rounds
+Style-mutation
+rounds inside one
+outer round
+3
+PromptWizard
+style_
+variation
+Prompt variants
+generated per call
+5
+PromptWizard
+rene_task_
+eg_iterations
+Critique rounds on
+instruction and
+examples
+3
+PromptWizard
+few_shot_
+count /
+seen_set_
+size
+In-context examples
+/ training examples
+3 / 25
+APE
+num_
+candidates,
+iterations
+Induced candidates;
+resampling rounds
+10, 2
+APE
+num_
+scoring_
+examples,
+top_n
+Scoring minibatch;
+candidates kept
+5, 3
+ProTeGi
+beam_width,
+num_steps
+Beam width;
+expansion rounds
+3, 3
+ProTeGi
+minibatch_
+size, eval_
+batch_size
+Error minibatch;
+scoring batch
+5, 8
+MPIR
+N, validation
+size
+Rounds; gate
+questions
+7, 25
+MPIR
+rener
+temperature,
+max tokens
+Sampling;
+evaluation /
+renement
+0.7, 1500
+/ 3000
+MPIR
+history kept
+(chained)
+Last candidates
+shown; characters
+each
+4, 800
+MPIR
+guards
+Fallback, echo (5
+phrases), duplicate
+see
+Section
+3.4
+accuracy computed oine from the saved raw outputs:
+the response counts as correct if the delimited span (or,
+if there is none, the last 300 characters) names exactly
+one option and it is the gold one. Both are reported;
+strict extraction remains primary because MPIR's gate
+uses it.
+F. STATISTICAL ANALYSIS
+For every cell we report the paired dierence in test accu-
+racy between the nal MPIR prompt and P0 with a 95%
+paired-bootstrap interval over test examples. Cells with
+identical prompts have a dierence of zero by construc-
+tion, apart from serving noise. Across cells we report
+counts of wins, the mean dierence and a hierarchical
+bootstrap interval that resamples tasks, then optimizers
+and seeds within tasks. The noise oor is the distribution
+6
+VOLUME 14, 2026
+
+
+=== PAGE 7 ===
+Nguyen et al.: Rubric-Guided Prompt Refinement: A Pre-Specified Negative Result
+of accuracy dierences between repeated scorings of the
+same prompt, and the minimum detectable eect at 80%
+power and α = 0.05 follows from the paired discordance
+rate [65], [66].
+G. HARNESS DEFECTS AND DEVIATIONS
+Running against a live model exposed defects that
+mocked tests could not (truncation of long responses,
+answer normalization, delimiter mismatches in expert
+exemplars, template mismatches between an optimizer's
+own and MPIR's evaluation harness, two echo patterns
+and the unscored baseline). All are described with their
+magnitude in Appendix C and were xed before the
+numbers reported here were produced.
+5. RESULTS
+A. BASE PROMPTS AND THE SCORING HARNESS
+Table 4 gives the strict and lenient test accuracy of
+the nine pilot base prompts (seed 42) with Wilson
+intervals and the chance level of each task, and Table
+5 the reference conditions. Several baselines are at or
+below chance under strict extraction, the largest being
+ProTeGi: 10.5% on hyperbaton, 5.0% on ruin_names
+and 1.0% on penguins_in_a_table. Under lenient ex-
+traction the same responses score 58.0%, 37.5% and
+45.8%. The cause is visible in the raw outputs: the model
+reasons to an option but wraps a whole explanatory
+sentence in the answer tags, which the strict rule re-
+jects. This happens for exemplar-free prompts (APE,
+ProTeGi, zero-shot) and not for prompts that contain a
+worked example of the bare tag (PromptWizard, expert
+few-shot).
+Two checks bear on how much of this is a harness
+eect. First, a single worked format exemplar (the rst
+BBH-author exemplar, with its bare tag) appended to
+an exemplar-free base prompt raised strict accuracy by
++19.5 points on average for APE and +42.3 points for
+ProTeGi, over 15 cells each (paired-bootstrap intervals
+exclude zero in 9 and 15 cells; the gain ranges from -
+45.0 to +72.9 points, the negative end being APE's de-
+generate hyperbaton prompt). Second, the same prompt
+does not score the same twice. The strict accuracy of the
+identical nine prompts, scored in the pilot and again for
+this study, diers by 2.6 points on average and up to 7.0
+points (Section 5.7). Accuracy dierences smaller than
+this cannot be attributed to a prompt.
+B. WHAT THE ROUNDS WERE
+The composition of the renement rounds is in Table
+6 (all rounds of all runs; per-cell, per-round records for
+the primary variant are in Appendix E). The legacy loop
+of the pilot (V0, nine cells) produced on average 4.3
+distinct candidate prompts per run although decoding
+was greedy: the seven rounds were not identical copies,
+but they diered only through serving non-determinism,
+not by design, which is why 'seven rounds without
+acceptance' overstated the evidence. In the repaired
+variants the rounds dier by sampling and, for V2, by
+history.
+For the 1.7B rener, 60% of the chained rounds (337
+of 560) never reached validation because the response
+had no delimiters or echoed a template, and of the 193
+validated candidates 126 scored below the baseline, 66
+tied and 1 scored higher. A 'tie' is therefore not the
+typical outcome; most candidates are worse, often far
+worse. Renement with the original, inconsistent rubric
+text (V2L) was no better: 0 accepted candidates in 63
+rounds and 63% of rounds lost to fallbacks or echoes, so
+the inconsistency in the rubric text is not what limits
+the 1.7B rener.
+C. THE REPAIRED LAYER ON 45 CELLS (RQ1, D1)
+With the 1.7B model rening its own prompts through
+the chained variant, the nal prompt equals P0 in 79 of
+80 runs (45 cells, one to three MPIR seeds each). Only
+1 run accepted a candidate. No cell is a win: the mean
+paired dierence over cells is -0.04 points (hierarchical
+bootstrap interval [-0.16, +0.00]), and 0 of 45 cells satisfy
+the win criterion. By the pre-specied rule (D1) the
+outcome is 'null'. The result does not depend on the base
+optimizer: PromptWizard 1 of 28 runs changed; APE
+0 of 31 runs changed; ProTeGi 0 of 21 runs changed.
+Table 7 gives the per-task view. The tests of the rst
+submission (McNemar, GEE, Wilcoxon on three tasks)
+are not reported, because with identical prompts they
+cannot be informative.
+D. IS THE GATE THE BOTTLENECK? (RQ2, D3)
+To separate the candidates from the gate, every vali-
+dated candidate of MPIR seed 1 was also scored on the
+full test split. Ungated, the mean test-accuracy change of
+a 1.7B-rener candidate relative to its P0 is -27.0 points
+for the independent variant (41 candidates) and -15.2
+points for the chained variant (22); the best candidate
+of each cell averages -29.2 and -24.3 points, and no cell
+has a candidate that beats P0 by 3 points or more (0
+and 0 of 9 cells), so D3 is not met: the gate is not what
+keeps improvements out. Validation accuracy also tracks
+test accuracy closely across candidates (Spearman 0.92
+pooled over 211 candidates, median 0.93 within cells),
+largely because bad candidates are very bad. Table 8
+re-applies other acceptance rules oine to the same
+candidates.
+E. FREE REWRITING VERSUS THE RUBRIC
+In the pilot, the ungated free rewrite changed accuracy
+by +3.0 points on hyperbaton (6 test items, within the
+serving noise of Section 5.7), and lowered it by 15.5 and
+14.6 points on ruin_names and penguins_in_a_table:
+an ungated rewrite by this model is harmful. The gated
+rewrite (V3) is not: 16 of 27 runs accepted a rewrite, but
+87 of its 189 rounds produced text identical to P0 (the
+VOLUME 14, 2026
+7
+
+
+=== PAGE 8 ===
+Nguyen et al.: Rubric-Guided Prompt Refinement: A Pre-Specified Negative Result
+TABLE 4: Test accuracy (%) of the nine pilot base prompts (seed 42, Qwen3-1.7B, greedy, one scoring pass). Strict
+is the primary metric with a 95% Wilson interval; lenient is the secondary metric. Chance is 1 over the number of
+distinct gold labels. Delims is the share of responses containing both tags.
+Task
+Optimizer
+Strict [95% CI]
+Lenient
+Chance
+Delims %
+hyperbaton
+PromptWizard
+59.0 [52.1, 65.6]
+59.0
+50.0
+100
+hyperbaton
+APE
+44.5 [37.8, 51.4]
+59.5
+50.0
+100
+hyperbaton
+ProTeGi
+10.5 [7.0, 15.5]
+58.0
+50.0
+76
+ruin_names
+PromptWizard
+63.5 [56.6, 69.9]
+63.5
+16.7
+100
+ruin_names
+APE
+41.0 [34.4, 47.9]
+43.0
+16.7
+99
+ruin_names
+ProTeGi
+5.0 [2.7, 9.0]
+37.5
+16.7
+98
+penguins_in_a_table
+PromptWizard
+71.9 [62.2, 79.9]
+71.9
+20.0
+100
+penguins_in_a_table
+APE
+15.6 [9.7, 24.2]
+59.4
+20.0
+94
+penguins_in_a_table
+ProTeGi
+1.0 [0.2, 5.7]
+45.8
+20.0
+100
+TABLE 5: Reference conditions, strict (lenient) test
+accuracy %, seed 42. Free rewrite is the ungated rubric-
+free rewrite of the PromptWizard prompt from the pilot.
+Task
+Zero-shot
+CoT
+Expert
+few-shot
+CoT
+Free
+rewrite
+(ungated)
+hyperbaton
+51.0 (58.0)
+86.0 (89.5)
+61.0 (61.0)
+ruin_names
+37.0 (43.0)
+50.0 (50.0)
+44.5 (44.5)
+penguins_in_a_
+table
+6.2 (37.5)
+72.9 (72.9)
+55.2 (55.2)
+model mostly copies the prompt), so accepted rewrites
+are near-copies, and the mean paired dierence is +0.7
+points with 2 winning cells of 9. Rubric-guided candi-
+dates (V1, V2) were not better: -0.5 and +0.0 points,
+no wins. We therefore cannot say that unstructured
+rewriting is worse than MPIR; with this rener neither
+helps, and the gate is what protects against the harm of
+the ungated versions.
+F. A MORE CAPABLE REFINER (RQ3, D2)
+With Qwen3-235B-A22B as rener the picture changes:
+58 of 63 rounds reach validation (almost no echoes), 24
+candidates beat the baseline on validation, 5 of 9 runs
+accept a candidate, and the nal prompt is a signicant
+win in 4 of 9 cells (hyperbaton / promptwizard +30.0,
+hyperbaton / protegi +29.0, ruin_names / protegi
++12.0, penguins_in_a_table / protegi +11.5), for a
+mean dierence of +8.7 points. GPT-6 Luna produces
+valid candidates in 90% of rounds but they rarely beat
+the baseline: 1 winning cell, mean dierence +3.0 points.
+Under the pre-specied rule D2, with GPT-6 Luna in the
+role of the strongest rener, capability dependence is not
+supported (the mean dierence exceeds that of the 1.7B
+rener by +3.0 points, but only 1 cell wins against the
+required 3); with Qwen3-235B as the rener the rule is
+met. The honest summary is that a stronger rener can
+make the layer work, but not monotonically in general
+capability: the two strong reners dier, one is from the
+target's family, and GPT-6 Luna was run with minimal
+reasoning. These runs use one MPIR seed (plus a second
+seed for Qwen3-235B in Section 5.6.1), one target model
+and nine cells, and they are an upper-bound probe rather
+than a controlled capability scale.
+Where the gains arise matters. They occur in cells
+whose base prompt is weak for a harness reason (Pro-
+TeGi prompts that fail the format, and a PromptWizard
+prompt on hyperbaton) and the accepted candidates are
+rewrites that add an explicit instruction to wrap the nal
+answer on its own line and a worked output example
+(Figure B.3 in Appendix B). That is the same lever as
+the single-exemplar intervention of Section 5.1, which
+gives +42.3 points for ProTeGi without any rener.
+The data therefore do not show that the rubric's other
+criteria add anything beyond a x for output format.
+1) Follow-Up Runs (Exploratory)
+G. SERVING NOISE AND MINIMUM DETECTABLE EFFECT
+Each of the nine pilot base prompts was scored ve
+times on the test and validation splits (identical prompt,
+greedy decoding). Test accuracy varies with a standard
+deviation of 1.4 points and a range of 3.3 points per
+prompt on average; between two scorings of the same
+prompt 6.5% of examples change outcome on average
+(up to 16.6%), and the pilot and present scorings of the
+same prompt dier by up to 7.0 points. This is larger
+than the 2% assumed in the rst submission and is the
+reason a 25-question validation split is noisy. For 200
+test examples the minimum detectable paired eect at
+80% power and α = 0.05 is 5.0 points if only serving
+noise separates two prompts, and 6.3 to 8.9 points if
+two dierent prompts disagree on 10-20% of examples,
+as the candidates here do. The individual gains found
+with the strong rener (+30, +29, +12, +11 points) are
+above this oor; eects of a few points are not detectable
+at these test sizes.
+H. DOES THE RUBRIC JUDGE MEASURE ANYTHING?
+(RQ4)
+The 1.7B judge gives a parseable total for 93% of
+prompts and scores them 7.2 points higher than the
+reference judge on average; its totals for the same
+unchanged P0 vary with a standard deviation of 4.7
+8
+VOLUME 14, 2026
+
+
+=== PAGE 9 ===
+Nguyen et al.: Rubric-Guided Prompt Refinement: A Pre-Specified Negative Result
+TABLE 6: Outcome of every renement round. Fallback: no delimiters. Echo: template phrase. Duplicate: same text
+as an earlier prompt. Validated rounds are split by validation score against the baseline (better/equal/worse). The
+last column counts runs whose nal prompt diers from P0.
+Variant
+Runs
+Rounds
+Fallback
+Echo
+Dup.
+Validated
+Val. better/equal/worse
+Accepted
+Runs changed
+V0 legacy
+9
+63
+3
+16
+5
+39
+1/7/31
+1
+1/9
+V1 independent
+27
+189
+23
+46
+0
+120
+2/21/97
+2
+2/27
+V2 chained
+80
+560
+177
+160
+30
+193
+1/66/126
+1
+1/80
+V2L original rubric
+9
+63
+26
+14
+4
+19
+0/4/15
+0
+0/9
+V3 free rewrite (gated)
+27
+189
+0
+0
+87
+102
+19/23/60
+18
+16/27
+V2, rener Qwen3-235B
+9
+63
+3
+2
+0
+58
+24/3/31
+11
+5/9
+V2, rener GPT-6 Luna
+9
+63
+6
+0
+0
+57
+3/8/46
+2
+1/9
+TABLE 7: Chained variant, 1.7B rener: runs whose
+nal prompt diers from P0 (of all MPIR runs) and
+mean paired test-accuracy dierence in points, per task
+and optimizer. * marks the Tier-1 tasks (seeds 42-44);
+Tier-2 tasks are seed 42.
+Task
+PromptWizardAPE
+ProTeGi
+hyperbaton *
+1/7
+changed,
+-0.6
+0/7
+changed,
++0.0
+0/5
+changed,
++0.0
+ruin_names *
+0/7
+changed,
++0.0
+0/7
+changed,
++0.0
+0/5
+changed,
++0.0
+penguins_in_a_
+table *
+0/5
+changed,
++0.0
+0/7
+changed,
++0.0
+0/5
+changed,
++0.0
+temporal_
+sequences
+0/2
+changed,
++0.0
+0/2
+changed,
++0.0
+0/1
+changed,
++0.0
+movie_
+recommendation
+0/1
+changed,
++0.0
+0/2
+changed,
++0.0
+0/1
+changed,
++0.0
+disambiguation_
+qa
+0/2
+changed,
++0.0
+0/2
+changed,
++0.0
+0/1
+changed,
++0.0
+geometric_shapes
+0/2
+changed,
++0.0
+0/2
+changed,
++0.0
+0/1
+changed,
++0.0
+salient_
+translation_
+error_detection
+0/1
+changed,
++0.0
+0/1
+changed,
++0.0
+0/1
+changed,
++0.0
+sports_
+understanding
+0/1
+changed,
++0.0
+0/1
+changed,
++0.0
+0/1
+changed,
++0.0
+points across sampled rounds. Both judges' totals cor-
+relate only weakly with accuracy (median within-cell
+Spearman 0.27 and 0.27 with test accuracy), and the two
+judges agree with each other at 0.38. The rubric score
+is therefore at best a weak signal of prompt quality; the
+claim of the rst submission that it approximates expert
+review is withdrawn. No human ratings were collected;
+the reference judge is a stronger model, not a person, so
+this analysis bounds the judge's usefulness but does not
+validate the rubric against human judgement.
+TABLE 8: Acceptance-rule sensitivity on the oracle-
+scored candidates (MPIR seed 1, 1.7B rener, Tier-1
+seed-42 cells). Delta is the mean change in test accuracy
+of the selected prompt versus P0, in points (for the larger
+gate, measured on the held-out half of the test split).
+Variant
+Acceptance rule
+Cells
+accept-
+ing
+Mean
+delta
+Better/worse
+cells
+V1 inde-
+pendent
+strict (as run)
+1/9
+-0.9
+0/1
+V1 inde-
+pendent
+non-strict (ties
+accepted)
+2/9
+-1.1
+0/2
+V1 inde-
+pendent
+mean of 3
+validation scorings
+1/9
+-0.9
+0/1
+V1 inde-
+pendent
+larger gate (val +
+half of test)
+0/9
++0.0
+0/0
+V2
+chained
+strict (as run)
+0/8
++0.0
+0/0
+V2
+chained
+non-strict (ties
+accepted)
+2/8
+-0.8
+0/2
+V2
+chained
+mean of 3
+validation scorings
+0/8
++0.0
+0/0
+V2
+chained
+larger gate (val +
+half of test)
+0/8
++0.0
+0/0
+V3 free
+rewrite
+strict (as run)
+5/9
++0.4
+2/3
+V3 free
+rewrite
+non-strict (ties
+accepted)
+7/9
+-0.6
+2/5
+V3 free
+rewrite
+mean of 3
+validation scorings
+6/9
+-0.4
+2/4
+V3 free
+rewrite
+larger gate (val +
+half of test)
+3/9
++1.9
+2/1
+I. EFFECT OF THE ORIGINAL DEFECT
+The original loop accepted the rst round's outcome
+whatever it scored. Applying that rule to the oracle-
+scored candidates of the independent variant (nine cells,
+MPIR seed 1) gives a mean test-accuracy change of -
+13.6 points relative to P0: the uncorrected loop changed
+the prompt in 4 of 9 cells and was worse than P0 in 4,
+better in 0. The repaired loop on the same candidates
+changes accuracy by -0.9 points. So the defect would
+have produced large apparent losses, not gains, with
+this rener; its eect with the original GPT-4o rener is
+unknown, because that conguration was not rerun.
+VOLUME 14, 2026
+9
+
+
+=== PAGE 10 ===
+Nguyen et al.: Rubric-Guided Prompt Refinement: A Pre-Specified Negative Result
+TABLE 9: Rener capability, nine Tier-1 seed-42 cells; the target stays Qwen3-1.7B. Validated is the share of rounds
+that reached validation; wins and mean dierence refer to the nal prompt versus P0 (1.7B rows pool three MPIR
+seeds, the others use seed 1).
+Rener, variant
+Validated
+Val. better
+Runs changed
+Winning cells
+Mean di (pts)
+Qwen3-1.7B (self), V1
+63%
+2
+2/27
+0/9
+-0.5
+Qwen3-1.7B (self), V2
+34%
+1
+0/27
+0/9
++0.0
+Qwen3-235B-A22B, V2
+92%
+24
+5/9
+4/9
++8.7
+GPT-6 Luna, V2
+90%
+3
+1/9
+1/9
++3.0
+TABLE 10: Rubric totals (out of 35) assigned to P0 and to every oracle-scored candidate (223 prompts), temperature
+0. Spearman correlations of the total with validation and with test accuracy are computed within each of the nine
+cells (median shown).
+Judge
+Totals parsed
+Mean total
+SD
+Spearman, val.
+Spearman, test
+Qwen3-1.7B
+93%
+27.9
+9.1
+0.28
+0.27
+GPT-6 Luna (reference)
+100%
+20.7
+8.2
+0.27
+0.27
+J. DECISION RULES
+TABLE 11: Outcome of the pre-specied decision rules
+(Section 4.1).
+Rule
+Criterion
+Observed
+Outcome
+D1
+>= 15 of 45 cells win
+and mean >= +2.0
+pts; null if <= 2 wins
+and |mean| <= 1.0
+0 wins, mean
+-0.04
+Null
+D2
+stronger rener: mean
++2.0 over 1.7B and
+>= 3 of 9 wins
+GPT-6 Luna
++3.0 / 1 wins;
+Qwen3-235B
++8.7 / 4 wins
+Not met
+(Luna);
+met
+(Qwen3-
+235B)
+D3
+best oracle candidate
+>= +3 pts in >= 3
+of 9 cells although
+gated nal is not
+0, 0, 1 cells
+(V1, V2, V3)
+Not met
+6. DISCUSSION
+A. WHAT THE EVIDENCE SUPPORTS
+With Qwen3-1.7B as target and rener, the rubric-
+guided layer did not improve the prompts of any of
+three optimizers on any of nine tasks: the nal prompt
+equalled P0 in 79 of 80 runs, and by the pre-specied rule
+the outcome is null (Section 5.3). That conclusion sur-
+vives the points raised against the pilot. The renement
+rounds were made genuinely distinct by sampling and by
+history. The failure is not an artifact of the coarse gate,
+because ungated candidates are on average clearly worse
+than P0 and validation accuracy tracks test accuracy
+(Section 5.4). It is not caused by the inconsistent rubric
+text (Section 5.2), and a rubric-free gated rewrite does
+no better (Section 5.5). Most renement attempts by
+this rener never reach validation, which is a failure of
+instruction following, not a verdict on the rubric.
+The evidence for capability dependence is mixed and
+should be read as a probe, not a measurement. A
+much larger open-weight rener (Qwen3-235B-A22B)
+produced signicant gains in several cells, while a strong
+closed rener run with minimal reasoning (GPT-6 Luna)
+did so in one (Section 5.6). The gains arise where the
+base prompt fails for format reasons, and the accepted
+candidates add an answer-format instruction and a
+worked output example, the same lever that a single
+exemplar delivers without any rener (Section 5.1). We
+therefore cannot claim that the seven-criteria rubric
+itself, as opposed to rewriting by a stronger model that
+happens to repair the output format, is responsible.
+Criterion-level ablations were not run, and the original
+GPT-4o and GPT-3.5-turbo conguration was not re-
+peated, so the rst evaluation's per-task gains remain
+unexplained and should not be cited as evidence for
+MPIR.
+B. PRACTICAL GUIDANCE, SCOPED TO WHAT WAS TESTED
+The following points follow from these experiments,
+with Qwen3 models, nine BBH tasks and the optimizers
+listed; they are not general rules. (i) Before adding a
+renement layer, inspect how answers are extracted:
+a single worked example of the answer format moved
+strict accuracy of exemplar-free prompts by tens of
+points here, far more than any renement. (ii) Do not
+accept a model's rewrite of a prompt without scoring
+the original prompt as a baseline; the uncorrected loop
+lowered accuracy by about 14 points on average. (iii)
+Gate on held-out data, but note that identical prompts
+scored twice dier on 6% of examples, so dierences of
+a few points on a few hundred questions are noise. (iv)
+When the rening model is as small as the target, expect
+most rewrites to be unusable (echoes, missing delimiters)
+and monitor that rate; a larger rener reduces it.
+C. THREATS TO VALIDITY
+1) Internal Validity
+The serving stack is not deterministic: repeated scor-
+ing of one prompt moves accuracy by 3.3 points on
+10
+VOLUME 14, 2026
+
+
+=== PAGE 11 ===
+Nguyen et al.: Rubric-Guided Prompt Refinement: A Pre-Specified Negative Result
+average, which the gate and the minimum detectable
+eect (5.0 points) take into account but cannot remove.
+The inference server was restarted several times and
+its memory settings were changed during the study;
+cached scores and generations were kept across restarts,
+so a few interrupted runs combine scorings taken under
+dierent settings, with dierences of the order of the
+measured noise. Oracle scoring of all candidates covers
+MPIR seed 1 only, the strong-rener runs use one MPIR
+seed (a second for one rener), and the follow-up runs
+of Section 5.6.1 were added after the results were seen.
+The APE prompt for hyperbaton is a degenerate artifact
+of our implementation (Appendix A), which limits what
+rening it can show.
+2) External Validity
+One target model family and size was used in every run.
+Tier 1 was chosen from a biased statistic and Tier 2 is
+a random draw of six tasks from 24, so the nine tasks
+may not represent the other BBH tasks or other task
+families. The strong-rener experiment covers nine cells.
+The original closed-model conguration, including GPT-
+4o as rener, was not rerun; GPT-6 Luna is a dierent
+model and is not a replication of it.
+3) Construct and Conclusion Validity
+Strict answer extraction partly measures output format-
+ting; we report lenient accuracy as a secondary metric.
+The rubric and its judge are weakly related to accuracy
+(Section 5.8), no human ratings were collected, and the
+rubric's criteria were not ablated, so the study says
+little about which criteria matter. The statistics are
+descriptive by design: with identical prompts in most
+cells, tests of dierences would be uninformative, and the
+nine pilot cells share three tasks and three optimizers,
+so they are not independent.
+7. CONCLUSION
+We re-tested a rubric-guided renement layer for auto-
+matically optimized prompts after repairing its rene-
+ment loop, adding gates, controls and diagnostics, and
+xing the decision rules in advance. With a 1.7B model
+rening its own prompts the layer produced no improve-
+ment in 45 cells (one of 80 runs accepted a candidate).
+The uncorrected loop of the rst evaluation would have
+reduced accuracy, the strict answer extraction accounts
+for much of the apparent weakness of exemplar-free
+baselines, and identical prompts do not score identically
+on this serving stack. A far larger rener can make the
+layer improve some prompts, but the gains coincide with
+a repaired answer format that a single exemplar also
+provides, so they do not show that the rubric is what
+helps. These conclusions are limited to Qwen3-based
+targets, nine tasks and the optimizers tested; the rst
+evaluation's GPT-4o results remain unveried. Code,
+per-round logs and generations are public.
+8. FUNDING
+This research received no specic grant from any fund-
+ing agency in the public, commercial, or not-for-prot
+sectors.
+9. ETHICAL STATEMENT
+This study did not involve human participants, human
+data, or animal subjects, and did not require ethical
+approval.
+10. DECLARATION OF COMPETING INTEREST
+The authors declare that they have no conicts of
+interest.
+11. DATA AVAILABILITY STATEMENT
+The datasets used in this study are drawn from the
+publicly available Big-Bench Hard benchmark. Code,
+prompts, the revision protocol, per-round logs, gen-
+erations, and analysis outputs are openly available
+at https://github.com/millennials92/meta_prompted_
+instruction_renement.
+12. AUTHOR CONTRIBUTION STATEMENT
+Linh Nguyen: Conceptualization, Methodology, Soft-
+ware, Investigation, Formal analysis, Data curation,
+Writing - original draft, Visualization. Quang-Vinh
+Dang: Conceptualization, Methodology, Supervision,
+Writing - review & editing, Project administration.
+Minh Ngoc Dinh: Methodology, Validation, Writing - re-
+view & editing. Thuy Nguyen: Investigation, Validation,
+Writing - review & editing.
+APPENDIX. PROMPT EXAMPLES
+A. BASE PROMPTS PRODUCED BY A 1.7B-DRIVEN
+OPTIMIZER
+These are prompts exactly as saved by the pipeline
+(seed 42), not cleaned. They show the quality of the
+upstream, 1.7B-driven baselines that MPIR was asked
+to rene, which limits how informative rening them
+can be. PromptWizard's prompt for penguins_in_a_
+table opens with a detached question that is not a task
+instruction; the APE prompt for hyperbaton is APE's
+own instruction-induction meta-prompt, not a task in-
+struction, because the search selected a candidate that
+echoed the induction template; the APE and ProTeGi
+prompts for the other two tasks are the seed instruction
+"Let's think step by step." plus the answer-format line.
+How could I determine the accuracy of
+my solution to this problem?
+[Question] Here is a table where the
+first line is a header and
+each subsequent line is a penguin: name,
+age, height (cm),
+weight (kg) Louis, 7, 50, 11 Bernard,
+5, 80, 13 Vincent, 9, 60, 11 ...
+What is the name of the 60 cm tall penguin?
+VOLUME 14, 2026
+11
+
+
+=== PAGE 12 ===
+Nguyen et al.: Rubric-Guided Prompt Refinement: A Pre-Specified Negative Result
+Options: (A) Louis (B) Bernard (C) Vincent
+(D) Gwen (E) James
+[Answer] ... Therefore, the name of the
+60 cm tall penguin is Vincent.
+**Final Answer:** (C) Vincent <ANS_START>(C)<ANS_
+END>
+[... two further worked examples omitted
+...]
+Wrap the final answer between <ANS_START>
+and <ANS_END>
+Figure A.1. PromptWizard's saved prompt for
+penguins_in_a_table (abridged).
+I gave a friend an instruction. Based
+on the instruction they
+produced the following input-output pairs:
+[Question] Which sentence has the correct
+adjective order: ...
+[Answer] (B)
+[... further input-output pairs omitted
+...]
+What was the instruction I gave?
+Wrap the final answer between <ANS_START>
+and <ANS_END>
+Figure A.2. APE's saved prompt for hyperbaton
+(abridged): an unextracted induction meta-prompt, not
+a task instruction.
+B. REFERENCE PROMPTS
+The zero-shot condition uses the BBH authors' task
+description plus "Let's think step by step" and the
+answer-format line. The expert few-shot condition
+appends the authors' three worked chain-of-thought
+exemplars [20], each followed by a bare <ANS_
+START>(X)<ANS_END> tag. This tag is the
+property that exemplar-free prompts lack (Section 5.1).
+Q: Which of the following is a humorous
+edit of this artist or movie name: ’whitesnake’?
+Options: (A) whitesnape (B) whitesnapke
+(C) whitesnuake (D) mwhitesnake
+A: Let’s think step by step. ... So the
+answer is (A).
+<ANS_START>(A)<ANS_END>
+Figure A.3. First expert exemplar for ruin_names,
+abridged. The same exemplar is the single format
+exemplar used in the intervention of Section 5.1.
+C. FREE-REWRITE CONTROL PROMPT
+You are given a task-solving prompt generated
+for a Big-Bench Hard task.
+Rewrite the prompt to improve clarity,
+readability, and instruction organization
+while
+preserving the original task meaning.
+Preserve the original task, answer format,
+and examples.
+Do not use any prompt-evaluation rubric.
+Output only the rewritten task-solving
+prompt.
+Original prompt: <START> {prompt} <END>
+Figure A.4. Meta-prompt of the free-rewrite control
+(abridged).
+APPENDIX. ECHO FAILURE TRANSCRIPTS
+Two ways in which a small rener failed silently, found
+by inspecting saved outputs after an anomalous
+accuracy reading in the pilot. Both are well-formed
+<START>/<END> responses with no usable task
+instruction. They are now caught by the echo guard
+(Section 3.4) and, independently, by the validation
+gate.
+<START>
+I gave a friend an instruction. Based
+on the instruction they produced the
+following
+input-output pairs: [Question] Which
+sentence has the correct adjective order:
+...
+The task is to determine the correct
+adjective order in a sentence ...
+<END>
+Figure B.1. hyperbaton / APE: the rener echoed
+APE's induction template; no answer-format line, so
+validation accuracy fell to zero (abridged).
+<START>
+### Task Overview You are a Senior Prompt
+Engineer ... ### Prompt Under Evaluation
+...
+### Seven-Criteria Evaluation Rubric
+...
+<END>
+Figure B.2. ruin_names / PromptWizard: the rener
+echoed the evaluation meta-prompt itself; the round
+scored 0.0 (abridged).
+P0 (ProTeGi, hyperbaton): Let’s think
+step by step. Wrap the final answer between
+<ANS_START> and <ANS_END>
+Accepted candidate (Qwen3-235B refiner,
+round 7; validation 0.52 vs 0.16, test
+39.5% vs 10.5%):
+You are a Senior Reasoning Assistant
+... ### Instructions 1. Step Back ...
+2. Reason Step-by-Step ...
+5. Follow Format Exactly ... 7. Final
+Answer: On a new line, wrap only the
+final answer with
+<ANS_START> and <ANS_END>. ### Output
+Format Examples [Question] A bat and
+a ball cost $1.10 ... [Answer] ...
+Figure B.3. An accepted candidate from the strong
+rener (abridged). It adds a role, step-back and
+numbered steps, but also an explicit instruction to
+wrap the nal answer on its own line and a worked
+output example, which is the format lever of Section
+5.1; the example is generic, not about adjective order.
+APPENDIX. PIPELINE DEFECTS AND SERVING
+CONFIGURATION
+Defects found while running the pipeline against a live
+model. Magnitudes are the symptoms recorded at the
+time. Items 1-8 were xed before any number reported
+in Section 5; items 9-11 were found during this revision.
+Earlier pre-pilot xes (a per-seed data-split collision,
+an unseeded random generator, mismatched scoring
+12
+VOLUME 14, 2026
+
+
+=== PAGE 13 ===
+Nguyen et al.: Rubric-Guided Prompt Refinement: A Pre-Specified Negative Result
+TABLE 12: Table C1. Defects found in the pipeline, their
+observed symptom and the x.
+#
+Defect
+Observed symptom
+Fix
+1
+Response
+truncated by
+an under-
+provisioned
+context
+PromptWizard
+prompts left too
+little context:
+responses cut
+mid-sentence, 0/50
+on a task
+Explicit max
+new tokens
+(1024) and
+context 8192
+2
+Answer nor-
+malization
+gap
+Bare letter 'A'
+scored wrong
+against gold '(A)'
+Strip
+parentheses
+and case on
+both sides
+3
+Delimiter
+convention
+absent from
+expert
+exemplars
+Expert few-shot
+scored exactly 0.0
+on hyperbaton
+(whole response
+wrapped)
+Append a bare
+tag after each
+exemplar's
+conclusion
+4
+Missing
+delimiters
+crashed the
+loop
+IndexError ended
+every remaining
+condition of a task
+Fallback to the
+unrened
+prompt (now
+logged as an
+outcome)
+5
+Echo of the
+rubric
+meta-prompt
+ruin_names /
+PromptWizard
+candidate scored 0.0
+Marker-phrase
+echo guard
+6
+Echo of
+APE's
+induction
+template;
+unscored
+baseline
+hyperbaton / APE
+candidate scored 0.0
+and was accepted
+because the
+incumbent score
+started at minus
+innity
+Score P0 rst;
+accept only on
+strict
+improvement
+7
+Evaluation
+template
+mismatch
+Same prompt text
+scored 0.07 through
+one template and
+0.515 through
+another (trailing
+whitespace changes
+greedy decoding)
+Score every
+condition
+through the
+base
+optimizer's
+own template
+8
+Search-time
+scoring
+omitted the
+answer
+format
+APE/ProTeGi
+candidates scored
+near 0 during
+search, so selection
+ran on noise
+Bake the
+answer-format
+line into scored
+instructions
+9
+Rubric text
+inconsistent
+'ve criteria', 'all 6
+criteria', 'X/25' for
+a seven-criterion,
+35-point rubric
+Corrected text
+for V1-V3;
+original kept as
+V2L
+10
+Renement
+rounds not
+independent
+Same input,
+temperature 0,
+seven times
+Independent
+sampling and
+chained
+variants
+(Section 3.2)
+11
+APE search
+selected a
+degenerate
+prompt
+hyperbaton P0 is
+APE's own
+induction template
+Left in place
+and disclosed;
+same code as
+the pilot
+minibatches in APE, and swallowed API errors) are
+recorded in the repository's REBUILD.md.
+TABLE 13: Table C2. Serving conguration.
+Item
+Value
+Inference
+engine
+vLLM 0.28.0 (V1 engine, model
+runner V2 disabled, ashinfer sampler
+disabled), PyTorch 2.13.0+cu132
+Target and
+default
+rener
+Qwen/Qwen3-1.7B, revision 70d244c,
+bf16, no quantization
+Capability-
+experiment
+reners
+Qwen/Qwen3-4B-AWQ (74d4bd2)
+and Qwen/Qwen3-8B-AWQ
+(4da05a8), 4-bit AWQ
+Context and
+limits
+max model length 8192; max new
+tokens 1024 (target), 1500 / 3000
+(meta calls); thinking disabled
+Decoding
+target: temperature 0; rener:
+temperature 0.7 (0 for V0); seeds
+recorded per call
+Server ags
+gpu-memory-utilization 0.80
+max-num-seqs 96 seed 0; prex
+caching on
+Hardware
+NVIDIA RTX 5000 Ada Generation
+Laptop GPU, 16 GB, driver 596.58;
+WSL2 (Ubuntu 24.04, kernel
+5.15.167.4) on Windows 11
+Non-
+determinism
+Continuous batching; identical
+prompts are re-scored to measure it
+(Section 5.7)
+APPENDIX. THE ORIGINAL EVALUATION
+(EXPLORATORY; VALIDATION LEAK)
+The rst evaluation used GPT-3.5-turbo as target and
+GPT-4o as rener on all BBH tasks. It is reproduced
+here only because the manuscript's framing referred to
+it, and Reviewer comments asked for its numbers. Its
+validation stage scored candidates on the optimizer's
+own training examples and its loop never scored the
+unrened prompt (Section 3.2), single runs at
+temperature 0. The numbers are exploratory, are not
+evidence for MPIR, and were not used to compute any
+result in Section 5. The Gemini 3.5 Flash-Lite check
+used the same model as target and rener, with the
+same defects; its baseline already averaged 92%, leaving
+little headroom, and it was not analysed further.
+The three pilot tasks ranked 1, 3 and 6 of 23 by the
+original PW+MPIR gain (hyperbaton +21.8,
+penguins_in_a_table +7.6, ruin_names +5.8 points).
+Selecting tasks on the maximum of a noisy, leaked
+statistic invites winner's-curse eects, which is why
+Tier 2 of the revised design draws tasks at random.
+APPENDIX. ROUND-LEVEL RECORD OF THE PRIMARY
+VARIANT
+Per cell (task / optimizer, seed 42) and round, the
+outcome of the chained variant V2 with MPIR seed 1
+(F fallback, E echo, D duplicate, V validated with its
+VOLUME 14, 2026
+13
+
+
+=== PAGE 14 ===
+Nguyen et al.: Rubric-Guided Prompt Refinement: A Pre-Specified Negative Result
+TABLE 14: Table D1. Original GPT-3.5-turbo evaluation (accuracy %, single run, leaked validation split) and Gemini
+3.5 Flash-Lite check. PW = PromptWizard; Di = PW+MPIR minus PW. Exploratory only.
+Task
+Zero-shot
+Expert
+PW
+PW+MPIR
+Di
+APE
+APE+MPIR
+ProTeGi
+ProTeGi+MPIR
+Gem. PW
+Gem. MPIR
+hyperbaton
+74.6
+84.4
+62.2
+84.0
++21.8
+82.7
+85.8
+80.9
+88.9
+100
+100
+disambiguation_qa
+55.1
+69.3
+61.7
+62.2
++0.5
+69.8
+68.0
+73.8
+67.6
+77
+80
+causal_judgement
+53.7
+59.9
+59.3
+56.8
+-2.5
+58.0
+58.6
+61.1
+58.6
+70
+75
+date_understanding
+55.6
+80.0
+71.1
+74.2
++3.1
+87.6
+84.4
+88.0
+85.8
+95
+96
+penguins_in_a_table
+45.5
+74.4
+75.0
+82.6
++7.6
+81.0
+84.3
+79.3
+76.9
+100
+98
+boolean_expression
+81.8
+91.6
+92.0
+94.2
++2.2
+90.7
+93.8
+90.7
+92.9
+100
+100
+object_counting
+59.1
+88.0
+91.5
+92.4
++0.9
+92.0
+93.3
+88.4
+93.3
+100
+100
+word_sorting
+82.6
+65.3
+80.0
+81.3
++1.3
+69.3
+80.0
+68.4
+66.7
+92
+92
+logical_deduction
+45.3
+59.4
+44.9
+50.8
++5.9
+61.9
+59.7
+60.7
+59.3
+99
+96
+salient_translation_error_detection
+44.0
+54.7
+50.7
+52.0
++1.3
+55.1
+54.7
+52.9
+49.3
+75
+74
+geometric_shapes
+29.3
+64.4
+57.8
+49.3
+-8.5
+62.7
+61.3
+61.8
+60.9
+86
+83
+snarks
+45.0
+72.5
+63.3
+65.4
++2.1
+61.4
+68.6
+75.8
+73.2
+90
+90
+temporal_sequences
+33.3
+17.3
+44.4
+38.2
+-6.2
+26.7
+86.7
+84.0
+86.2
+100
+100
+web_of_lies
+47.5
+80.9
+52.4
+52.9
++0.5
+80.0
+73.3
+81.3
+80.9
+100
+100
+navigate
+49.3
+93.8
+65.3
+68.0
++2.7
+95.6
+92.9
+95.6
+97.8
+100
+99
+reasoning_about_colored_objects
+54.2
+83.1
+56.0
+68.4
++12.4
+82.7
+82.7
+82.7
+83.6
+100
+100
+sports_understanding
+78.2
+93.8
+79.6
+86.2
++6.6
+95.1
+96.4
+93.3
+94.7
+91
+86
+multistep_arithmetic_two
+33.3
+84.9
+51.1
+51.5
++0.4
+86.2
+84.9
+83.6
+82.7
+97
+94
+ruin_names
+54.7
+69.3
+66.2
+72.0
++5.8
+58.7
+68.4
+58.7
+77.8
+88
+87
+movie_recommendation
+66.2
+79.1
+73.3
+66.7
+-6.6
+76.9
+79.1
+76.0
+80.9
+95
+96
+formal_fallacies
+53.8
+51.6
+53.3
+53.3
++0.0
+52.4
+52.9
+55.1
+56.9
+99
+99
+dyck_languages
+1.7
+16.9
+14.2
+12.9
+-1.3
+24.4
+34.2
+20.9
+32.4
+72
+75
+tracking_shued_objects
+22.4
+63.8
+69.8
+65.5
+-4.3
+63.0
+58.2
+61.6
+60.9
+100
+100
+Average
+50.7
+69.5
+62.4
+64.4
++2.0
+70.2
+74.0
+72.8
+74.3
+92
+92
+validation accuracy), then the baseline validation
+accuracy of P0 and the judge's rubric total out of 35 at
+round 1. Table E2 gives the same for the independent
+variant V1. Full logs for every variant, seed and round,
+including candidate texts and judge outputs, are in
+results/revision/rounds.
+APPENDIX. PROTOCOL AND DEVIATIONS
+The decision rules of Section 4.1 were xed in
+REVISION_PROTOCOL.md before any revised
+experiment ran (commit 8fd1397). Dated amendments,
+all made before results were inspected: serving stack
+and measured throughput (about 1.2k tokens/s at rst,
+then improved by xing KV-cache thrash), which
+reduced the compute plan; oracle test scoring of every
+validated candidate only for MPIR seed 1; one
+validation score per candidate in G1; V2L with one
+seed and no oracle scoring; plain temperature-0.7
+sampling without top-p; Tier-1 seed-42 cells run only
+in G2. The protocol and every amendment are in the
+repository; none is a registry entry.
+ACKNOWLEDGMENT
+The authors thank the reviewers for their constructive
+comments on the rst submission of this manuscript.
+Generative AI tools were used to assist with improving
+the grammar and readability of the manuscript text
+and to generate initial code snippets during
+development; all AI-assisted text and code were
+reviewed, veried, and adapted by the authors, who
+take full responsibility for the manuscript's content,
+analyses, and conclusions.
+REFERENCES
+[1] D. Vilar, M. Freitag, C. Cherry, J. Luo, V. Ratnakar,
+and G. Foster, Prompting PaLM for translation: Assessing
+strategies and performance, in Proceedings of the 61st
+Annual Meeting of the Association for Computational Lin-
+guistics (Volume 1: Long Papers), 2023, pp. 15 40615 427.
+[2] T. Goyal, J. J. Li, and G. Durrett, News summariza-
+tion and evaluation in the era of GPT-3, arXiv preprint
+arXiv:2209.12356, 2022.
+[3] E. Kamalloo, N. Dziri, C. Clarke, and D. Raei, Evaluating
+open-domain question answering in the era of large language
+models, in Proceedings of the 61st Annual Meeting of the
+Association for Computational Linguistics (Volume 1: Long
+Papers), 2023, pp. 55915606.
+[4] L. Qin, Q. Chen, X. Feng, Y. Wu, Y. Zhang, Y. Li,
+M. Li, W. Che, and P. S. Yu, Large language models
+meet NLP: A survey, Frontiers of Computer Science, 2025,
+arXiv:2405.12819.
+[5] F. Errica, D. Sanvito, G. Siracusano, and R. Bifulco, What
+did I do wrong? Quantifying LLMs' sensitivity and consis-
+tency to prompt engineering, in Proc. 2025 Conf. Nations
+of the Americas Chapter of the Assoc. Comput. Linguistics:
+Human Language Technologies (Volume 1: Long Papers),
+2025, pp. 15431558.
+[6] M. Sclar, Y. Choi, Y. Tsvetkov, and A. Suhr, Quantifying
+language models' sensitivity to spurious features in prompt
+design or: How I learned to start worrying about prompt
+formatting, in The Twelfth International Conference on
+Learning Representations, 2024.
+[7] P. Colombo, T. P. Pires, M. Boudiaf, D. Culver, R. Melo,
+C. Corro, A. F. T. Martins, F. Esposito, V. L. Raposo,
+S. Morgado, and M. Desa, Saullm-7b: A pioneering large
+language model for law, 2024.
+[8] X. Zhang, C. Tian, X. Yang, L. Chen, Z. Li, and L. R.
+Petzold, AlpaCare: Instruction-tuned large language models
+for medical application, arXiv preprint arXiv:2310.14558,
+2023.
+[9] J. Wei, X. Wang, D. Schuurmans, M. Bosma, B. Ichter,
+F. Xia, E. H. Chi, Q. V. Le, and D. Zhou, Chain-of-thought
+prompting elicits reasoning in large language models, in
+Proceedings of the 36th International Conference on Neural
+Information Processing Systems (Article 1800), 2022.
+[10] A. Kong, S. Zhao, H. Chen, Q. Li, Y. Qin, R. Sun, X. Zhou,
+E. Wang, and X. Dong, Better zero-shot reasoning with role-
+play prompting, in Proceedings of the 2024 Conference of
+the North American Chapter of the Association for Com-
+putational Linguistics (Volume 1: Long Papers), 2024, pp.
+40994113.
+[11] T. B. Brown, B. Mann, N. Ryder, M. Subbiah, J. Kaplan,
+P. Dhariwal, A. Neelakantan, P. Shyam, G. Sastry, A. Askell,
+S. Agarwal, A. Herbert-Voss, G. Krueger, T. Henighan,
+R. Child, A. Ramesh, D. M. Ziegler, J. Wu, C. Winter,
+14
+VOLUME 14, 2026
+
+
+=== PAGE 15 ===
+Nguyen et al.: Rubric-Guided Prompt Refinement: A Pre-Specified Negative Result
+TABLE 15: Table E1. Round-level outcomes, variant V2, MPIR seed 1 (an asterisk marks an accepted candidate).
+Cell
+P0 val
+R1
+R2
+R3
+R4
+R5
+R6
+R7
+Judge /35
+hyperbaton / promptwizard
+0.72
+E
+E
+E
+E
+E
+V 0.72
+F
+31
+hyperbaton / ape
+0.64
+F
+E
+E
+F
+F
+V 0.00
+F
+33
+hyperbaton / protegi
+0.16
+V 0.00
+F
+V 0.00
+F
+V 0.00
+F
+F
+16
+ruin_names / promptwizard
+0.76
+E
+E
+E
+F
+E
+E
+E
+28
+ruin_names / ape
+0.28
+V 0.00
+F
+V 0.00
+V 0.00
+F
+F
+F
+17
+ruin_names / protegi
+0.08
+V 0.00
+V 0.00
+F
+F
+F
+V 0.00
+V 0.00
+17
+penguins_in_a_table / promptwizard
+0.84
+V 0.00
+F
+F
+F
+F
+F
+F
+31
+penguins_in_a_table / ape
+0.24
+V 0.00
+F
+V 0.00
+F
+F
+F
+F
+16
+penguins_in_a_table / protegi
+0.00
+V 0.00
+V 0.00
+V 0.00
+V 0.00
+V 0.00
+V 0.00
+V 0.00
+17
+TABLE 16: Table E2. Round-level outcomes, variant V1, MPIR seed 1 (an asterisk marks an accepted candidate).
+Cell
+P0 val
+R1
+R2
+R3
+R4
+R5
+R6
+R7
+Judge /35
+hyperbaton / promptwizard
+0.72
+E
+E
+E
+V 0.68
+V 0.72
+V 0.76*
+E
+29
+hyperbaton / ape
+0.64
+V 0.00
+E
+E
+E
+E
+E
+E
+32
+hyperbaton / protegi
+0.16
+F
+V 0.00
+V 0.00
+V 0.00
+V 0.00
+V 0.00
+F
+17
+ruin_names / promptwizard
+0.76
+E
+E
+E
+V 0.00
+E
+E
+E
+31
+ruin_names / ape
+0.28
+V 0.00
+V 0.00
+V 0.00
+V 0.00
+V 0.00
+V 0.00
+V 0.00
+16
+ruin_names / protegi
+0.08
+V 0.00
+F
+V 0.00
+V 0.00
+F
+V 0.00
+V 0.00
+17
+penguins_in_a_table / promptwizard
+0.84
+V 0.00
+V 0.00
+V 0.00
+V 0.00
+V 0.00
+V 0.00
+V 0.00
+30
+penguins_in_a_table / ape
+0.24
+F
+V 0.00
+V 0.00
+V 0.00
+V 0.00
+V 0.00
+V 0.00
+15
+penguins_in_a_table / protegi
+0.00
+V 0.00
+V 0.00
+V 0.00
+V 0.00
+F
+V 0.00
+V 0.00
+16
+D. Amodei et al., Language models are few-shot learners, in
+Proceedings of the 34th International Conference on Neural
+Information Processing Systems (Article 159), 2020.
+[12] J. D. Zamrescu-Pereira, R. Y. Wong, B. Hartmann, and
+Q. Yang, Why Johnny can't prompt: How non-AI experts
+try (and fail) to design LLM prompts, in Proceedings of
+the 2023 CHI Conference on Human Factors in Computing
+Systems, 2023.
+[13] L. Reynolds and K. McDonell, Prompt programming for
+large language models: Beyond the few-shot paradigm, in
+Extended Abstracts of the 2021 CHI Conference on Human
+Factors in Computing Systems, 2021.
+[14] Y. Zhou, A. I. Muresanu, Z. Han, K. Paster, S. Pitis, H. Chan,
+and J. Ba, Large language models are human-level prompt
+engineers, in The Eleventh International Conference on
+Learning Representations, 2023.
+[15] R. Pryzant, D. Iter, J. Li, Y. T. Lee, C. Zhu, and M. Zeng,
+Automatic prompt optimization with "gradient descent" and
+beam search, in Proceedings of the 2023 Conference on
+Empirical Methods in Natural Language Processing, 2023.
+[16] Q. Guo, R. Wang, J. Guo, B. Li, K. Song, X. Tan, G. Liu,
+J. Bian, and Y. Yang, Connecting large language models
+with evolutionary algorithms yields powerful prompt opti-
+mizers, in The Twelfth International Conference on Learning
+Representations, 2024.
+[17] C. Yang, X. Wang, Y. Lu, H. Liu, Q. V. Le, D. Zhou, and
+X. Chen, Large language models as optimizers, in The
+Twelfth International Conference on Learning Representa-
+tions, 2024.
+[18] E. Agarwal, R. Magazine, J. Singh, V. Dani, T. Ganu, and
+A. Nambi, Promptwizard: Optimizing prompts via task-
+aware, feedback-driven self-evolution, in Findings of the
+Association for Computational Linguistics: ACL 2025, 2025,
+pp. 19 97420 003.
+[19] K. Ramnath, K. Zhou, S. Guan, S. S. Mishra, X. Qi, Z. Shen,
+S. Wang, S. Woo, S. Jeoung, Y. Wang, H. Wang, H. Ding,
+Y. Lu, Z. Xu, Y. Zhou, B. Srinivasan, Q. Yan, Y. Chen,
+H. Ding, P. Xu, and L. L. Cheong, A systematic survey
+of automatic prompt optimization techniques, pp. 33 066
+33 098, 2025.
+[20] M. Yuksekgonul, F. Bianchi, J. Boen, S. Liu, P. Lu, Z. Huang,
+C. Guestrin, and J. Zou, Optimizing generative ai by back-
+propagating language model feedback, Nature, vol. 639, pp.
+609616, 2025.
+[21] P. Liu, W. Yuan, J. Fu, Z. Jiang, H. Hayashi, and G. Neubig,
+Pre-train, prompt, and predict: A systematic survey of
+prompting methods in natural language processing, ACM
+Computing Surveys, vol. 55, 2023.
+[22] Q. Dong et al., A survey on in-context learning, in Proceed-
+ings of the 2024 Conference on Empirical Methods in Natural
+Language Processing, 2024, pp. 11071128.
+[23] S. Min, X. Lyu, A. Holtzman, M. Artetxe, M. Lewis,
+H. Hajishirzi, and L. Zettlemoyer, Rethinking the role of
+demonstrations: What makes in-context learning work? in
+Proceedings of the 2022 Conference on Empirical Methods in
+Natural Language Processing, 2022, pp. 11 04811 064.
+[24] T. Kojima, S. S. Gu, M. Reid, Y. Matsuo, and Y. Iwa-
+sawa, Large language models are zero-shot reasoners, in
+Proceedings of the 36th International Conference on Neural
+Information Processing Systems (Article 1613), 2022.
+[25] X. Wang and D. Zhou, Chain-of-thought reasoning without
+prompting, in Proceedings of the 38th International Confer-
+ence on Neural Information Processing Systems, 2024.
+[26] B. Wang, S. Min, X. Deng, J. Shen, Y. Wu, L. Zettle-
+moyer, and H. Sun, Towards understanding chain-of-thought
+prompting: An empirical study of what matters, in Pro-
+ceedings of the 61st Annual Meeting of the Association for
+Computational Linguistics (Volume 1: Long Papers), 2023,
+pp. 27172739.
+[27] J. Kim, N. Yang, and K. Jung, Persona is a double-
+edged sword: Mitigating the negative impact of role-playing
+prompts in zero-shot reasoning tasks, 2024, arXiv preprint.
+[28] M. Zheng, J. Pei, L. Logeswaran, M. Lee, and D. Jurgens,
+When a helpful assistant is not really helpful: Personas
+in system prompts do not improve performances of large
+language models, in Findings of the Association for Compu-
+tational Linguistics: EMNLP 2024, 2024, pp. 15 12615 154.
+[29] H. S. Zheng, S. Mishra, X. Chen, H.-T. Cheng, E. H. Chi,
+Q. V. Le, and D. Zhou, Take a step back: Evoking reasoning
+via abstraction in large language models, in The Twelfth
+International Conference on Learning Representations, 2024.
+[30] J. Coda-Forno, M. Binz, J. X. Wang, and E. Schulz, Cog-
+bench: A large language model walks into a psychology
+lab, in Proceedings of the 41st International Conference on
+Machine Learning, 2024.
+[31] N. F. Liu, K. Lin, J. Hewitt, A. Paranjape, M. Bevilacqua,
+F. Petroni, and P. Liang, Lost in the middle: How language
+VOLUME 14, 2026
+15
+
+
+=== PAGE 16 ===
+Nguyen et al.: Rubric-Guided Prompt Refinement: A Pre-Specified Negative Result
+models use long contexts, Transactions of the Association
+for Computational Linguistics, vol. 12, pp. 157173, 2024.
+[32] Y. Yu, H. Jiang, X. Luo, Q. Wu, C.-Y. Lin, D. Li, Y. Yang,
+Y. Huang, and L. Qiu, Mitigate position bias in llms via
+scaling a single hidden states channel, in Findings of the
+Association for Computational Linguistics: ACL 2025, 2025,
+pp. 60926111.
+[33] Microsoft,
+Prompt
+engineering
+techniques,
+Microsoft
+Foundry
+documentation,
+Microsoft
+Learn,
+2026,
+page
+dated
+May
+13,
+2026.
+Accessed
+Oct.
+20,
+2026.
+Archived
+(earlier
+URL):
+https://web.archive.org/web/20251112071324/https://learn.microsoft.com/en-
+us/AZURE/AI-FOUNDRY/OPENAI/CONCEPTS/PROMPT-
+ENGINEERING.
+[Online].
+Available:
+https:
+//learn.microsoft.com/en-us/azure/foundry/openai/
+concepts/prompt-engineering
+[34] X. Wang, J. Wei, D. Schuurmans, Q. V. Le, E. H. Chi,
+S. Narang, A. Chowdhery, and D. Zhou, Self-consistency
+improves chain of thought reasoning in language models, in
+The Eleventh International Conference on Learning Repre-
+sentations, 2023.
+[35] O. Khattab, A. Singhvi, P. Maheshwari, Z. Zhang, K. San-
+thanam, S. Vardhamanan, S. Haq, A. Sharma, T. T. Joshi,
+H. Moazam, H. Miller, M. Zaharia, and C. Potts, Dspy:
+Compiling declarative language model calls into state-of-the-
+art pipelines, in The Twelfth International Conference on
+Learning Representations, 2024.
+[36] A. Madaan, N. Tandon, P. Gupta, S. Hallinan, L. Gao,
+S. Wiegree, U. Alon, N. Dziri, S. Prabhumoye, Y. Yang,
+S. Gupta, B. P. Majumder, K. Hermann, S. Welleck, A. Yaz-
+danbakhsh, and P. Clark, Self-rene: Iterative renement
+with self-feedback, in Thirty-seventh Conference on Neural
+Information Processing Systems, 2023.
+[37] N. Shinn, F. Cassano, A. Gopinath, K. R. Narasimhan,
+and S. Yao, Reexion: Language agents with verbal rein-
+forcement learning, in Thirty-seventh Conference on Neural
+Information Processing Systems, 2023.
+[38] W. Cui, J. Zhang, Z. Li, H. Sun, D. Lopez, K. Das, B. A.
+Malin, and S. Kumar, Heuristic-based search algorithm
+in automatic instruction-focused prompt optimization: A
+survey, in Findings of the Association for Computational
+Linguistics: ACL 2025, 2025, pp. 22 09322 111.
+[39] Q. Ye, M. Ahmed, R. Pryzant, and F. Khani, Prompt en-
+gineering a prompt engineer, in Findings of the Association
+for Computational Linguistics: ACL 2024, 2024, pp. 355385.
+[40] M. Yang, M. Li, Y. Li, Z. Chen, C. Gao, J. Zhang, Y. Li,
+and F. Feng, Dual-phase accelerated prompt optimization,
+in Findings of the Association for Computational Linguistics:
+EMNLP 2024, 2024, pp. 12 16312 173.
+[41] K. Mayilvaghanan, V. Nathan, and A. Kumar, PRO-
+PEL: Prompt optimization with expert priors for small and
+medium-sized LLMs, in Proceedings of the 4th International
+Workshop on Knowledge-Augmented Methods for Natural
+Language Processing, 2025, pp. 272302.
+[42] A.
+Chakma,
+M.
+Surdeanu,
+and
+E.
+Blanco,
+Two-stage
+prompt optimization for few-shot relation extraction: From
+reasoning-guided search to gradient-guided renement, 2026.
+[43] L. A. Agrawal, S. Tan, D. Soylu, N. Ziems, R. Khare,
+K. Opsahl-Ong, A. Singhvi, H. Shandilya, M. J. Ryan,
+M. Jiang, C. Potts, K. Sen, A. G. Dimakis, I. Stoica, D. Klein,
+M. Zaharia, and O. Khattab, GEPA: Reective prompt evo-
+lution can outperform reinforcement learning, International
+Conference on Learning Representations (ICLR), Oral, 2026.
+[44] M. Singh, V. Yadav, and E. Blanco, Error taxonomy-guided
+prompt optimization, 2026.
+[45] Y. Liu, J. Xu, L. L. Zhang, Q. Chen, X. Feng, Y. Chen,
+Z. Guo, Y. Yang, and P. Cheng, Beyond prompt content:
+Enhancing llm performance via content-format integrated
+prompt optimization, 2025.
+[46] A. Nair, A. Banerjee, L. Mombaerts, M. Hagen, and T. Boro-
+govac, Tournament of prompts: Evolving LLM instructions
+through structured debates and Elo ratings, 2025, workshop
+venue (KDD 2025) UNVERIFIED; cite as arXiv preprint
+unless conrmed.
+[47] H.-C. Lin, B. M. Ruppik, C. van Niekerk, C.-H. Shen,
+M. Heck, N. Lubis, R. Vukovic, S. Feng, and M. Gasic,
+Prompt reinforcing for long-term planning of large language
+models, 2025.
+[48] S. S. S. Das, R. Kamoi, B. Pang, Y. Zhang, C. Xiong,
+and R. Zhang, GReaTer: Gradients over reasoning makes
+smaller language models strong prompt optimizers, in The
+Thirteenth International Conference on Learning Represen-
+tations, 2025.
+[49] J. Shim, D. W. Kim, S. W. Kim et al., POaaS: Minimal-
+edit prompt optimization as a service to lift accuracy and
+cut hallucinations on on-device sLLMs, 2026, accepted at
+FEVER 2026 (per arXiv comment).
+[50] Á. Pándy, R. Lakatos, and A. Hajdu, Error-driven prompt
+optimization for arithmetic reasoning, IEEE Access, vol. 14,
+pp. 62 57062 583, 2026.
+[51] S. Badhe and D. Shah, Prompt-level distillation: A non-
+parametric alternative to model ne-tuning for ecient rea-
+soning, 2026, accepted at ACL 2026 Industry Track (per
+arXiv comment); proceedings pages UNVERIFIED.
+[52] D. Shah, S. Badhe, N. Kathrotia, and P. Tiwari, CROP:
+Token-ecient reasoning in large language models via regu-
+larized prompt optimization, 2026, accepted at ICLR 2026
+Workshop on Logical Reasoning of Large Language Models
+(per arXiv comment).
+[53] Z. Zhu, H. Zhou, Z. Feng, T. Li, C. J. J. Deryl, M. L. Onn,
+G. W. Ng, and K. Mao, Rethinking prompt optimizers: From
+prompt merits to optimization, 2025, no peer-reviewed venue
+found.
+[54] S. M. Bsharat, A. Myrzakhan, and Z. Shen, Principled
+instructions are all you need for questioning LLaMA-1/2,
+GPT-3.5/4, 2023, no peer-reviewed venue found.
+[55] J. Huang, X. Chen, S. Mishra, H. S. Zheng, A. W. Yu,
+X. Song, and D. Zhou, Large language models cannot self-
+correct reasoning yet, in The Twelfth International Confer-
+ence on Learning Representations, 2024.
+[56] Y. Zhang, M. Khalifa, L. Logeswaran, J. Kim, M. Lee, H. Lee,
+and L. Wang, Small language models need strong veriers
+to self-correct reasoning, in Findings of the Association
+for Computational Linguistics: ACL 2024, 2024, pp. 15 637
+15 653.
+[57] L. Zheng, W.-L. Chiang, Y. Sheng, S. Zhuang, Z. Wu,
+Y. Zhuang, Z. Lin, Z. Li, D. Li, E. P. Xing, H. Zhang, J. E.
+Gonzalez, and I. Stoica, Judging LLM-as-a-judge with MT-
+Bench and Chatbot Arena, in Advances in Neural Infor-
+mation Processing Systems 36 (Datasets and Benchmarks
+Track), 2023.
+[58] P. Wang, L. Li, L. Chen, Z. Cai, D. Zhu, B. Lin, Y. Cao,
+L. Kong, Q. Liu, T. Liu, and Z. Sui, Large language models
+are not fair evaluators, in Proceedings of the 62nd Annual
+Meeting of the Association for Computational Linguistics
+(Volume 1: Long Papers), 2024, pp. 94409450.
+[59] A. Panickssery, S. R. Bowman, and S. Feng, LLM evaluators
+recognize and favor their own generations, 2024, arXiv
+preprint; no peer-reviewed venue found (NeurIPS 2024 listing
+UNVERIFIED).
+[60] X. Wang, B. Ma, C. Hu, L. Weber-Genzel, P. Röttger,
+F. Kreuter, D. Hovy, and B. Plank, my answer is C: First-
+token probabilities do not match text answers in instruction-
+tuned language models, in Findings of the Association for
+Computational Linguistics: ACL 2024, 2024, pp. 74077416.
+[61] C. Zheng, H. Zhou, F. Meng, J. Zhou, and M. Huang, Large
+language models are not robust multiple choice selectors, in
+The Twelfth International Conference on Learning Represen-
+tations, 2024.
+[62] J. Pineau, P. Vincent-Lamarre, K. Sinha, V. Larivière,
+A. Beygelzimer, F. d'Alché Buc, E. Fox, and H. Larochelle,
+Improving reproducibility in machine learning research (a
+report from the NeurIPS 2019 reproducibility program),
+Journal of Machine Learning Research, vol. 22, no. 164, pp.
+120, 2021.
+[63] J. Dodge, S. Gururangan, D. Card, R. Schwartz, and N. A.
+Smith, Show your work: Improved reporting of experimental
+results, in Proceedings of the 2019 Conference on Empirical
+16
+VOLUME 14, 2026
+
+
+=== PAGE 17 ===
+Nguyen et al.: Rubric-Guided Prompt Refinement: A Pre-Specified Negative Result
+Methods in Natural Language Processing and the 9th Inter-
+national Joint Conference on Natural Language Processing,
+2019, pp. 21852194.
+[64] X.
+Bouthillier,
+P.
+Delaunay,
+M.
+Bronzi,
+A.
+Tromov,
+B. Nichyporuk, J. Szeto, N. Mohammadi Sepahvand, E. Ra,
+K. Madan, V. Voleti, S. Ebrahimi Kahou, V. Michalski,
+T. Arbel, C. Pal, G. Varoquaux, and P. Vincent, Accounting
+for variance in machine learning benchmarks, in Proceedings
+of Machine Learning and Systems 3 (MLSys 2021), 2021.
+[65] R. Dror, G. Baumer, S. Shlomov, and R. Reichart, The
+hitchhiker's guide to testing statistical signicance in natural
+language processing, in Proceedings of the 56th Annual
+Meeting of the Association for Computational Linguistics
+(Volume 1: Long Papers), 2018, pp. 13831392.
+[66] D. Card, P. Henderson, U. Khandelwal, R. Jia, K. Mahowald,
+and D. Jurafsky, With little power comes great responsi-
+bility, in Proceedings of the 2020 Conference on Empirical
+Methods in Natural Language Processing, 2020, pp. 9263
+9274.
+[67] S. Schulho, M. Ilie, N. Balepur, K. Kahadze, A. Liu, C. Si,
+Y. Li, A. Gupta, H. Han, S. Schulho, P. S. Dulepet,
+S. Vidyadhara, D. Ki, S. Agrawal, C. Pham, G. C. Kroiz,
+F. Li, H. Tao, P. Resnik et al., The prompt report: A
+systematic survey of prompting techniques, 2024.
+[68] P. Sahoo, A. K. Singh, S. Saha, V. Jain, S. Mondal, and
+A. Chadha, A systematic survey of prompt engineering in
+large language models: Techniques and applications, 2024.
+[69] L.
+Boonstra,
+Prompt
+engineering,
+Google
+whitepaper,
+Kaggle,
+2025,
+archived:
+https://web.archive.org/web/20260905081837/https://www.kaggle.com/whitepaper-
+prompt-engineering.
+Publication
+month
+UNVERIFIED.
+[Online].
+Available:
+https://www.kaggle.com/
+whitepaper-prompt-engineering
+[70] Anthropic, Prompt engineering overview, Claude Developer
+Platform documentation, 2025, accessed Oct. 20, 2026. Page
+revised since the version used for the rubric; archived:
+https://web.archive.org/web/20261019210255/https://platform.claude.com/docs/en/build-
+with-claude/prompt-engineering/overview.
+[Online].
+Available:
+https://platform.claude.com/docs/en/
+build-with-claude/prompt-engineering/overview
+[71] OpenAI,
+Best
+practices
+for
+prompt
+engineering
+with
+the OpenAI API, OpenAI Help Center, 2025, archived:
+https://web.archive.org/web/20260915104022/https://help.openai.com/en/articles/6654000-
+best-practices-for-prompt-engineering-with-the-openai-
+api.
+Live
+page
+returned
+HTTP
+403
+on
+Oct.
+20,
+2026;
+no
+access
+date
+asserted.
+[Online].
+Available:
+https://help.openai.com/en/articles/
+6654000-best-practices-for-prompt-engineering-with-the-openai-api
+[72] A. Yang et al., Qwen3 technical report, 2025.
+LINH NGUYEN Linh Nguyen is a Master's student in the Master
+of Articial Intelligence program at RMIT University Vietnam,
+Ho Chi Minh City, Vietnam.
+QUANG-VINH DANG Quang-Vinh Dang is a Senior Lecturer at
+British University Vietnam, Hung Yen, Vietnam.
+MINH NGOC DINH Minh Ngoc Dinh is Dean of the School of
+Information Technology and Data Science, Millenia Education,
+Ho Chi Minh City, Vietnam.
+THUY NGUYEN Thuy Nguyen is a Senior Lecturer at RMIT
+University Vietnam, Ho Chi Minh City, Vietnam.
+VOLUME 14, 2026
+17

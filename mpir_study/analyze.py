@@ -248,7 +248,10 @@ def val_test_correlation(rows: list[dict]) -> dict:
         c = [r for r in rows if r["cell"] == cell]
         per_cell[cell] = spearman([r["val"] - r["baseline_val"] for r in c], [r["test"] - r["p0_test"] for r in c])
     valid = [v for v in per_cell.values() if v is not None]
-    return {"pooled_spearman": spearman(val_rel, test), "n": len(rows),
+    pos = [r for r in rows if r["refiner"] == "1.7b" and r["val"] > 0]
+    return {"pos_val_1.7b": {"n": len(pos), "spearman": spearman([r["val"] - r["baseline_val"] for r in pos],
+                                                                 [r["test"] - r["p0_test"] for r in pos])},
+            "pooled_spearman": spearman(val_rel, test), "n": len(rows),
             "median_within_cell": float(np.median(valid)) if valid else None, "cells": len(valid)}
 
 
@@ -276,9 +279,24 @@ def legacy_acceptance(runs: list[dict], variant="v1", refiner="1.7b") -> dict:
                     accepted_first = x["outcome"]
         out[cell_of(r).key] = {"legacy_test": best_test, "p0_test": base_test, "gated_test": r["final_test"],
                                "first_round_outcome": rounds[0]["outcome"]}
+    # Literal protocol G6: the first validated (non-fallback, non-echo) candidate is accepted unconditionally.
+    literal = {}
+    for r in runs_where(runs, variant=variant, refiner=refiner, mseed=1):
+        rounds = r["rounds"]
+        if any(x["outcome"] == "validated" and "test" not in x for x in rounds):
+            continue
+        best_val, best_test = None, None
+        for x in rounds:
+            if x["outcome"] != "validated":
+                continue
+            if best_val is None or x["val"] > best_val:
+                best_val, best_test = x["val"], x["test"]
+        literal[cell_of(r).key] = (best_test if best_test is not None else r["p0_test"]) - r["p0_test"]
     deltas = [v["legacy_test"] - v["p0_test"] for v in out.values()]
     gated = [v["gated_test"] - v["p0_test"] for v in out.values()]
-    return {"cells": out, "n": len(out), "mean_legacy_delta": float(np.mean(deltas)) if deltas else None,
+    return {"cells": out, "n": len(out), "literal_g6": {"mean_delta": float(np.mean(list(literal.values()))) if literal else None,
+                                                        "cells": literal},
+            "mean_legacy_delta": float(np.mean(deltas)) if deltas else None,
             "mean_gated_delta": float(np.mean(gated)) if gated else None,
             "legacy_worse": sum(1 for d in deltas if d < 0), "legacy_better": sum(1 for d in deltas if d > 0),
             "legacy_changed_prompt": sum(1 for v in out.values() if v["legacy_test"] != v["p0_test"])}
@@ -288,9 +306,10 @@ def legacy_acceptance(runs: list[dict], variant="v1", refiner="1.7b") -> dict:
 def capability(runs: list[dict]) -> dict:
     out = {}
     for refiner in ("1.7b", "4b", "8b", "qwen235", "gpt6luna"):
-        for variant in ("v1", "v2"):
+        for variant in ("v1", "v2", "v3", "v1p", "v2p"):
             group = [r for r in runs_where(runs, variant=variant, refiner=refiner) if r["spec"]["cell"]["seed"] == 42
-                     and r["spec"]["cell"]["task"] in TIER1_TASKS]
+                     and r["spec"]["cell"]["task"] in TIER1_TASKS
+                     and (refiner in ("1.7b", "4b", "8b") or r["spec"]["mseed"] == 1)]
             if not group:
                 continue
             by_cell: dict[str, list[dict]] = defaultdict(list)
@@ -298,11 +317,27 @@ def capability(runs: list[dict]) -> dict:
                 by_cell[cell_of(r).key].append(r)
             cells = {k: cell_difference(v, k) for k, v in by_cell.items()}
             wins = sum(1 for c in cells.values() if c["diff"] > 0 and c["lo"] > 0)
+            rounds = [x for r in group for x in r["rounds"]]
+            validated = [x for x in rounds if x["outcome"] == "validated"]
             out[f"{variant}|{refiner}"] = {
+                "rounds": len(rounds), "validated": len(validated),
+                "val_better": sum(1 for x in validated if x["val"] > x["baseline_val"]),
                 "cells": len(cells), "wins": wins, "mean_diff": float(np.mean([c["diff"] for c in cells.values()])),
                 "runs": len(group), "runs_accepting": sum(1 for r in group if not r["final_is_p0"]),
                 "per_cell": {k: {"diff": v["diff"], "lo": v["lo"], "hi": v["hi"]} for k, v in cells.items()}}
     return out
+
+
+def follow_seed2(runs: list[dict]) -> dict:
+    """Second MPIR seed of the chained variant with the Qwen3-235B refiner (exploratory follow-up)."""
+    group = [r for r in runs_where(runs, variant="v2", refiner="qwen235", mseed=2)]
+    if not group:
+        return {}
+    cells = {cell_of(r).key: cell_difference([r], cell_of(r).key) for r in group}
+    return {"cells": len(cells), "wins": sum(1 for c in cells.values() if c["diff"] > 0 and c["lo"] > 0),
+            "mean_diff": float(np.mean([c["diff"] for c in cells.values()])),
+            "runs_accepting": sum(1 for r in group if not r["final_is_p0"]),
+            "per_cell": {k: {"diff": v["diff"], "lo": v["lo"], "hi": v["hi"]} for k, v in cells.items()}}
 
 
 # ---------------------------------------------------------------------------------------------- A7 noise
@@ -364,8 +399,13 @@ def exemplar() -> dict:
     by_opt = defaultdict(list)
     for key, v in cells.items():
         by_opt[key.split("__")[1]].append(v["with_exemplar"] - v["p0"])
+    wins_by_opt = defaultdict(int)
+    for key, v in cells.items():
+        wins_by_opt[key.split("__")[1]] += int(v["diff"] > 0 and v["lo"] > 0)
     return {"cells": cells, "mean_gain_by_optimizer": {k: float(np.mean(v)) for k, v in by_opt.items()},
-            "n": len(cells)}
+            "wins_by_optimizer": dict(wins_by_opt), "cells_by_optimizer": {k: len(v) for k, v in by_opt.items()},
+            "min_gain": float(min(c["diff"] for c in cells.values())),
+            "max_gain": float(max(c["diff"] for c in cells.values())), "n": len(cells)}
 
 
 # ---------------------------------------------------------------------------------------------- A6 judge
@@ -475,6 +515,31 @@ def reference_conditions() -> dict:
     return out
 
 
+def grid_by_optimizer(grid: dict) -> dict:
+    out: dict = defaultdict(list)
+    for c in grid["cells"].values():
+        out[c["optimizer"]].append(c)
+    return {k: {"cells": len(v), "mean_diff": float(np.mean([c["diff"] for c in v])),
+                "cells_changed": int(sum(1 for c in v if c["diff"] != 0)),
+                "accepted_runs": int(sum(c["accepted_runs"] for c in v)), "runs": int(sum(c["seeds"] for c in v))}
+            for k, v in out.items()}
+
+
+def pilot_vs_rescore(landscape: dict) -> dict:
+    """Same prompt (identical hash), pilot-time strict accuracy vs strict accuracy now, seed-42 cells."""
+    out = {}
+    for key, v in landscape.items():
+        if v["seed"] != 42 or v["task"] not in TIER1_TASKS:
+            continue
+        path = REPO / "demos" / "results" / "predictions" / f"{v['task']}_{v['optimizer']}_42.jsonl"
+        if path.exists():
+            rows = [json.loads(l) for l in open(path, encoding="utf-8") if l.strip()]
+            out[key] = {"pilot": float(np.mean([r["is_correct"] for r in rows])), "now": v["strict"]}
+    diffs = [abs(x["pilot"] - x["now"]) for x in out.values()]
+    return {"cells": out, "mean_abs_diff": float(np.mean(diffs)) if diffs else None,
+            "max_abs_diff": float(max(diffs)) if diffs else None}
+
+
 def grid_by_task_optimizer(grid: dict) -> dict:
     out: dict = {}
     for c in grid["cells"].values():
@@ -485,6 +550,123 @@ def grid_by_task_optimizer(grid: dict) -> dict:
             for k, v in sorted(out.items())}
 
 
+# ---------------------------------------------------------------------------------------------- lenient checks
+def _lenient_vector(cell: Cell, prompt_hash_value: str):
+    from .data import load_split
+    hit = cell_cache(cell.key, with_outputs=True).get((prompt_hash_value, "test", 0))
+    if hit is None:
+        return None
+    _, outputs = hit
+    gold = [ex["answer"] for ex in load_split(cell.task, cell.seed, "test")]
+    return np.asarray([is_correct_lenient(o, g) for o, g in zip(outputs, gold)], dtype=float)
+
+
+def lenient_oracle(runs: list[dict]) -> dict:
+    """Do the oracle conclusions survive lenient answer extraction, and how many candidates lack the answer tag?"""
+    out = {}
+    for (variant, refiner) in sorted({(r["spec"]["variant"], r["spec"]["refiner"]) for r in runs}):
+        deltas_len, deltas_strict, no_tag, n = [], [], 0, 0
+        for r in runs_where(runs, variant=variant, refiner=refiner):
+            cell = cell_of(r)
+            p0_len = _lenient_vector(cell, r["p0_hash"])
+            for x in r["rounds"]:
+                if x["outcome"] != "validated" or "test" not in x or p0_len is None:
+                    continue
+                cand_len = _lenient_vector(cell, x["cand_hash"])
+                if cand_len is None:
+                    continue
+                n += 1
+                no_tag += int("ANS_START" not in x["candidate"])
+                deltas_len.append(float(cand_len.mean() - p0_len.mean()))
+                deltas_strict.append(x["test"] - r["p0_test"])
+        if n:
+            out[f"{variant}|{refiner}"] = {"n": n, "share_without_tag": no_tag / n,
+                                           "mean_strict_delta": float(np.mean(deltas_strict)),
+                                           "mean_lenient_delta": float(np.mean(deltas_len)),
+                                           "share_lenient_better": float(np.mean([d > 0 for d in deltas_len]))}
+    return out
+
+
+def winner_cells(runs: list[dict]) -> dict:
+    """For each strong-refiner run whose final prompt changed: strict and lenient accuracy before and after,
+    and whether P0 and the final prompt contain an answer-tag instruction."""
+    out = {}
+    for refiner in ("qwen235", "gpt6luna"):
+        for r in runs_where(runs, variant="v2", refiner=refiner, mseed=1):
+            if r["final_is_p0"]:
+                continue
+            cell = cell_of(r)
+            p0_len = _lenient_vector(cell, r["p0_hash"])
+            fin_len = _lenient_vector(cell, r["final_hash"])
+            final_text = next((x["candidate"] for x in r["rounds"] if x["cand_hash"] == r["final_hash"]), "")
+            from .data import load_p0
+            out[f"{refiner}|{cell.key}"] = {
+                "p0_strict": r["p0_test"], "final_strict": r["final_test"],
+                "p0_lenient": float(p0_len.mean()) if p0_len is not None else None,
+                "final_lenient": float(fin_len.mean()) if fin_len is not None else None,
+                "p0_has_tag_instruction": "ANS_START" in load_p0(cell),
+                "final_has_tag_instruction": "ANS_START" in final_text}
+    return out
+
+
+def capability_lenient(runs: list[dict]) -> dict:
+    """Final-vs-P0 differences under lenient extraction, per cell (MPIR seeds pooled), for every variant/refiner
+    group of the Tier-1 seed-42 cells (API refiners: MPIR seed 1 only), mirroring capability()."""
+    out = {}
+    for refiner in ("1.7b", "qwen235", "gpt6luna"):
+        for variant in ("v1", "v2", "v3", "v1p", "v2p"):
+            group = [r for r in runs_where(runs, variant=variant, refiner=refiner)
+                     if r["spec"]["cell"]["seed"] == 42 and r["spec"]["cell"]["task"] in TIER1_TASKS
+                     and (refiner == "1.7b" or r["spec"]["mseed"] == 1)]
+            by_cell: dict[str, list[dict]] = defaultdict(list)
+            for r in group:
+                by_cell[cell_of(r).key].append(r)
+            cells = {}
+            for key, rs in by_cell.items():
+                cell = cell_of(rs[0])
+                a = _lenient_vector(cell, rs[0]["p0_hash"])
+                finals = [_lenient_vector(cell, r["final_hash"]) for r in rs]
+                if a is None or any(f is None for f in finals):
+                    continue
+                x = np.mean(finals, axis=0) - a
+                if not np.any(x):
+                    cells[key] = {"diff": 0.0, "lo": 0.0, "hi": 0.0}
+                    continue
+                rng = np.random.default_rng(20261019)
+                idx = rng.integers(0, len(x), size=(10_000, len(x)))
+                means = x[idx].mean(axis=1)
+                lo, hi = np.percentile(means, [2.5, 97.5])
+                cells[key] = {"diff": float(x.mean()), "lo": float(lo), "hi": float(hi)}
+            if cells:
+                out[f"{variant}|{refiner}"] = {
+                    "cells": cells, "wins": sum(1 for c in cells.values() if c["diff"] > 0 and c["lo"] > 0),
+                    "mean_diff": float(np.mean([c["diff"] for c in cells.values()])),
+                    "losses": sum(1 for c in cells.values() if c["diff"] < 0 and c["hi"] < 0)}
+    return out
+
+
+def exemplar_lenient() -> dict:
+    """Lenient accuracy before and after appending the single format exemplar (from the cached raw outputs)."""
+    from .data import load_p0
+    from .exemplar import with_exemplar
+    from .scoring import prompt_hash
+    path = REV / "exemplar_intervention.json"
+    if not path.exists():
+        return {}
+    gains, by_opt = {}, defaultdict(list)
+    for key in json.loads(path.read_text()):
+        task, optimizer, seed = key.split("__")
+        cell = Cell(task, optimizer, int(seed[1:]))
+        p0 = load_p0(cell)
+        a = _lenient_vector(cell, prompt_hash(p0))
+        b = _lenient_vector(cell, prompt_hash(with_exemplar(p0, task)))
+        if a is None or b is None:
+            continue
+        gains[key] = float(b.mean() - a.mean())
+        by_opt[optimizer].append(gains[key])
+    return {"gains": gains, "mean_by_optimizer": {k: float(np.mean(v)) for k, v in by_opt.items()}}
+
+
 # ---------------------------------------------------------------------------------------------- driver
 def main() -> None:
     runs = load_runs()
@@ -492,20 +674,27 @@ def main() -> None:
     summary["composition"] = composition(runs)
     summary["main_grid"] = main_grid(runs)
     rows = candidate_table(runs)
-    summary["oracle"] = {f"{v}|{ref}": oracle_summary(rows, v, ref) for v in ("v1", "v2", "v2l", "v3")
+    summary["oracle"] = {f"{v}|{ref}": oracle_summary(rows, v, ref) for v in ("v1", "v2", "v2l", "v3", "v1p", "v2p")
                          for ref in ("1.7b", "4b", "8b", "qwen235", "gpt6luna") if any(r["variant"] == v and r["refiner"] == ref for r in rows)}
-    summary["acceptance_rules"] = {f"{v}|{ref}": acceptance_rules(rows, v, ref) for v in ("v1", "v2", "v3")
+    summary["acceptance_rules"] = {f"{v}|{ref}": acceptance_rules(rows, v, ref) for v in ("v1", "v2", "v3", "v1p", "v2p")
                                    for ref in ("1.7b", "4b", "8b", "qwen235", "gpt6luna") if any(
                                        r["variant"] == v and r["refiner"] == ref and r["mseed"] == 1 for r in rows)}
     summary["val_test_corr"] = {"all": val_test_correlation(rows)} if rows else {}
     summary["legacy"] = legacy_acceptance(runs)
     summary["capability"] = capability(runs)
+    summary["follow_seed2"] = follow_seed2(runs)
+    summary["lenient_oracle"] = lenient_oracle(runs)
+    summary["winner_cells"] = winner_cells(runs)
+    summary["capability_lenient"] = capability_lenient(runs)
+    summary["exemplar_lenient"] = exemplar_lenient()
     summary["noise"] = noise_floor()
     from .data import tier1_cells, tier2_cells
     summary["p0_parsing"] = p0_parsing(tier1_cells() + tier2_cells())
     summary["p0_landscape"] = p0_landscape(tier1_cells() + tier2_cells())
     summary["reference_conditions"] = reference_conditions()
     summary["grid_by_task_optimizer"] = grid_by_task_optimizer(summary["main_grid"])
+    summary["grid_by_optimizer"] = grid_by_optimizer(summary["main_grid"])
+    summary["pilot_vs_rescore"] = pilot_vs_rescore(summary["p0_landscape"])
     summary["exemplar"] = exemplar()
     summary["judge_repeat"] = judge_repeatability(runs)
     summary["judge_validity"] = judge_validity(rows)

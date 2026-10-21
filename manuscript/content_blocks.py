@@ -8,7 +8,7 @@
 from blocks_api import BLOCKS  # noqa: F401  (re-exported for the build scripts)
 
 TITLE = ("Does Rubric-Guided Refinement Improve Automatically Optimized Prompts? "
-         "A Pre-Specified Negative-Result Study with Small Open-Weight Models")
+         "A Pre-Specified Negative-Result Study")
 
 AUTHORS = [
     {"name": "Linh Nguyen", "affil_idx": [1], "corresponding": False, "email": "s4021009@rmit.edu.vn"},
@@ -27,8 +27,8 @@ CORRESPONDING_AUTHOR_NOTE = (
     f"Email: {CORRESPONDING_AUTHOR_EMAIL}"
 )
 
-KEYWORDS = ("Prompt engineering, automatic prompt optimization, meta-prompting, negative results, "
-            "large language models, Big-Bench Hard")
+KEYWORDS = ("Automatic prompt optimization, Big-Bench Hard, Large language models, Meta-prompting, "
+            "Negative results, Prompt engineering")
 
 from study_numbers import N  # noqa: E402,F401  (numbers computed by mpir_study/analyze.py)
 

@@ -25,7 +25,16 @@ TEMPERATURE = 0.7  # plain temperature sampling; top-p was dropped (vLLM's non-f
 EVAL_MAX_TOKENS, REFINE_MAX_TOKENS = 1500, 3000
 HISTORY_KEEP, HISTORY_CHARS = 4, 800
 VALIDATION_REPS = 3
-VARIANTS = ("v0", "v1", "v2", "v2l", "v3")
+VARIANTS = ("v0", "v1", "v2", "v2l", "v3", "v1p", "v2p")
+
+
+def base_variant(variant: str) -> str:
+    """v1p / v2p are v1 / v2 with the answer-format line appended to every candidate (format-protected)."""
+    return {"v1p": "v1", "v2p": "v2"}.get(variant, variant)
+
+
+def is_protected(variant: str) -> bool:
+    return variant in ("v3", "v1p", "v2p")
 
 
 @dataclass(frozen=True)
@@ -44,6 +53,11 @@ class RunSpec:
     @property
     def path(self) -> Path:
         return ROUNDS_DIR / f"{self.key}.json"
+
+    @property
+    def gen_key(self) -> str:
+        """Generations are shared between v1 and v1p: the same refiner outputs are only scored differently."""
+        return f"{self.cell.key}__{base_variant(self.variant)}__r{self.refiner}__m{self.mseed}"
 
 
 def _seed(spec: RunSpec, round_no: int, call: int) -> int:
@@ -66,7 +80,7 @@ def _history_block(entries: list[dict]) -> str:
 
 def _generate(spec: RunSpec, refiner: Endpoint, source: str, round_no: int, history: list[dict]) -> dict:
     """Cached wrapper: a generation is stored per (spec, round) so scoring can be decoupled from the refiner."""
-    path = GEN_DIR / f"{spec.key}__t{round_no}.json"
+    path = GEN_DIR / f"{spec.gen_key}__t{round_no}.json"
     if path.exists():
         return json.loads(path.read_text(encoding="utf-8"))
     generated = _generate_uncached(spec, refiner, source, round_no, history)
@@ -86,17 +100,18 @@ def generate_independent(spec: RunSpec) -> None:
 
 def _generate_uncached(spec: RunSpec, refiner: Endpoint, source: str, round_no: int, history: list[dict]) -> dict:
     """One evaluate+refine (or free-rewrite) call chain; returns judge/refine texts and the raw candidate."""
-    sampled = spec.variant != "v0"
+    variant = base_variant(spec.variant)
+    sampled = variant != "v0"
     kwargs = {"temperature": TEMPERATURE if sampled else 0.0}
-    if spec.variant == "v3":
+    if variant == "v3":
         raw = chat(refiner, [{"role": "user", "content": FREE_REWRITE_PROMPT.format(prompt=source, variant_instruction="")}],
                    max_tokens=REFINE_MAX_TOKENS, seed=_seed(spec, round_no, 1), **kwargs)
         return {"judge_text": None, "refine_text": raw, "raw_candidate": raw.strip() or None}
-    rubric = CORRECTED_RUBRIC if spec.variant in ("v1", "v2") else ORIGINAL_RUBRIC
+    rubric = CORRECTED_RUBRIC if variant in ("v1", "v2") else ORIGINAL_RUBRIC
     messages = [{"role": "user", "content": rubric.format(prompt=source)}]
     judge_text = chat(refiner, messages, max_tokens=EVAL_MAX_TOKENS, seed=_seed(spec, round_no, 1), **kwargs)
     request = (HISTORY_REQUEST.format(history=_history_block(history))
-               if spec.variant in ("v2", "v2l") and history else REFINEMENT_REQUEST)
+               if variant in ("v2", "v2l") and history else REFINEMENT_REQUEST)
     messages = messages + [{"role": "assistant", "content": judge_text}, {"role": "user", "content": request}]
     refine_text = chat(refiner, messages, max_tokens=REFINE_MAX_TOKENS, seed=_seed(spec, round_no, 2), **kwargs)
     return {"judge_text": judge_text, "refine_text": refine_text, "raw_candidate": _extract_candidate(refine_text)}
@@ -108,7 +123,7 @@ def _classify(spec: RunSpec, raw_candidate: str | None, source: str, p0: str, se
         return "fallback", None
     if spec.variant != "v3" and any(marker in raw_candidate for marker in ECHO_MARKERS):
         return "echo", None
-    if spec.variant == "v3":
+    if is_protected(spec.variant):
         prompt = final_prompt_template().format(instruction=raw_candidate.strip(), few_shot_examples="",
                                                 answer_format=ANSWER_FORMAT)
     else:
@@ -128,7 +143,7 @@ def run_refinement(spec: RunSpec, scorer: Scorer, oracle: bool = False) -> dict:
     best_prompt, best_val, seen, history, records = p0, baseline, {prompt_hash(p0)}, [], []
 
     for round_no in range(1, spec.rounds + 1):
-        source = best_prompt if spec.variant in ("v2", "v2l") else p0
+        source = best_prompt if base_variant(spec.variant) in ("v2", "v2l") else p0
         generated = _generate(spec, refiner, source, round_no, history)
         outcome, candidate = _classify(spec, generated["raw_candidate"], source, p0, seen)
         judge_total, judge_max = parse_rubric_total(generated["judge_text"] or "")

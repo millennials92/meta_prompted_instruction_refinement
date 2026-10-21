@@ -139,3 +139,10 @@ open-weight reference judge only. One model family (Qwen3) is used.
   were added to examine that signal: (a) V3 (rubric-free gated rewrite) with the same refiner, oracle-scored, to
   separate the rubric from rewriting by a stronger model; (b) a second MPIR seed of V2 with that refiner.
   These were decided after seeing the results and are reported as exploratory.
+* 2026-10-21 (post-audit, NOT pre-specified): an audit found that V1/V2 candidates are scored as the refiner's raw
+  text, whereas V3 candidates and the base optimizers' own prompts carry the answer-format line, and that the 1.7B
+  refiner drops that line in about 93% of candidates (those candidates score exactly 0 under strict extraction).
+  Two format-protected variants were therefore added on the nine Tier-1 seed-42 cells: V1P (V1 candidates with the
+  format line appended; exactly the same refiner outputs, only scored differently) and V2P (chained, protected).
+  The lenient parser was also corrected to accept everything the strict parser accepts. D1 (the 45-cell grid) was
+  specified and run for the unprotected V2 and is reported as such; the protected variants are exploratory.

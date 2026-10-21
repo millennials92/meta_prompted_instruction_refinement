@@ -153,7 +153,7 @@ def latex_body():
     for b in C.BLOCKS:
         t = b["type"]
         if t == "appendix_start":
-            out.append(r"\appendix")
+            out.append(r"\appendices")
         elif t == "h1":
             out.append(f"\\section{{{esc(strip_section_number(strip_appendix_label(b['text'])))}}}")
         elif t == "h2":
@@ -249,9 +249,13 @@ def latex_algo(b):
 def latex_table(b):
     ncols = len(b["header"])
     if b.get("colw"):
-        unit = "\\textwidth" if (b.get("full") and ncols >= 6) else "\\linewidth"
+        wide = bool(b.get("full")) and ncols >= 6
+        unit = "\\textwidth" if wide else "\\linewidth"
+        # Column padding (2 * \tabcolsep per column) is added on top of the p-column widths, so the nominal
+        # fractions are scaled down to keep the whole table inside the text block.
+        scale = 0.94 if wide else 0.86
         colspec = "".join(
-            f">{{\\raggedright\\arraybackslash}}p{{{w}{unit}}}" for w in b["colw"]
+            f">{{\\raggedright\\arraybackslash}}p{{{float(w) * scale:.3f}{unit}}}" for w in b["colw"]
         )
     else:
         colspec = "l" + "c" * (ncols - 1)
@@ -267,13 +271,13 @@ def latex_table(b):
              r"\resizebox{" + width + r"}{!}{%" if not b.get("colw") else "",
              f"\\begin{{tabular}}{{{colspec}}}",
              r"\toprule"]
-    lines.append(" & ".join(f"\\textbf{{{esc(h)}}}" for h in b["header"]) + r" \\")
+    lines.append(" & ".join(f"\\textbf{{{resolve_citations(h)}}}" for h in b["header"]) + r" \\")
     lines.append(r"\midrule")
     n_rows = len(b["rows"])
     for i, row in enumerate(b["rows"]):
         is_last = (i == n_rows - 1)
         bold = b.get("note") == "bold_last_row" and is_last
-        cells = [esc(c) for c in row]
+        cells = [resolve_citations(c) for c in row]
         if bold:
             cells = [f"\\textbf{{{c}}}" for c in cells]
         lines.append(" & ".join(cells) + r" \\")

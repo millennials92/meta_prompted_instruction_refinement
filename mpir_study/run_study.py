@@ -34,6 +34,11 @@ def specs_for(group: str, mseeds: tuple[int, ...]) -> list[tuple[RunSpec, bool]]
         # (a) the rubric-free gated rewrite with the same refiner, and (b) a second MPIR seed.
         return ([(RunSpec(c, "v3", "qwen235", 1), True) for c in pilot_cells]
                 + [(RunSpec(c, "v2", "qwen235", 2, val_reps=1), False) for c in pilot_cells])
+    if group == "g4-protect":
+        # Format-protected variants: the answer-format line is appended to every candidate, as it is for the
+        # rubric-free rewrite and for the base optimizers' own prompts (added after the F1 audit finding).
+        return ([(RunSpec(c, "v1p", "1.7b", m), m == 1) for c in pilot_cells for m in mseeds]
+                + [(RunSpec(c, "v2p", "1.7b", 1), True) for c in pilot_cells])
     if group == "g3-4b":
         return [(RunSpec(c, v, "4b", m), m == 1) for c in pilot_cells for v in ("v1", "v2") for m in mseeds]
     if group == "g3-8b":

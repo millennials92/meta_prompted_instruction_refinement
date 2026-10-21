@@ -11,11 +11,16 @@
 \usepackage{url}
 
 \begin{document}
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
 
-\history{Date of publication xxxx 00, 0000, date of current version xxxx 00, 0000.}
-\doi{10.1109/ACCESS.2026.0000000}
+\vol{14}
+\year{2026}
+\history{Manuscript received September 5, 2026; revised October 21, 2026.}
+\doi{to be assigned by IEEE upon acceptance}
 
-\title{Does Rubric-Guided Refinement Improve Automatically Optimized Prompts? A Pre-Specified Negative-Result Study with Small Open-Weight Models}
+\title{Does Rubric-Guided Refinement Improve Automatically Optimized Prompts? A Pre-Specified Negative-Result Study}
 
 \author{\uppercase{Linh Nguyen}\authorrefmark{1}, \uppercase{Quang-Vinh Dang}\authorrefmark{2}, \uppercase{Minh Ngoc Dinh}\authorrefmark{3}, AND \uppercase{Thuy Nguyen}\authorrefmark{1}}
 
@@ -28,15 +33,15 @@
 \tfootnote{This research received no specific grant from any funding agency in the public,
 commercial, or not-for-profit sectors.}
 
-\markboth{Nguyen \headeretal: Meta-Prompted Instruction Refinement: A Boundary-Condition Finding}
-{Nguyen \headeretal: Meta-Prompted Instruction Refinement: A Boundary-Condition Finding}
+\markboth{Nguyen \headeretal: Does Rubric-Guided Refinement Improve Optimized Prompts?}
+{Nguyen \headeretal: Does Rubric-Guided Refinement Improve Optimized Prompts?}
 
 \begin{abstract}
-Large language models remain critically dependent on prompt quality, and automatic prompt optimization (APO) methods often produce output lacking the structured guidance human-crafted prompts provide. This paper reports a pre-registered go/no-go pilot testing Meta-Prompted Instruction Refinement (MPIR), a lightweight rubric-guided layer that refines an APO-generated prompt through meta-prompted evaluation, refinement, and empirical validation. An initial evaluation using GPT-4o to judge and refine prompts targeting GPT-3.5-turbo reported per-task gains on Big-Bench Hard (BBH) but a pooled improvement that did not reach significance, and a later audit found its validation stage had leaked training data into scoring. To isolate whether the apparent gains reflected the refinement mechanism or the meta-model's capability advantage over its target, we reran the pilot with a single small open-weight model (Qwen3-1.7B) as target, optimizer, and refinement judge simultaneously, across three APO backbones on the three BBH tasks where the original gains were largest. The effect did not reproduce: MPIR's refined prompt was byte-identical to its base optimizer's prompt in all nine tested configurations, and pooled McNemar and GEE tests returned accuracy differences of 0.0000. Tracing the cause, we identify and fix a general defect in the refinement algorithm -- it never scored the pre-refinement prompt as a baseline -- plus six further correctness bugs found live. We report this as a boundary-condition finding: a cheap, post-hoc rubric-refinement layer of this kind appears to depend on the refining model's own capability, and its benefit is smaller than the original per-task deltas suggest.
+Meta-Prompted Instruction Refinement (MPIR) is a post-hoc layer that asks a language model to score an automatically optimized prompt against a seven-criterion rubric, rewrite it, and keep the rewrite only if it beats the original on held-out questions. An earlier evaluation with a closed refiner reported mixed gains, but audits found a validation leak and an unscored baseline, and a small pilot left its refinement rounds, statistics and answer-extraction harness open to criticism. We report a re-test whose decision rules were fixed in a time-stamped protocol. We repaired the refinement loop, logged every round, and refined 45 base prompts (PromptWizard, APE and ProTeGi on nine Big-Bench Hard tasks, up to three seeds) with Qwen3-1.7B as target and refiner. The layer changed the prompt in 1 of 80 runs and won in 0 of 45 cells, mainly because the small refiner rarely produced a usable candidate that kept the answer format. Identical prompts disagree on 6.5\% of examples between scorings, and one answer-format exemplar raised the strict accuracy of exemplar-free prompts by +19 and +42 points. In an exploratory probe, a 235B-parameter refiner won in 4 of 9 cells under strict scoring, but most of these gains reverse under lenient scoring and a rubric-free rewrite reaches similar gains, so they do not isolate the rubric. Conclusions are limited to Qwen3 targets, nine tasks and the optimizers tested.
 \end{abstract}
 
 \begin{keywords}
-Big-Bench Hard, Prompt engineering, automatic prompt optimization, large language models, meta-prompting, negative results
+Automatic prompt optimization, Big-Bench Hard, Large language models, Meta-prompting, Negative results, Prompt engineering
 \end{keywords}
 
 \titlepgskip=-21pt
@@ -45,32 +50,29 @@ Big-Bench Hard, Prompt engineering, automatic prompt optimization, large languag
 
 \section{Introduction}
 
-The prompt is the specification, the interface and the test fixture of an LLM-based component at once, and unlike source code it cannot be checked by a compiler. Large language models (LLMs) perform strongly on tasks such as translation \cite{vilar2023}, summarization \cite{goyal2023} and question answering \cite{kamalloo2023} (see \cite{qin2025} for a survey), yet small changes in phrasing or formatting can change their accuracy substantially \cite{errica2025,sclar2024}. Prompt design has therefore become a bottleneck for reliable deployment in domains such as law and medicine \cite{colombo2024,zhang2025}.
+Large language models (LLMs) are used for translation \cite{vilar2023}, summarization \cite{goyal2023} and question answering \cite{kamalloo2023} (see \cite{qin2025} for a survey), and are being applied in domains such as law and medicine \cite{colombo2024,zhang2025}. Their accuracy depends on the prompt, and small changes in phrasing or formatting can change it substantially \cite{errica2025,sclar2024}. Writing and tuning prompts is therefore a practical bottleneck for reliable deployment.
 
-Two families of approaches address that bottleneck. Manual prompting applies heuristics distilled from practice, such as chain-of-thought reasoning \cite{wei2022}, role assignment \cite{kong2024} and few-shot demonstration \cite{brown2020}; these are interpretable but need expertise and trial and error \cite{zamfirescupereira2023,reynolds2021}. Automatic prompt optimization (APO) searches the space of prompts with the help of an LLM, using critique, mutation, evolution or optimizer-style proposal loops \cite{zhou2023,pryzant2023,guo2024,yang2024,agarwal2025}; it scales but may forfeit the structure that human-written prompts carry \cite{ramnath2025}. A natural idea, which we call Meta-Prompted Instruction Refinement (MPIR), is to add a cheap post-hoc stage after any APO run: ask an LLM to score the optimized prompt against a rubric of manual heuristics, ask it to rewrite the prompt accordingly, and keep the rewrite only if it scores better on held-out validation questions.
+Two families of approaches address that bottleneck. Manual prompting applies heuristics distilled from practice, such as chain-of-thought reasoning \cite{wei2022}, role assignment \cite{kong2024} and few-shot demonstration \cite{brown2020}; these are interpretable but need expertise and trial and error \cite{zamfirescupereira2023,reynolds2021}. Automatic prompt optimization (APO) searches the space of prompts with the help of an LLM, using critique, mutation, evolution or optimizer-style proposal loops \cite{zhou2023,pryzant2023,guo2024,yang2024,agarwal2025}; it scales, but the prompts it produces are often less structured and harder to interpret than human-written ones \cite{ramnath2025}. A natural idea, which we call Meta-Prompted Instruction Refinement (MPIR), is to add a cheap post-hoc stage after any APO run: ask an LLM to score the optimized prompt against a rubric of manual heuristics, ask it to rewrite the prompt accordingly, and keep the rewrite only if it scores better on held-out validation questions.
 
-This paper does not propose MPIR as a new method. It reports a pre-specified test of whether that idea works when the same small open-weight model plays every role, and what the evidence does and does not allow us to conclude. The study has a history that readers need in order to weigh it. An earlier evaluation used GPT-4o as the refining model and GPT-3.5-turbo as the target on 23 Big-Bench Hard (BBH) tasks \cite{yuksekgonul2025}. It reported per-task gains over PromptWizard \cite{agarwal2025} on a majority of tasks but a pooled gain that was not statistically significant (Appendix D reproduces those numbers). A later code audit found two defects: the validation stage scored candidate prompts on the optimizer's own training examples, and the refinement loop never scored the unrefined prompt, so a refinement was always accepted whatever it scored. A manuscript describing that evaluation was desk-rejected by another journal without external review. The numbers in it should be treated as exploratory and are not used as evidence here.
+Whether such a layer helps matters in practice. It costs a few model calls and can be added to any APO pipeline, but if it does not help those calls are wasted, and an ungated version can make prompts worse. A clean test is not trivial: the rewrite is produced by a model that may be no more capable than the target, the gate uses a small validation set, and benchmark accuracy depends on how answers are extracted. We therefore report a pre-specified test, and we treat a null result as informative.
 
-We therefore asked a narrower question that the first evaluation could not answer: are the apparent gains attributable to the rubric-guided refinement mechanism, or to the refining model being more capable than the model it refines for? A first pilot with Qwen3-1.7B in every role found the refined prompt byte-identical to the base prompt in all nine (task, optimizer) cells. Review of that pilot, however, exposed weaknesses that we take seriously: the seven refinement rounds were not independent attempts, the composition of the outcomes was not reported, the statistics were degenerate, the task choice was biased, the capability-gap explanation was untested, and the evaluation harness floored several baselines. This revision answers each of them with new experiments, specified in a version-controlled protocol before they were run (Section 4.1).
+The idea was first evaluated with GPT-4o as the refining model and GPT-3.5-turbo as the target on the tasks of Big-Bench Hard (BBH) \cite{suzgun2023}. That evaluation reported per-task gains over PromptWizard \cite{agarwal2025} but a pooled gain that was not significant (Appendix D reproduces its numbers). A later audit found that its validation stage scored candidates on the optimizer's own training examples and that its loop never scored the unrefined prompt. An earlier version of this study was submitted elsewhere and was not externally reviewed; the first evaluation's numbers are exploratory and are not used as evidence here. A pilot with Qwen3-1.7B in every role then found no effect, but its seven refinement rounds were not independent attempts, and its statistics, task choice and answer-extraction harness were open to criticism. This paper replaces the pilot with a new study.
 
-We ask four research questions. RQ1: with the refinement loop repaired so that rounds are genuinely distinct attempts, does gated MPIR improve a base optimizer's prompt over many tasks, optimizers and seeds? RQ2: is the failure to improve a property of the candidates or of the coarse validation gate? RQ3: does a more capable refining model change the answer? RQ4: does the rubric judge measure anything related to accuracy? @@SUMMARY@@
+We ask four research questions. RQ1: with the refinement loop repaired so that rounds are genuinely distinct attempts, does gated MPIR improve a base optimizer's prompt over many tasks, optimizers and seeds? RQ2: is a failure to improve a property of the candidates or of the coarse validation gate? RQ3: does a more capable refining model change the answer? RQ4: does the rubric judge measure anything related to accuracy? (Terms such as cell and run are defined in Section 4.2.) In brief: with a 1.7B refiner the layer changed the prompt in 1 of 80 runs and won in 0 of 45 cells, mainly because that refiner rarely produces a usable candidate that keeps the answer format (RQ1, RQ2); a much larger refiner obtained strict-metric gains in several cells, but most of them reverse under lenient scoring and a rubric-free rewrite reaches gains of the same kind (RQ3); and the rubric score is only weakly related to accuracy (RQ4).
 
 The contributions are:
 
 \begin{itemize}
-\item \textbf{A repaired and instrumented refinement loop.} Rounds differ by sampling and, in the chained variant, by the history of rejected candidates; every round is logged with an outcome category (fallback, echo-rejected, duplicate, validated), its validation and test scores, and the judge's rubric total.
-\item \textbf{A pre-specified, multi-seed, multi-task evaluation.} 45 base prompts (three optimizers, nine tasks, up to three seeds), with decision rules fixed in a time-stamped protocol and a random, documented choice of six tasks to complement the three pilot tasks.
-\item \textbf{Diagnostics that make a null result interpretable.} Oracle scoring of all candidates on the test split, acceptance-rule sensitivity, a serving-noise floor and minimum detectable effect, a gated free-rewrite control, an uncorrected-algorithm comparison, and a judge-validity analysis against a stronger reference judge.
-\item \textbf{Harness findings.} Strict answer extraction floors some baselines; lenient re-scoring of the saved raw outputs and a catalogue of the pipeline defects, with serving configuration, are reported (Appendix C).
+\item \textbf{A repaired, instrumented refinement loop.} Rounds differ by sampling and, in the chained variant, by the history of rejected candidates; every round is logged with its outcome (fallback, echo, duplicate, validated), its validation and test scores and the judge's rubric total.
+\item \textbf{A pre-specified, multi-seed, multi-task evaluation.} 45 base prompts (three optimizers, nine tasks, up to three seeds), decision rules fixed in a time-stamped protocol, and a random, documented choice of six tasks to complement the three pilot tasks.
+\item \textbf{Diagnostics that make the result interpretable.} Oracle scoring of all candidates, acceptance-rule sensitivity, a serving-noise floor and minimum detectable effect, gated and format-protected controls, strict and lenient answer extraction, a comparison with the uncorrected algorithm and a judge-validity analysis; defects of the pipeline and the serving configuration are catalogued (Appendix C).
 \end{itemize}
-
-Section 2 reviews related work. Section 3 describes the layer under test. Section 4 gives the design and statistics. Section 5 reports results, Section 6 discusses what they support and their limits, and Section 7 concludes. Code, per-example predictions and per-round logs are public.
 
 \section{Related Work}
 
 \subsection{Manual Prompting Heuristics}
 
-Prompting steers an LLM through in-context learning without changing its weights \cite{liu2023,brown2020}, and has been described as a form of natural-language programming \cite{reynolds2021}. Non-expert authors struggle because they get no structural feedback and over-fit to the few examples they try \cite{zamfirescupereira2023}. Experienced authors rely on heuristics. Few-shot demonstrations help \cite{brown2020,dong2024}, though Min et al. show that format, label space and input distribution matter more than label correctness \cite{min2022}. Chain-of-thought prompting decomposes multistep problems \cite{wei2022,kojima2022}, and coherent, relevant reasoning steps matter more than length \cite{wang2024,wang2023}. Role prompting assigns a persona to guide reasoning \cite{kong2024}, but its benefit is inconsistent: poorly aligned personas can hurt \cite{kim2024}, and a large study found that adding personas to system prompts does not reliably improve performance \cite{zheng2024b}. Step-back prompting abstracts key principles before solving \cite{zheng2024}; a behavioural benchmark of 35 LLMs found that it fosters model-based behaviour in sequential decision tasks \cite{codaforno2024}, which is weaker support for knowledge-intensive reasoning than the original step-back evidence. Models attend unevenly to information in long contexts \cite{liu2024,yu2025}, and vendor guidance reports recency effects \cite{microsoft2025}; whether either matters for the short prompts studied here is an empirical question rather than a premise. Self-consistency, a decoding-time heuristic, samples several reasoning paths and votes \cite{wang2023b}; MPIR does not use it.
+Prompting steers an LLM through in-context learning without changing its weights \cite{liu2023,brown2020}, and has been described as a form of natural-language programming \cite{reynolds2021}. Non-expert authors struggle because they get no structural feedback and over-fit to the few examples they try \cite{zamfirescupereira2023}. Experienced authors rely on heuristics. Few-shot demonstrations help \cite{brown2020,dong2024}, though Min et al. show that format, label space and input distribution matter more than label correctness \cite{min2022}. Chain-of-thought prompting decomposes multistep problems \cite{wei2022,kojima2022}, and coherent, relevant reasoning steps matter more than length \cite{wang2024,wang2023}. Role prompting assigns a persona to guide reasoning \cite{kong2024}, but its benefit is inconsistent: poorly aligned personas can hurt \cite{kim2024}, and a large study found that adding personas to system prompts does not reliably improve performance \cite{zheng2024b}. Step-back prompting abstracts key principles before solving \cite{zheng2024}; a behavioural benchmark of 35 LLMs found that it fosters model-based behaviour in sequential decision tasks \cite{codaforno2024}, although this is weaker evidence for knowledge-intensive reasoning than the original step-back results. Models attend unevenly to information in long contexts \cite{liu2024,yu2025}, and vendor guidance reports recency effects for some models while reporting no difference for GPT-4-class models \cite{microsoft2025}; whether either matters for the short prompts studied here is an empirical question rather than a premise. Self-consistency, a decoding-time heuristic, samples several reasoning paths and votes \cite{wang2023b};
 
 \subsection{Automatic Prompt Optimization and Meta-Prompting}
 
@@ -92,18 +94,18 @@ Table 1 contrasts how the methods above propose and select candidates. It states
 \centering
 \small
 \caption{Design comparison of MPIR with representative methods. The table describes design differences only; it reports no empirical comparison.}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.18\linewidth}>{\raggedright\arraybackslash}p{0.3\linewidth}>{\raggedright\arraybackslash}p{0.3\linewidth}>{\raggedright\arraybackslash}p{0.22\linewidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.155\linewidth}>{\raggedright\arraybackslash}p{0.258\linewidth}>{\raggedright\arraybackslash}p{0.258\linewidth}>{\raggedright\arraybackslash}p{0.189\linewidth}}
 \toprule
 \textbf{Method} & \textbf{Candidate generation} & \textbf{Selection} & \textbf{Role relative to an APO run} \\
 \midrule
-APE ‹19› & Induction from demonstrations & Execution accuracy & Optimizer \\
-ProTeGi ‹20› & Textual-gradient edits & Beam search on minibatches & Optimizer \\
-EvoPrompt ‹21› & Crossover and mutation & Fitness per generation & Optimizer \\
-OPRO ‹22› & LLM proposal given score history & Best of trajectory & Optimizer \\
-PromptWizard ‹23› & Critique and sequential re-optimization & Scores on training batches & Optimizer \\
-PE2 ‹24› & Structured diagnosis template & Held-out scoring & Optimizer \\
-PROPEL ‹26› & Expert principles as priors & Implicit in the priors & Optimizer \\
-GEPA ‹59› & Evolution with reflection & Reflection-guided selection & Optimizer \\
+APE \cite{zhou2023} & Induction from demonstrations & Execution accuracy & Optimizer \\
+ProTeGi \cite{pryzant2023} & Textual-gradient edits & Beam search on minibatches & Optimizer \\
+EvoPrompt \cite{guo2024} & Crossover and mutation & Fitness per generation & Optimizer \\
+OPRO \cite{yang2024} & LLM proposal given score history & Best of trajectory & Optimizer \\
+PromptWizard \cite{agarwal2025} & Critique and sequential re-optimization & Scores on training batches & Optimizer \\
+PE2 \cite{ye2024} & Structured diagnosis template & Held-out scoring & Optimizer \\
+PROPEL \cite{mayilvaghanan2025} & Expert principles as priors & Implicit in the priors & Optimizer \\
+GEPA \cite{agrawal2026} & Evolution with reflection & Reflection-guided selection & Optimizer \\
 MPIR (tested here) & Rubric-guided critique and rewrite & Validation accuracy vs. the unrefined prompt & Post-hoc layer \\
 \bottomrule
 \end{tabular}
@@ -115,9 +117,15 @@ What distinguishes MPIR in this table is its role, not a mechanism: it adds one 
 
 MPIR is a three-stage cycle applied to a prompt P0 that an upstream APO method has already produced: (1) a language model scores P0 against a seven-criteria rubric of manual prompting heuristics and recommends improvements; (2) it rewrites P0 accordingly; (3) the rewrite is scored on validation questions and kept only if it beats the incumbent (Figure 1). We describe it here as the object under test, not as a contribution.
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\linewidth]{../figures/figure_3.png}
+\caption{The MPIR cycle as drawn for the first submission: a prompt P0 from an APO run enters evaluation, refinement and validation for N rounds, and the best validated prompt is returned. In the legacy loop every round starts from P0; the repaired variants of Section 3.2 sample the refiner and, in the chained variant, start each round from the incumbent prompt.}
+\end{figure}
+
 \subsection{Problem Formulation}
 
-Let (Qv, Av) = \{(qi, ai)\}, i = 1..M, be a validation set of M question-answer pairs and A(L, P) the accuracy of the target model L on it under prompt P. Let R(P0) be the set of refinements that the refining model L' produces from P0. MPIR returns
+Let (Qv, Av) = \{(qi, ai)\}, i = 1..M, be a validation set of M question-answer pairs and A(L, P) the accuracy of the target model L on it under prompt P. Let R(P0) be the set of candidate prompts that the refinement loop produces from P0. MPIR returns
 
 Pfinal = argmax over P' in \{P0\} $\cup$ R(P0) of A(L, P'),
 
@@ -125,7 +133,7 @@ with ties resolved in favour of P0 (a candidate must be strictly better). Includ
 
 \subsection{Algorithm and Variants}
 
-Algorithm 1 is the repaired loop. It scores P0 first, so the incumbent score Abest starts at A(L, P0) instead of minus infinity. In the original implementation the incumbent score started at minus infinity, so the first round's candidate was accepted whatever it scored, which is the defect Section 5.8 quantifies. Choosing among \{P0\} $\cup$ candidates by held-out score is standard in APO loops, so we regard this as an implementation defect of ours, not as a general property of the method.
+Algorithm 1 is the repaired loop. It scores P0 first, so the incumbent score Abest starts at A(L, P0) instead of minus infinity. In the original implementation the incumbent score started at minus infinity, so the first round's candidate was accepted whatever it scored, which is the defect Section 5.9 quantifies. Choosing among \{P0\} $\cup$ candidates by held-out score is standard in APO loops, so we regard this as an implementation defect of ours, not as a general property of the method.
 
 \begin{algorithm}[htbp]
 \caption{MPIR with a validation gate (repaired)}
@@ -147,13 +155,13 @@ Algorithm 1 is the repaired loop. It scores P0 first, so the incumbent score Abe
 \end{algorithmic}
 \end{algorithm}
 
-The pilot ran what we call the legacy loop: Psrc = P0 in every round, H empty and $\tau$ = 0. Because Evaluate and Refine then receive identical input in every round, the seven rounds were one request repeated, up to serving non-determinism, and 'seven rounds without acceptance' meant roughly one distinct attempt per cell. The repaired loop differs between rounds in two ways: independent mode samples at $\tau$ = 0.7 so each round is a fresh draw, and chained mode refines the current incumbent and shows the model the earlier candidates with their validation scores, as OPRO does with its trajectory \cite{yang2024}. We study five variants (Table 2).
+The pilot ran what we call the legacy loop: Psrc = P0 in every round, H empty and $\tau$ = 0. Because Evaluate and Refine then receive identical input in every round, the seven rounds were one request repeated, up to serving non-determinism, and 'seven rounds without acceptance' meant roughly one distinct attempt per cell. The repaired loop differs between rounds in two ways: independent mode samples at $\tau$ = 0.7 so each round is a fresh draw, and chained mode refines the current incumbent and shows the model the earlier candidates with their validation scores, as OPRO does with its trajectory \cite{yang2024}. We study seven variants (Table 2). Two of them, V1P and V2P, are format-protected: the answer-format line is appended to every candidate, as it is for the rubric-free rewrite and for the prompts of the base optimizers. They were added after an audit found that the refinement request does not ask the refiner to keep the answer-format line, which the 1.7B refiner then dropped in most candidates (Section 5.2); they are exploratory.
 
 \begin{table}[htbp]
 \centering
 \small
-\caption{Refinement variants studied. All use the same gate (strict improvement over the incumbent on 25 validation questions) and N = 7 rounds.}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.3\linewidth}>{\raggedright\arraybackslash}p{0.14\linewidth}>{\raggedright\arraybackslash}p{0.22\linewidth}>{\raggedright\arraybackslash}p{0.14\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}}
+\caption{Refinement variants studied. All use the same gate (strict improvement over the incumbent on 25 validation questions) and N = 7 rounds. V3 candidates, and those of V1P and V2P, carry the answer-format line; V1 and V2 candidates are scored as the refiner wrote them.}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.258\linewidth}>{\raggedright\arraybackslash}p{0.120\linewidth}>{\raggedright\arraybackslash}p{0.189\linewidth}>{\raggedright\arraybackslash}p{0.120\linewidth}>{\raggedright\arraybackslash}p{0.172\linewidth}}
 \toprule
 \textbf{Variant} & \textbf{Refines} & \textbf{History} & \textbf{Sampling} & \textbf{Rubric text} \\
 \midrule
@@ -162,19 +170,21 @@ V1 independent & P0 & none & $\tau$ = 0.7 & corrected \\
 V2 chained (primary) & incumbent & scored candidates & $\tau$ = 0.7 & corrected \\
 V2L chained & incumbent & scored candidates & $\tau$ = 0.7 & original \\
 V3 gated free rewrite & P0 & none & $\tau$ = 0.7 & none (no rubric) \\
+V1P independent, format-protected & P0 & none & $\tau$ = 0.7 & corrected \\
+V2P chained, format-protected & incumbent & scored candidates & $\tau$ = 0.7 & corrected \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \subsection{The Seven-Criteria Rubric}
 
-The rubric was assembled from the prompting literature \cite{schulhoff2024,sahoo2024}, industry guidance \cite{boonstra2025,anthropic2025,openai2025,microsoft2025} and iterative experimentation on BBH-style tasks. It scores a prompt from 1 to 5 on: (1) Role Prompting, (2) Step-Back Reasoning, (3) Guided Chain of Thought, (4) Instruction and Separation, (5) Output Format with Examples, (6) Worked Reasoning in Examples and (7) Conclusion, for a total out of 35. The evidence behind the criteria is uneven. Chain-of-thought and demonstrations are well supported \cite{wei2022,wang2023,min2022}. Role prompting is the least supported, since its benefit is inconsistent \cite{kim2024,zheng2024b}. The Conclusion criterion extrapolates positional-bias results from long contexts \cite{liu2024,yu2025} to short prompts, and the vendor page we cite for it states that instruction placement made no difference for GPT-4-class models \cite{microsoft2025}. Industry sources are practitioner guidance rather than empirical evidence; they are living documents, so the reference list gives archived copies and access dates.
+The rubric was assembled from the prompting literature \cite{schulhoff2024,sahoo2024}, industry guidance \cite{boonstra2025,anthropic2025,openai2025,microsoft2025} and iterative experimentation on BBH-style tasks. It scores a prompt from 1 to 5 on: (1) Role Prompting, (2) Step-Back Reasoning, (3) Guided Chain of Thought, (4) Instruction and Separation, (5) Output Format with Examples, (6) Worked Reasoning in Examples and (7) Conclusion, for a total out of 35. The evidence behind the criteria is uneven. Chain-of-thought and demonstrations are well supported \cite{wei2022,wang2023,min2022}. Role prompting is the least supported, since its benefit is inconsistent \cite{kim2024,zheng2024b}. The Conclusion criterion extrapolates positional-bias results from long contexts \cite{liu2024,yu2025} to short prompts, and the vendor page we cite for it states that instruction placement made no difference for GPT-4-class models \cite{microsoft2025}. Industry sources are practitioner guidance rather than empirical evidence; they are living documents, so the reference list gives archived copies and access dates. The rubric was refined during the first evaluation using BBH tasks, including the three Tier-1 tasks, so Tier 1 is not independent of the rubric's development; the six random Tier-2 tasks are.
 
 The rubric text used in the pilot was internally inconsistent: it announced 'five defined criteria', asked for 'all 6 criteria' and 'Total Score: X/25' while listing seven criteria. We found this during the audit. The primary variants use a corrected text (seven criteria, X/35); variant V2L keeps the original text as a sensitivity check.
 
 \subsection{Evaluation, Refinement and Output Guards}
 
-The evaluation meta-prompt (Figure 2) asks the refining model to apply the rubric to the prompt and report scores, strengths, weaknesses and 7-10 suggestions. The refinement request (Figure 3) asks for a rewrite wrapped in <START> and <END>; in chained mode it also lists the earlier candidates with their validation accuracy and asks the model not to repeat them. Three output guards exist, and each outcome is logged per round. A response without delimiters is a fallback: it cannot be validated, and the pilot's code returned P0 in that case, which ties the baseline by construction. A candidate containing phrases verbatim from the evaluation template, or APE's induction template, is an echo and is rejected before validation. A candidate textually identical to the incumbent, to P0 or to an earlier candidate is a duplicate. Only the remaining candidates are validated.
+The evaluation meta-prompt (Figure 2) asks the refining model to apply the rubric to the prompt and report scores, strengths, weaknesses and 7-10 suggestions. The refinement request (Figure 3) asks for a rewrite wrapped in <START> and <END>; in chained mode it also lists the earlier candidates with their validation accuracy and asks the model not to repeat them. Three output guards exist, and each outcome is logged per round. A response without delimiters is a fallback: it cannot be validated, and the pilot's code returned P0 in that case, which ties the baseline by construction. A candidate containing phrases verbatim from the evaluation template, or APE's induction template, is an echo and is rejected before validation. A candidate textually identical to the incumbent, to P0 or to an earlier candidate is a duplicate. Only the remaining candidates are validated. The refinement request of V1 and V2 does not ask the refiner to keep the answer-format line (the free-rewrite prompt does), and a candidate is scored exactly as written; this asymmetry matters for small refiners and is examined in Section 5.2.
 
 \begin{figure}[htbp]
 \centering
@@ -219,11 +229,11 @@ A candidate is accepted only if its accuracy on the 25 validation questions stri
 
 \subsection{Pre-Specification and Decision Rules}
 
-The first pilot's go/no-go rule was written in the project's planning document (REBUILD.md, commit 7612aa0, 2026-09-03) before the pilot ran. It was a version-controlled plan, not an entry in a public registry, and the pilot was not pre-registered in the strict sense in which we used that word in the first submission. Several pipeline fixes were also made while the pilot was running (Appendix C). For this revision we wrote the protocol in REVISION\_\allowbreak{}PROTOCOL.md and committed it (commit 8fd1397, 2026-10-19) before running any revised experiment; its commit time-stamps the rules below, which are reproduced from it. Dated amendments are listed in Appendix F. This is also not a registry entry.
+The pilot's go/no-go rule was written in the project's planning document (REBUILD.md, commit 7612aa0, 2026-09-03) before the pilot ran. That is a time-stamped plan in a version-controlled repository, not an entry in a public registry, so we describe the study as pre-specified, not pre-registered; several pipeline fixes were also made while the pilot ran (Appendix C). The chronology is: first evaluation and audit (before September 2026); pilot, 2026-09-04 and 05; first submission to this journal, 2026-09-05; decision and reviews, 2026-10-19; revision protocol committed 2026-10-19 (commit 8fd1397), before any revised experiment; revised experiments, 2026-10-20 and 21. The decision rules below are reproduced from that protocol. Its dated amendments, which include one change of the refiners used for D2 and later exploratory additions, are listed with their dates in Appendix F.
 
 \begin{itemize}
-\item \textbf{D1 (RQ1).} Primary outcome per cell: paired difference in test accuracy between the final MPIR prompt and P0 (10,000-resample paired bootstrap, 95\% percentile interval); a cell is a win if the difference is positive and the interval excludes zero. The effect 'reproduces' if at least 15 of 45 cells are wins and the mean cell difference is at least +2.0 points; it is 'null' if at most 2 of 45 are wins and the mean lies within $\pm$1.0 point; otherwise 'mixed'.
-\item \textbf{D2 (RQ3).} Capability dependence is supported if the mean cell difference with the 8B refiner exceeds that with the 1.7B refiner by at least 2.0 points and at least 3 of 9 cells are wins with the 8B refiner.
+\item \textbf{D1 (RQ1).} Primary outcome per cell: paired difference in test accuracy between the final MPIR prompt and P0 (10,000-resample paired bootstrap, 95\% percentile interval); a cell is a win if the difference is positive and the interval excludes zero. The effect 'reproduces' if at least 15 of 45 cells are wins and the mean cell difference is at least +2.0 points; it is 'null' if at most 2 of 45 are wins and the mean lies within $\pm$1.0 point; otherwise 'mixed'. The protocol did not say how the up to three MPIR seeds of a cell are combined: we pool them by averaging the per-example outcomes of the final prompts over the seeds before the bootstrap. The planned 135 runs (45 cells times three MPIR seeds) were cut to 80 for compute reasons, so cells have one to three runs.
+\item \textbf{D2 (RQ3).} Capability dependence is supported if the mean cell difference with the strongest refiner exceeds that with the 1.7B refiner by at least 2.0 points and at least 3 of 9 cells are wins with that refiner. The protocol named a local 8B refiner; because the shared GPU was too slow for the extra servers, the strongest-refiner role was reassigned on 2026-10-20 (before any result with these refiners was inspected) to GPT-6 Luna, with Qwen3-235B-A22B as an intermediate rung. Any statement about Qwen3-235B against D2 is therefore post hoc.
 \item \textbf{D3 (RQ2).} The gate is limiting if the best oracle candidate beats P0 on test by at least 3.0 points in at least 3 of 9 cells although the gated final prompt did not.
 \end{itemize}
 
@@ -231,21 +241,28 @@ McNemar, GEE and Wilcoxon tests on identical prompts cannot be informative, and 
 
 \subsection{Data, Splits and Task Selection}
 
-BBH has 23 tasks in 27 task files, about 6,511 examples \cite{yuksekgonul2025}. Each task is split three ways with random.Random(seed).sample over the original example order: 25 optimizer-training examples, 25 validation examples for the gate, and the remainder as test (200 examples for every task used here except penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table, which has 96). The partition is stored with the original example indices, is shared by all optimizers and conditions for a given (task, seed), and no stage touches test data during optimization or refinement. Tier 1 is the three pilot tasks (hyperbaton, ruin\_\allowbreak{}names, penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table) at seeds 42, 43 and 44. They were chosen because the leaked first evaluation showed the largest gains there, so they are a biased sample and may be subject to winner's-curse effects. Tier 2 is six tasks drawn uniformly at random, without replacement, from the other 24 task files with random.Random(20261019): temporal\_\allowbreak{}sequences, movie\_\allowbreak{}recommendation, disambiguation\_\allowbreak{}qa, geometric\_\allowbreak{}shapes, salient\_\allowbreak{}translation\_\allowbreak{}error\_\allowbreak{}detection and sports\_\allowbreak{}understanding, at seed 42. In total there are 45 cells, one per (task, optimizer, seed), each with its own P0.
+BBH has 23 tasks in 27 task files, about 6,511 examples \cite{suzgun2023}. Each task is split three ways with random.Random(seed).sample over the original example order: 25 optimizer-training examples, 25 validation examples for the gate, and the remainder as test (200 examples for every task used here except penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table, which has 96). The partition is stored with the original example indices, is shared by all optimizers and conditions for a given (task, seed), and no stage touches test data during optimization or refinement. Tier 1 is the three pilot tasks (hyperbaton, ruin\_\allowbreak{}names, penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table) at seeds 42, 43 and 44. They were chosen because the leaked first evaluation showed the largest gains there, so they are a biased sample and may be subject to winner's-curse effects. Tier 2 is six tasks drawn uniformly at random, without replacement, from the other 24 task files with random.Random(20261019): temporal\_\allowbreak{}sequences, movie\_\allowbreak{}recommendation, disambiguation\_\allowbreak{}qa, geometric\_\allowbreak{}shapes, salient\_\allowbreak{}translation\_\allowbreak{}error\_\allowbreak{}detection and sports\_\allowbreak{}understanding, at seed 42. In total there are 45 cells, each with its own base prompt P0.
+
+\begin{itemize}
+\item \textbf{Cell.} A (task, optimizer, split seed) combination with its own split and its own base prompt P0.
+\item \textbf{Run.} One execution of a refinement variant on a cell with one MPIR seed (the seed of the refiner's sampling); a cell has one to three runs.
+\item \textbf{Variant, round.} A refinement procedure (V0 to V3, V1P, V2P, V2L; Table 2); one round is one evaluate-refine-validate step, with N = 7 rounds per run.
+\item \textbf{Split seed, MPIR seed.} The seed that draws the train, validation and test split and the optimizer's own randomness (42, 43, 44), and the seed of the refiner's sampling (1 to 3).
+\end{itemize}
 
 \subsection{Models and Serving}
 
-The target model is Qwen3-1.7B \cite{qwenteam2025} with thinking disabled and greedy decoding, at most 1024 new tokens. The refining model is the same model in the main grid and Qwen3-4B-AWQ or Qwen3-8B-AWQ in the capability experiment; meta-prompt calls allow 1500 (evaluation) and 3000 (refinement) new tokens. Refiner sampling uses temperature 0.7. Everything is served with vLLM 0.28.0 under WSL2 on one 16 GB RTX 5000 Ada GPU, bf16 weights for the 1.7B model, a maximum context of 8192 tokens (Appendix C). Greedy decoding is not bit-reproducible under continuous batching, so we measure the resulting noise (Section 5.7).
+The target model is Qwen3-1.7B \cite{qwenteam2025} with thinking disabled and greedy decoding, at most 1024 new tokens. The refining model is the same model in the main grid. In the capability experiment the refiner is Qwen3-235B-A22B (the 2507 instruct release, a mixture-of-experts model from the target's family) or GPT-6 Luna \cite{luna2026}, both reached through the OpenRouter API on 2026-10-20 and 21 with temperature 0.7, a 3000-token limit and, for GPT-6 Luna, minimal reasoning effort. Meta-prompt calls allow 1500 (evaluation) and 3000 (refinement) new tokens. The target and the 1.7B refiner are served with vLLM \cite{kwon2023} 0.28.0 under WSL2 on one 16 GB RTX 5000 Ada GPU, bf16 weights, a maximum context of 8192 tokens (Appendix C). Greedy decoding is not bit-reproducible under continuous batching, so we measure the resulting noise (Section 5.7).
 
 \subsection{Base Optimizers and Conditions}
 
-APE and ProTeGi are clean-room implementations of the published algorithms \cite{zhou2023,pryzant2023}, run with few\_\allowbreak{}shot\_\allowbreak{}count = 0, hence exemplar-free; ProTeGi scores every successor on a full minibatch instead of using the original bandit scheme. PromptWizard \cite{agarwal2025} is run with synthetic-example generation disabled; its three in-context examples are drawn from the 25 training examples with model-generated reasoning, and its generated expert identity is not used at evaluation. Hyperparameters are in Table 3. Only the expert few-shot condition uses the three BBH-author exemplars \cite{yuksekgonul2025}; the first manuscript's statement that APE and ProTeGi also used them was wrong. Reference conditions are zero-shot CoT \cite{kojima2022} and expert few-shot CoT. The free-rewrite control (Appendix A.3) rewrites P0 with no rubric; V3 adds the gate.
+APE and ProTeGi are clean-room implementations of the published algorithms \cite{zhou2023,pryzant2023}, run with few\_\allowbreak{}shot\_\allowbreak{}count = 0, hence exemplar-free; ProTeGi scores every successor on a full minibatch instead of using the original bandit scheme. PromptWizard \cite{agarwal2025} is run with synthetic-example generation disabled; its three in-context examples are drawn from the 25 training examples with model-generated reasoning, and its generated expert identity is not used at evaluation. Hyperparameters are in Table 3. Many of the APE and ProTeGi base prompts are not optimized in any strong sense: for two of the three pilot tasks they are the seed instruction "Let's think step by step." plus the answer-format line, and the APE prompt for hyperbaton is its own induction template (Appendix A). PromptWizard is a reduced configuration, because synthetic-example generation was disabled. The base prompts are therefore a mix of weak and degenerate starting points, which limits what refining them can show. Only the expert few-shot condition uses the three BBH-author exemplars \cite{suzgun2023}; the first manuscript's statement that APE and ProTeGi also used them was wrong. Reference conditions are zero-shot CoT \cite{kojima2022} and expert few-shot CoT. The free-rewrite control (Appendix A.3) rewrites P0 with no rubric; V3 adds the gate.
 
 \begin{table}[htbp]
 \centering
 \small
 \caption{Hyperparameters of the base optimizers and of MPIR as actually used.}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.15\linewidth}>{\raggedright\arraybackslash}p{0.27\linewidth}>{\raggedright\arraybackslash}p{0.4\linewidth}>{\raggedright\arraybackslash}p{0.18\linewidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.129\linewidth}>{\raggedright\arraybackslash}p{0.232\linewidth}>{\raggedright\arraybackslash}p{0.344\linewidth}>{\raggedright\arraybackslash}p{0.155\linewidth}}
 \toprule
 \textbf{Component} & \textbf{Parameter} & \textbf{Description} & \textbf{Value used} \\
 \midrule
@@ -272,7 +289,7 @@ Accuracy is the share of test examples whose delimited answer equals the gold an
 
 \subsection{Statistical Analysis}
 
-For every cell we report the paired difference in test accuracy between the final MPIR prompt and P0 with a 95\% paired-bootstrap interval over test examples. Cells with identical prompts have a difference of zero by construction, apart from serving noise. Across cells we report counts of wins, the mean difference and a hierarchical bootstrap interval that resamples tasks, then optimizers and seeds within tasks. The noise floor is the distribution of accuracy differences between repeated scorings of the same prompt, and the minimum detectable effect at 80\% power and $\alpha$ = 0.05 follows from the paired discordance rate \cite{dror2018,card2020}.
+For every cell we report the paired difference in test accuracy between the final MPIR prompt and P0 with a 95\% paired-bootstrap interval over test examples. Cells with identical prompts have a difference of zero by construction, apart from serving noise. Across cells we report counts of wins, the mean difference and a hierarchical bootstrap interval that resamples tasks and then the cells within each selected task. The noise floor is the distribution of accuracy differences between repeated scorings of the same prompt, and the minimum detectable effect at 80\% power and $\alpha$ = 0.05 follows from the paired discordance rate \cite{dror2018,card2020}. Intervals use the percentile bootstrap \cite{efron1979} and, for single accuracies, the Wilson interval \cite{wilson1927}.
 
 \subsection{Harness Defects and Deviations}
 
@@ -280,17 +297,266 @@ Running against a live model exposed defects that mocked tests could not (trunca
 
 \section{Results}
 
-PLACEHOLDER
+\subsection{Base Prompts and the Scoring Harness}
+
+Table 4 gives the strict and lenient test accuracy of the nine pilot base prompts (seed 42) with Wilson intervals \cite{wilson1927} and the chance level of each task, and Table 5 the reference conditions. Several baselines are at or below chance under strict extraction, the largest being ProTeGi: 10.5\% on hyperbaton, 5.0\% on ruin\_\allowbreak{}names and 1.0\% on penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table. Under lenient extraction the same responses score 58.0\%, 37.5\% and 45.8\%. The raw outputs show the cause: the model reasons to an option but wraps a whole explanatory sentence in the answer tags, which the strict rule rejects. This happens for exemplar-free prompts (APE, ProTeGi, zero-shot) and not for prompts that contain a worked example of the bare tag (PromptWizard, expert few-shot). Lenient extraction accepts everything strict extraction accepts, plus a response whose tagged span (or, without tags, last 300 characters) names exactly the gold option; it is approximate, and a prompt that scores well on it is not guaranteed to be reasoning correctly.
+
+\begin{table*}[htbp]
+\centering
+\footnotesize
+\caption{Test accuracy (\%) of the nine pilot base prompts (seed 42, Qwen3-1.7B, greedy, one scoring pass). Strict is the primary metric with a 95\% Wilson interval; lenient is the secondary metric. Chance is 1 over the number of distinct gold labels. Delims is the share of responses containing both tags.}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.254\textwidth}>{\raggedright\arraybackslash}p{0.141\textwidth}>{\raggedright\arraybackslash}p{0.226\textwidth}>{\raggedright\arraybackslash}p{0.113\textwidth}>{\raggedright\arraybackslash}p{0.094\textwidth}>{\raggedright\arraybackslash}p{0.113\textwidth}}
+\toprule
+\textbf{Task} & \textbf{Optimizer} & \textbf{Strict [95\% CI]} & \textbf{Lenient} & \textbf{Chance} & \textbf{Delims \%} \\
+\midrule
+hyperbaton & PromptWizard & 59.0 [52.1, 65.6] & 59.0 & 50.0 & 100 \\
+hyperbaton & APE & 44.5 [37.8, 51.4] & 59.5 & 50.0 & 100 \\
+hyperbaton & ProTeGi & 10.5 [7.0, 15.5] & 58.0 & 50.0 & 76 \\
+ruin\_\allowbreak{}names & PromptWizard & 63.5 [56.6, 69.9] & 63.5 & 16.7 & 100 \\
+ruin\_\allowbreak{}names & APE & 41.0 [34.4, 47.9] & 43.0 & 16.7 & 99 \\
+ruin\_\allowbreak{}names & ProTeGi & 5.0 [2.7, 9.0] & 37.5 & 16.7 & 98 \\
+penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table & PromptWizard & 71.9 [62.2, 79.9] & 71.9 & 20.0 & 100 \\
+penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table & APE & 15.6 [9.7, 24.2] & 59.4 & 20.0 & 94 \\
+penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table & ProTeGi & 1.0 [0.2, 5.7] & 45.8 & 20.0 & 100 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Reference conditions, strict (lenient) test accuracy \%, seed 42. Free rewrite is the ungated rubric-free rewrite of the PromptWizard prompt from the pilot.}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.292\linewidth}>{\raggedright\arraybackslash}p{0.189\linewidth}>{\raggedright\arraybackslash}p{0.189\linewidth}>{\raggedright\arraybackslash}p{0.189\linewidth}}
+\toprule
+\textbf{Task} & \textbf{Zero-shot CoT} & \textbf{Expert few-shot CoT} & \textbf{Free rewrite (ungated)} \\
+\midrule
+hyperbaton & 51.0 (63.0) & 86.0 (89.5) & 61.0 (61.0) \\
+ruin\_\allowbreak{}names & 37.0 (43.0) & 50.0 (50.0) & 44.5 (44.5) \\
+penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table & 6.2 (37.5) & 72.9 (72.9) & 55.2 (55.2) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two checks bear on how much of this is a harness effect. First, appending one worked format exemplar (the first BBH-author exemplar, with its bare tag) to an exemplar-free base prompt raised strict accuracy by +19.5 points on average for APE and +42.3 points for ProTeGi over 15 cells each (the paired-bootstrap interval excludes zero in 9 and 15 cells; the range is -45.0 to +72.9 points, the negative end being APE's degenerate hyperbaton prompt). Under lenient extraction the same intervention gains +2.3 and +10.2 points, so most of the strict gain is the tag, and the exemplar's effect on reasoning is modest. Second, the same prompt does not score the same twice: the strict accuracy of the identical nine prompts, scored in the pilot and again for this study, differs by 2.6 points on average and up to 7.0 points (Section 5.7). Accuracy differences of this size are not reliably attributable to a prompt on this serving stack.
+
+\subsection{What the Rounds Were}
+
+The composition of the refinement rounds is in Table 6 (all rounds of all runs; per-cell, per-round records for the primary variant are in Appendix E). The legacy loop of the pilot (V0, nine cells) produced on average 4.3 distinct candidate prompts per run although decoding was greedy: the seven rounds were not identical copies, but they differed only through serving non-determinism, not by design, so 'seven rounds without acceptance' overstated the evidence. (The pilot's own prompts were byte-identical in all nine cells; in our re-run of the same loop 1 of nine runs changed its prompt, which shows how fragile even a greedy comparison is.) In the repaired variants the rounds differ by sampling and, for V2, by history.
+
+\begin{table*}[htbp]
+\centering
+\footnotesize
+\caption{Outcome of every refinement round (all runs of a variant pooled; refiner Qwen3-1.7B unless stated). Fallback: no delimiters. Echo: template phrase. Duplicate: same text as an earlier prompt. Validated rounds are split by validation score against the baseline (better/equal/worse). The last column counts runs whose final prompt differs from P0.}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccccccc}
+\toprule
+\textbf{Variant} & \textbf{Runs} & \textbf{Rounds} & \textbf{Fallback} & \textbf{Echo} & \textbf{Dup.} & \textbf{Validated} & \textbf{Val. better/equal/worse} & \textbf{Accepted} & \textbf{Runs changed} \\
+\midrule
+V0 legacy & 9 & 63 & 3 & 16 & 5 & 39 & 1/7/31 & 1 & 1/9 \\
+V1 independent & 27 & 189 & 23 & 46 & 0 & 120 & 2/21/97 & 2 & 2/27 \\
+V2 chained & 80 & 560 & 177 & 160 & 30 & 193 & 1/66/126 & 1 & 1/80 \\
+V2L original rubric & 9 & 63 & 26 & 14 & 4 & 19 & 0/4/15 & 0 & 0/9 \\
+V3 free rewrite (gated) & 27 & 189 & 0 & 0 & 87 & 102 & 19/23/60 & 18 & 16/27 \\
+V1P protected & 5 & 35 & 3 & 27 & 0 & 5 & 2/0/3 & 1 & 1/5 \\
+V2P protected & 5 & 35 & 17 & 13 & 0 & 5 & 0/0/5 & 0 & 0/5 \\
+V2, refiner Qwen3-235B & 18 & 126 & 9 & 5 & 0 & 112 & 52/4/56 & 21 & 10/18 \\
+V3, refiner Qwen3-235B & 9 & 63 & 0 & 0 & 19 & 44 & 15/4/25 & 8 & 5/9 \\
+V2, refiner GPT-6 Luna & 9 & 63 & 6 & 0 & 0 & 57 & 3/8/46 & 2 & 1/9 \\
+\bottomrule
+\end{tabular}
+}
+\end{table*}
+
+For the 1.7B refiner, 60\% of the chained rounds (337 of 560) never reached validation because the response had no delimiters or echoed a template; of the 193 validated candidates 126 scored below the baseline, 66 tied and 1 scored higher. Most validated candidates are far worse, not tied. An audit found a large part of the reason: the refinement request does not ask the refiner to keep the answer-format line, and 93\% of the validated V1 and 95\% of the validated V2 candidates lack it, so they score exactly zero under strict extraction; the rubric-free rewrite, whose prompt asks to preserve the answer format, loses it in none. The unprotected numbers therefore measure a failure of the 1.7B refiner to keep the format as much as a failure of the rubric. To separate the two we added the format-protected variants V1P and V2P, which append the answer-format line to every candidate. With protection the 1.7B refiner still reaches validation in only 14\% (V1P, 35 rounds) and 14\% (V2P, 35 rounds) of rounds, and 2 of its 10 validated candidates beat the baseline on validation (Table 6). Refinement with the original, inconsistent rubric text (V2L) was no better: 0 accepted candidates in 63 rounds and 63\% of rounds lost to fallbacks or echoes, so the inconsistency in the rubric text is not what limits the 1.7B refiner.
+
+\subsection{The Repaired Layer on 45 Cells (RQ1, D1)}
+
+With the 1.7B model refining its own prompts through the chained variant, the final prompt equals P0 in 79 of 80 runs (45 cells, one to three MPIR seeds each). Only 1 run accepted a candidate. No cell is a win: the mean paired difference over cells is -0.04 points (hierarchical bootstrap interval [-0.16, +0.00], which is almost degenerate because 44 of 45 cells are exactly zero), and 0 of 45 cells satisfy the win criterion. By the pre-specified rule (D1) the outcome is 'null'; a rule-of-three bound puts the acceptance rate of this procedure below about 4\% of runs. The result does not depend on the base optimizer: PromptWizard 1 of 28 runs changed; APE 0 of 31 runs changed; ProTeGi 0 of 21 runs changed. D1 was specified and run for the unprotected V2, and Section 5.2 shows that this procedure is limited by the 1.7B refiner's inability to produce usable, format-preserving candidates; the null is therefore a statement about this procedure with this refiner, and not about rubric-guided refinement in general. Table 7 gives the per-task view. The tests of the pilot (McNemar, GEE, Wilcoxon on three tasks) are not reported, because with identical prompts they cannot be informative.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Chained variant, 1.7B refiner: in each entry, the number of runs whose final prompt differs from P0 out of all MPIR runs of that task and optimizer, then the mean paired test-accuracy difference over those cells in points. * marks the Tier-1 tasks (split seeds 42 to 44, three cells per optimizer); Tier-2 tasks have split seed 42 only.}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.318\linewidth}>{\raggedright\arraybackslash}p{0.181\linewidth}>{\raggedright\arraybackslash}p{0.181\linewidth}>{\raggedright\arraybackslash}p{0.181\linewidth}}
+\toprule
+\textbf{Task} & \textbf{PromptWizard} & \textbf{APE} & \textbf{ProTeGi} \\
+\midrule
+hyperbaton * & 1 of 7; -0.6 & 0 of 7; +0.0 & 0 of 5; +0.0 \\
+ruin\_\allowbreak{}names * & 0 of 7; +0.0 & 0 of 7; +0.0 & 0 of 5; +0.0 \\
+penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table * & 0 of 5; +0.0 & 0 of 7; +0.0 & 0 of 5; +0.0 \\
+temporal\_\allowbreak{}sequences & 0 of 2; +0.0 & 0 of 2; +0.0 & 0 of 1; +0.0 \\
+movie\_\allowbreak{}recommendation & 0 of 1; +0.0 & 0 of 2; +0.0 & 0 of 1; +0.0 \\
+disambiguation\_\allowbreak{}qa & 0 of 2; +0.0 & 0 of 2; +0.0 & 0 of 1; +0.0 \\
+geometric\_\allowbreak{}shapes & 0 of 2; +0.0 & 0 of 2; +0.0 & 0 of 1; +0.0 \\
+salient\_\allowbreak{}translation\_\allowbreak{}error\_\allowbreak{}detection & 0 of 1; +0.0 & 0 of 1; +0.0 & 0 of 1; +0.0 \\
+sports\_\allowbreak{}understanding & 0 of 1; +0.0 & 0 of 1; +0.0 & 0 of 1; +0.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Is the Gate the Bottleneck? (RQ2, D3)}
+
+To separate the candidates from the gate, every validated candidate of MPIR seed 1 was also scored on the full test split. Ungated, the mean test-accuracy change of a 1.7B-refiner candidate relative to its P0 is -27.0 points for the independent variant (41 candidates) and -15.2 points for the chained variant (22), and no cell has a candidate that beats P0 by 3 points or more (0 and 0 of 9 cells); these candidates mostly lack the answer-format line (Section 5.2), so the figure largely reflects format loss. Candidates that keep the format are still not better on average: -8.8 points for the 1.7B rewrite (33 candidates) and -4.0 points for the Qwen3-235B candidates (58; best candidate per cell +4.0 points on average, 4 cells at +3 or more). D3 requires the best candidate to beat P0 by 3 points in at least 3 of 9 cells while the gated final prompt does not; it is not met for the 1.7B refiner. Validation accuracy tracks test accuracy across candidates (Spearman 0.92 over 262 oracle-scored candidates of all refiners), but this is driven by candidates that score zero; among 1.7B-refiner candidates with positive validation accuracy it is 0.47 (n = 25). The gate can therefore rank broken candidates but is a weaker guide among plausible ones, and a 25-question gate is noisy (Section 5.7). Table 8 re-applies other acceptance rules offline to the same candidates; cells with no validated candidate are omitted.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Acceptance-rule sensitivity on the oracle-scored candidates (MPIR seed 1, Tier-1 seed-42 cells). Cells accepting: cells in which the rule accepts some candidate, out of the cells with at least one validated candidate. Mean delta is the mean change in strict test accuracy of the selected prompt versus P0, in points, over those cells (for the larger gate, measured on the held-out half of the test split). Better/worse is the number of cells with a positive or negative delta.}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.172\linewidth}>{\raggedright\arraybackslash}p{0.310\linewidth}>{\raggedright\arraybackslash}p{0.138\linewidth}>{\raggedright\arraybackslash}p{0.103\linewidth}>{\raggedright\arraybackslash}p{0.138\linewidth}}
+\toprule
+\textbf{Variant} & \textbf{Acceptance rule} & \textbf{Cells accepting} & \textbf{Mean delta} & \textbf{Better/worse cells} \\
+\midrule
+V1 independent & strict (as run) & 1/9 & -0.9 & 0/1 \\
+V1 independent & non-strict (ties accepted) & 2/9 & -1.1 & 0/2 \\
+V1 independent & mean of 3 validation scorings & 1/9 & -0.9 & 0/1 \\
+V1 independent & larger gate (val + half of test) & 0/9 & +0.0 & 0/0 \\
+V2 chained & strict (as run) & 0/8 & +0.0 & 0/0 \\
+V2 chained & non-strict (ties accepted) & 2/8 & -0.8 & 0/2 \\
+V2 chained & mean of 3 validation scorings & 0/8 & +0.0 & 0/0 \\
+V2 chained & larger gate (val + half of test) & 0/8 & +0.0 & 0/0 \\
+V3 free rewrite & strict (as run) & 5/9 & +0.4 & 2/3 \\
+V3 free rewrite & non-strict (ties accepted) & 7/9 & -0.6 & 2/5 \\
+V3 free rewrite & mean of 3 validation scorings & 6/9 & -0.4 & 2/4 \\
+V3 free rewrite & larger gate (val + half of test) & 3/9 & +1.9 & 2/1 \\
+V2, Qwen3-235B & strict (as run) & 5/9 & +8.7 & 4/1 \\
+V2, Qwen3-235B & non-strict (ties accepted) & 6/9 & +8.6 & 4/2 \\
+V2, Qwen3-235B & mean of 3 validation scorings & 5/9 & +8.7 & 4/1 \\
+V2, Qwen3-235B & larger gate (val + half of test) & 6/9 & +7.8 & 4/2 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Free Rewriting Versus the Rubric}
+
+In the pilot, the ungated rubric-free rewrite of the PromptWizard prompt changed strict accuracy by +2.0, -19.0 and -16.7 points on hyperbaton, ruin\_\allowbreak{}names and penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table (Tables 4 and 5); the first is 4 test items, within the serving noise of Section 5.7, and the others are large losses, so the ungated rewrite was harmful on two of three tasks. The gated rewrite (V3) accepted a rewrite in 16 of 27 runs, against 2 of 27 for the independent rubric variant and 0 of 27 for the chained one (Tier-1 runs). Part of this gap is the format asymmetry of Section 5.2, not the rewriting style. V3 has 2 winning cells (hyperbaton / APE +17.0, ruin\_\allowbreak{}names / ProTeGi +2.8) and 1 cells in which the gate accepted a harmful rewrite (hyperbaton / PromptWizard -9.3), for a mean difference of +0.7 points. So the gate does not reliably protect against harm either, since 25 questions are noisy. We cannot say that unstructured rewriting is worse than rubric-guided refinement: the rubric-free variant did at least as well (+0.7 against -0.5 and +0.0 points), and the rubric adds nothing detectable with this refiner.
+
+\subsection{A More Capable Refiner (RQ3, D2)}
+
+\begin{table*}[htbp]
+\centering
+\footnotesize
+\caption{Refiner capability on the nine Tier-1 seed-42 cells; the target stays Qwen3-1.7B. Validated is the share of rounds reaching validation. Runs changed, strict wins and the strict mean refer to the final prompt versus P0 under strict extraction; the last two columns give wins/losses and the mean difference under lenient extraction. 1.7B rows pool up to three MPIR seeds, the others use MPIR seed 1.}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccccc}
+\toprule
+\textbf{Refiner, variant} & \textbf{Validated} & \textbf{Val. better} & \textbf{Runs changed} & \textbf{Strict wins} & \textbf{Strict mean} & \textbf{Lenient wins/losses} & \textbf{Lenient mean} \\
+\midrule
+Qwen3-1.7B (self), V1 & 63\% & 2 & 2/27 & 0/9 & -0.5 & 0/1 & -0.6 \\
+Qwen3-1.7B (self), V2 & 41\% & 0 & 0/27 & 0/9 & +0.0 & 0/0 & +0.0 \\
+Qwen3-1.7B (self), V3 & 54\% & 19 & 16/27 & 2/9 & +0.7 & 0/2 & -1.8 \\
+Qwen3-235B-A22B, V2 & 92\% & 24 & 5/9 & 4/9 & +8.7 & 1/3 & -3.2 \\
+Qwen3-235B-A22B, V3 & 70\% & 15 & 5/9 & 2/9 & +6.0 & 1/1 & -0.4 \\
+GPT-6 Luna, V2 & 90\% & 3 & 1/9 & 1/9 & +3.0 & 1/0 & +3.0 \\
+\bottomrule
+\end{tabular}
+}
+\end{table*}
+
+With Qwen3-235B-A22B as refiner, 112 of 126 rounds (both MPIR seeds pooled in Table 6) reach validation, almost no round is an echo, no candidate lacks the answer tag, 5 of 9 first-seed runs accept a candidate, and the final prompt is a significant strict win in 4 of 9 cells (hyperbaton / PromptWizard +30.0, hyperbaton / ProTeGi +29.0, ruin\_\allowbreak{}names / ProTeGi +12.0, penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table / ProTeGi +11.5); the mean difference is +8.7 points. A second MPIR seed gives the same pattern: 4 winning cells, mean +12.3 points. GPT-6 Luna, run with minimal reasoning, produces valid candidates in 90\% of rounds but only 3 of them beat the baseline, with 1 winning cell (hyperbaton / PromptWizard +27.0) and a mean difference of +3.0 points. Under the pre-specified rule D2, with GPT-6 Luna as the strongest refiner, capability dependence is not supported: the mean exceeds that of the 1.7B refiner by +3.0 points but only 1 cell wins, against the required 3. With Qwen3-235B the strict rule is met, but only post hoc, since the role was assigned to GPT-6 Luna.
+
+Strict accuracy is, however, the wrong judge of these gains. Under lenient extraction (Table 9) Qwen3-235B wins in 1 cell and loses in 3, with a mean difference of -3.2 points. The three ProTeGi cells in which the strict gain is large are cells where the base prompt reasons about as well as before but wraps whole sentences in the answer tags; the accepted candidate (Figure B.3) adds an explicit instruction to wrap the final answer on its own line and a worked output example, which repairs the tag, while the model's reasoning under the long structured prompt is worse (lenient accuracy falls, for example from 58.0\% to 49.0\% on hyperbaton with ProTeGi). A gate that uses strict extraction accepts such candidates, which is a concrete way in which answer extraction and the gate interact. The single gain that holds under both metrics is hyperbaton with PromptWizard, whose base prompt already had the tag (strict = lenient = 59.0\%) and whose accepted candidates, from two different refiners, add a role, a step-back and numbered reasoning steps and reach 89\% and 86\%. One cell out of nine, on a base prompt that opens with an irrelevant sentence (Appendix A), is a gain that a rubric-based rewrite can plausibly claim; there is no multiplicity correction and no replication on another task. The two strong refiners differ, one belongs to the target's family and one was run with minimal reasoning, so capability, family and reasoning budget are confounded, and the experiment is an upper-bound probe, not a controlled capability scale.
+
+\subsubsection{Follow-Up Runs (Exploratory)}
+
+Because the strong-refiner signal appeared after the pre-specified analysis, two follow-up runs were added and are exploratory (Appendix F). First, the rubric-free gated rewrite (V3) with the same Qwen3-235B refiner gives a mean strict difference of +6.0 points with 2 winning cells of 9 (ruin\_\allowbreak{}names / ProTeGi +26.0, hyperbaton / PromptWizard +25.5), against +8.7 points and 4 wins for the rubric-guided variant, and a lenient mean of -0.4 points. A refiner that does not use the rubric therefore reaches gains of the same kind, so the rubric is not what produces them. Second, a second MPIR seed of the rubric-guided variant gives +12.3 points and 4 winning cells, so the strict pattern is stable across seeds.
+
+\subsection{Serving Noise and Minimum Detectable Effect}
+
+Each of the nine pilot base prompts was scored five times on the test and validation splits (identical prompt, greedy decoding). Test accuracy varies with a standard deviation of 1.4 points and a range of 3.3 points per prompt on average; between two scorings of the same prompt 6.5\% of examples change outcome on average (up to 16.6\%), and the pilot and present scorings of the same prompt differ by up to 7.0 points. This is larger than the 2\% assumed in the first submission and is the reason a 25-question validation split is noisy. For 200 test examples the minimum detectable paired effect at 80\% power and $\alpha$ = 0.05 is 5.0 points if only serving noise separates two prompts (paired discordance 6.5\%), and 6.3 to 8.9 points if two different prompts disagree on 10-20\% of examples, as candidates here do. The strict gains of the strong refiner (+30, +29, +12, +11 points) are above this floor; effects of a few points are not detectable at these test sizes.
+
+\subsection{Does the Rubric Judge Measure Anything? (RQ4)}
+
+\begin{table*}[htbp]
+\centering
+\footnotesize
+\caption{Rubric totals (out of 35) assigned at temperature 0 to the base prompts and oracle-scored candidates (223 distinct prompts). Spearman correlations of the total with validation and with test accuracy are computed within each of the nine cells over the 262 oracle-scored candidates (median shown); the two judges' totals correlate at 0.38.}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.291\textwidth}>{\raggedright\arraybackslash}p{0.132\textwidth}>{\raggedright\arraybackslash}p{0.122\textwidth}>{\raggedright\arraybackslash}p{0.094\textwidth}>{\raggedright\arraybackslash}p{0.150\textwidth}>{\raggedright\arraybackslash}p{0.150\textwidth}}
+\toprule
+\textbf{Judge} & \textbf{Totals parsed} & \textbf{Mean total} & \textbf{SD} & \textbf{Spearman, val.} & \textbf{Spearman, test} \\
+\midrule
+Qwen3-1.7B & 93\% & 27.9 & 9.1 & 0.28 & 0.27 \\
+GPT-6 Luna (reference) & 100\% & 20.7 & 8.2 & 0.27 & 0.27 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+The 1.7B judge gives a parseable total for 93\% of prompts and scores them 7.2 points higher than the reference judge on average; its totals for the same unchanged P0 vary with a standard deviation of 4.7 points across sampled rounds. Both judges' totals correlate only weakly with accuracy (median within-cell Spearman 0.27 and 0.27 with test accuracy), and the two judges agree with each other at 0.38. The rubric score is therefore at best a weak signal of prompt quality. No human ratings were collected; the reference judge is a stronger model, not a person, so this analysis bounds the judge's usefulness but does not validate the rubric against human judgement.
+
+\subsection{Effect of the Original Defect}
+
+The original loop accepted the first round's outcome whatever it scored. With the 1.7B refiner and nine cells (MPIR seed 1, independent variant, oracle-scored candidates), applying that rule gives a mean test-accuracy change of -13.6 points relative to P0 when a fallback or echo round returns P0, as the pilot's code did: the prompt changed in 4 of 9 cells and was worse than P0 in 4, better in 0. Under the literal reading of protocol G6 (the first validated candidate is accepted unconditionally) the mean change is -29.2 points. Two cells account for most of either loss, the repaired loop changes accuracy by -0.9 points on the same candidates, and the figure applies to this refiner only; its effect with the original GPT-4o refiner is unknown, because that configuration was not rerun.
+
+\subsection{Decision Rules}
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Outcome of the decision rules (Section 4.1).}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.129\linewidth}>{\raggedright\arraybackslash}p{0.318\linewidth}>{\raggedright\arraybackslash}p{0.258\linewidth}>{\raggedright\arraybackslash}p{0.155\linewidth}}
+\toprule
+\textbf{Rule} & \textbf{Criterion} & \textbf{Observed} & \textbf{Outcome} \\
+\midrule
+D1 & At least 15 of 45 cells win and mean at least +2.0 pts; null if at most 2 wins and |mean| at most 1.0 & 0 wins, mean -0.04 & Null \\
+D2, GPT-6 Luna & Mean +2.0 over 1.7B and at least 3 of 9 wins & +3.0; 1 win & Not met \\
+D2, Qwen3-235B (post hoc) & Same & +8.7; 4 wins (lenient: -3.2; 1 win) & Met under strict only \\
+D3 & Best oracle candidate at least +3 pts in at least 3 of 9 cells although the gated final is not & 0, 0, 1 cells (V1, V2, V3) & Not met \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Discussion}
 
-PLACEHOLDER
+\subsection{What the Evidence Supports}
+
+With Qwen3-1.7B as target and refiner, the rubric-guided layer, as specified, did not improve the prompts of any of three optimizers on any of nine tasks: the final prompt equalled P0 in 79 of 80 runs, and by the pre-specified rule the outcome is null (Section 5.3). The refinement rounds were made distinct by sampling and history, the failure is not caused by the inconsistent rubric text, and a rubric-free gated rewrite does at least as well (Section 5.5). The main reason is the refiner: most rounds never produce a usable candidate, and the unprotected candidates lose the answer-format line, so under strict extraction they score zero. With the format line appended the refiner still reaches validation in a minority of rounds and 2 of 10 validated candidates beat the baseline (Section 5.2). The null is therefore a result about a 1.7B model's ability to follow a long refinement instruction, and it says little about rubric-guided refinement by a capable model.
+
+The evidence on a more capable refiner is mixed and exploratory. A much larger open-weight refiner produced significant strict gains in four cells in two MPIR seeds, and a strong closed refiner in one. Most of the strict gains are, however, repairs of the answer tag on base prompts that reason about as well as before; under lenient extraction they reverse, because the long structured rewrite makes the 1.7B target reason worse, and a rubric-free gated rewrite by the same refiner reaches gains of the same kind. The one gain that survives both metrics, hyperbaton with PromptWizard, is on a base prompt that opens with an irrelevant sentence, and it is a single cell. So the data do not show that the seven-criteria rubric helps; criterion-level ablations were not run, and the original GPT-4o and GPT-3.5-turbo configuration was not repeated, so the first evaluation's per-task gains remain unexplained and should not be cited as evidence for MPIR.
+
+A second lesson is about measurement. Answer extraction decides what the gate rewards: a gate that uses strict extraction accepts rewrites that fix the tag even when they harm reasoning, and exemplar-free baselines look far weaker than they are. Reporting a lenient metric next to the strict one exposed both effects.
+
+\subsection{Practical Guidance, Scoped to What Was Tested}
+
+The following points follow from these experiments, with Qwen3 models, nine BBH tasks and the optimizers listed; they are not general rules. (i) Before adding a refinement layer, inspect how answers are extracted and check a lenient metric: one worked example of the answer format moved strict accuracy of exemplar-free prompts by +19 and +42 points (APE, ProTeGi), and +2 and +10 points under lenient extraction. (ii) Do not accept a model's rewrite of a prompt without scoring the original prompt as a baseline; with a 1.7B refiner the uncorrected loop lowered accuracy by about 14 points on average in our nine cells (one MPIR seed). (iii) Gate on held-out data, but note that identical prompts scored twice differ on 6.5\% of examples, so differences of a few points on a few hundred questions are noise. (iv) When the refining model is as small as the target, expect most rewrites to be unusable (echoes, missing delimiters, a dropped answer format) and monitor that rate; protect the answer-format line explicitly.
+
+\subsection{Threats to Validity}
+
+\subsubsection{Internal Validity}
+
+The serving stack is not deterministic: repeated scoring of one prompt spans 3.3 points on average (standard deviation 1.4), which the gate and the minimum detectable effect (5.0 points) take into account but cannot remove. The inference server was restarted several times and its memory settings were changed during the study; cached scores and generations were kept across restarts, so a few interrupted runs combine scorings taken under different settings, with differences of the order of the measured noise. The main grid has 80 runs instead of the planned 135, oracle scoring covers MPIR seed 1 only, the strong-refiner runs use one MPIR seed (a second for one refiner), and the format-protected variants cover the nine Tier-1 seed-42 cells only. Two audit findings, the format asymmetry of V1 and V2 and a lenient parser that rejected bare letters, were found late and corrected after the main grid had run; the main grid was not re-run with protection. The follow-up runs and the protected variants were added after results were seen. The APE prompt for hyperbaton is a degenerate artifact of our implementation (Appendix A), and many APE and ProTeGi base prompts are weak, which limits what refining them can show.
+
+\subsubsection{External Validity}
+
+One target model family and size was used in every run. Tier 1 was chosen from a biased statistic and its tasks were also used while the rubric was developed; Tier 2 is a random draw of six tasks from 24, with one split seed. The strong-refiner experiment covers nine cells. The original closed-model configuration, including GPT-4o as refiner, was not rerun; GPT-6 Luna is a different model and not a replication of it.
+
+\subsubsection{Construct and Conclusion Validity}
+
+Strict answer extraction partly measures output formatting, and the lenient metric is an approximation. The rubric and its judge are weakly related to accuracy (Section 5.8), no human ratings were collected, and the rubric's criteria were not ablated. The statistics are descriptive by design: with identical prompts in most cells, tests of differences would be uninformative, the nine pilot cells share three tasks and three optimizers and are not independent, and the cell-level wins of the strong refiners carry no multiplicity correction.
 
 \section{Conclusion}
 
-PLACEHOLDER
+We re-tested a rubric-guided refinement layer for automatically optimized prompts after repairing its refinement loop and fixing the decision rules in advance. With a 1.7B model refining its own prompts the layer produced no improvement in 45 cells (one of 80 runs accepted a candidate), mainly because that refiner rarely produces a usable, format-preserving candidate. A much larger refiner obtained strict-metric gains in several cells, but most reverse under lenient scoring and a rubric-free rewrite reaches gains of the same kind, so the rubric is not shown to be what helps; one gain, on a single task, holds under both metrics. With a 1.7B refiner the uncorrected loop would have reduced accuracy by about 14 points (its effect with the original GPT-4o refiner is unknown), strict answer extraction accounts for much of the apparent weakness of exemplar-free baselines, and identical prompts do not score identically on this serving stack. These conclusions are limited to Qwen3-based targets, nine tasks and the optimizers tested, and the first evaluation's GPT-4o results remain unverified. Code, per-round logs and generations are public.
 
-\appendix
+\section{Funding}
+
+This research received no specific grant from any funding agency in the public, commercial, or not-for-profit sectors.
+
+\section{Ethical Statement}
+
+This study did not involve human participants, human data, or animal subjects, and did not require ethical approval.
+
+\section{Declaration of Competing Interest}
+
+The authors declare that they have no conflicts of interest.
+
+\section{Data Availability Statement}
+
+The datasets used in this study are drawn from the publicly available Big-Bench Hard benchmark. Code, prompts, the revision protocol, per-round logs, generations, and analysis outputs are openly available at \url{https://github.com/millennials92/meta_prompted_instruction_refinement}.
+
+\section{Author Contribution Statement}
+
+Linh Nguyen: Conceptualization, Methodology, Software, Investigation, Formal analysis, Data curation, Writing - original draft, Visualization. Quang-Vinh Dang: Conceptualization, Methodology, Supervision, Writing - review \& editing, Project administration. Minh Ngoc Dinh: Methodology, Validation, Writing - review \& editing. Thuy Nguyen: Investigation, Validation, Writing - review \& editing.
+
+\appendices
 
 \section{Prompt Examples}
 
@@ -328,7 +594,7 @@ Wrap the final answer between <ANS\_\allowbreak{}START> and <ANS\_\allowbreak{}E
 
 \subsection{Reference Prompts}
 
-The zero-shot condition uses the BBH authors' task description plus "Let's think step by step" and the answer-format line. The expert few-shot condition appends the authors' three worked chain-of-thought exemplars \cite{yuksekgonul2025}, each followed by a bare <ANS\_\allowbreak{}START>(X)<ANS\_\allowbreak{}END> tag. This tag is the property that exemplar-free prompts lack (Section 5.1).
+The zero-shot condition uses the BBH authors' task description plus "Let's think step by step" and the answer-format line. The expert few-shot condition appends the authors' three worked chain-of-thought exemplars \cite{suzgun2023}, each followed by a bare <ANS\_\allowbreak{}START>(X)<ANS\_\allowbreak{}END> tag. This tag is the property that exemplar-free prompts lack (Section 5.1).
 
 \centering
 \begin{quote}\ttfamily\small
@@ -374,15 +640,25 @@ The task is to determine the correct adjective order in a sentence ...\\{}
 \end{quote}
 \par\noindent\textbf{Figure B.2. ruin\_\allowbreak{}names / PromptWizard: the refiner echoed the evaluation meta-prompt itself; the round scored 0.0 (abridged).}
 
+\centering
+\begin{quote}\ttfamily\small
+P0 (ProTeGi, hyperbaton):  Let's think step by step.  Wrap the final answer between <ANS\_\allowbreak{}START> and <ANS\_\allowbreak{}END>\\{}
+Accepted candidate (Qwen3-235B refiner, round 7; validation 0.52 vs 0.16, test 39.5\% vs 10.5\%):\\{}
+  You are a Senior Reasoning Assistant ... \#\#\# Instructions  1. Step Back ... 2. Reason Step-by-Step ...\\{}
+  5. Follow Format Exactly ...  7. Final Answer: On a new line, wrap only the final answer with\\{}
+  <ANS\_\allowbreak{}START> and <ANS\_\allowbreak{}END>.   \#\#\# Output Format Examples  [Question] A bat and a ball cost \$1.10 ... [Answer] ...\\{}
+\end{quote}
+\par\noindent\textbf{Figure B.3. An accepted candidate from the strong refiner (abridged). It adds a role, step-back and numbered steps, and also an explicit instruction to wrap the final answer on its own line and a worked output example, which repairs the answer tag; the example is generic, not about adjective order. The strict accuracy of this prompt is higher than that of P0 (39.5\% against 10.5\%) but its lenient accuracy is lower (16\% against 58\%, Section 5.6).}
+
 \section{Pipeline Defects and Serving Configuration}
 
-Defects found while running the pipeline against a live model. Magnitudes are the symptoms recorded at the time. Items 1-8 were fixed before any number reported in Section 5; items 9-11 were found during this revision.
+Defects found while running the pipeline against a live model. Magnitudes are the symptoms recorded at the time. Items 1-8 were fixed before any number reported in Section 5; items 9-13 were found during this revision, items 12 and 13 late, after the main grid had run.
 
 \begin{table}[htbp]
 \centering
 \small
-\caption{Table C1. Defects found in the pipeline, their observed symptom and the fix.}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.04\linewidth}>{\raggedright\arraybackslash}p{0.26\linewidth}>{\raggedright\arraybackslash}p{0.4\linewidth}>{\raggedright\arraybackslash}p{0.3\linewidth}}
+\caption{Defects found in the pipeline, their observed symptom and the fix.}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.034\linewidth}>{\raggedright\arraybackslash}p{0.224\linewidth}>{\raggedright\arraybackslash}p{0.344\linewidth}>{\raggedright\arraybackslash}p{0.258\linewidth}}
 \toprule
 \textbf{\#} & \textbf{Defect} & \textbf{Observed symptom} & \textbf{Fix} \\
 \midrule
@@ -397,6 +673,8 @@ Defects found while running the pipeline against a live model. Magnitudes are th
 9 & Rubric text inconsistent & 'five criteria', 'all 6 criteria', 'X/25' for a seven-criterion, 35-point rubric & Corrected text for V1-V3; original kept as V2L \\
 10 & Refinement rounds not independent & Same input, temperature 0, seven times & Independent sampling and chained variants (Section 3.2) \\
 11 & APE search selected a degenerate prompt & hyperbaton P0 is APE's own induction template & Left in place and disclosed; same code as the pilot \\
+12 & Candidates of V1 and V2 scored without the answer-format line & The refinement request does not ask to keep it; 93-95\% of validated 1.7B candidates lack it and score exactly zero under strict extraction & Format-protected variants V1P and V2P (Section 3.2); asymmetry reported \\
+13 & Lenient parser rejected a bare letter inside the tags & Strict accepted what lenient rejected & Lenient now accepts everything strict accepts \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -406,17 +684,17 @@ Earlier pre-pilot fixes (a per-seed data-split collision, an unseeded random gen
 \begin{table}[htbp]
 \centering
 \small
-\caption{Table C2. Serving configuration.}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.26\linewidth}>{\raggedright\arraybackslash}p{0.74\linewidth}}
+\caption{Serving configuration.}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.224\linewidth}>{\raggedright\arraybackslash}p{0.636\linewidth}}
 \toprule
 \textbf{Item} & \textbf{Value} \\
 \midrule
 Inference engine & vLLM 0.28.0 (V1 engine, model runner V2 disabled, flashinfer sampler disabled), PyTorch 2.13.0+cu132 \\
 Target and default refiner & Qwen/Qwen3-1.7B, revision 70d244c, bf16, no quantization \\
-Capability-experiment refiners & Qwen/Qwen3-4B-AWQ (74d4bd2) and Qwen/Qwen3-8B-AWQ (4da05a8), 4-bit AWQ \\
+Capability-experiment refiners & qwen/qwen3-235b-a22b-2507 and openai/gpt-6-luna (reasoning effort minimal) through the OpenRouter API, 2026-10-20 and 21, temperature 0.7, 3000 new tokens; no local server \\
 Context and limits & max model length 8192; max new tokens 1024 (target), 1500 / 3000 (meta calls); thinking disabled \\
 Decoding & target: temperature 0; refiner: temperature 0.7 (0 for V0); seeds recorded per call \\
-Server flags & --gpu-memory-utilization 0.80 --max-num-seqs 96 --seed 0; prefix caching on \\
+Server flags & --gpu-memory-utilization 0.80-0.86 --max-num-seqs 64-128 --seed 0; the server was restarted several times and its memory settings changed (fp8 KV cache was tried and not usable without nvcc; prefix caching was off for one period); cached scores and generations were kept across restarts \\
 Hardware & NVIDIA RTX 5000 Ada Generation Laptop GPU, 16 GB, driver 596.58; WSL2 (Ubuntu 24.04, kernel 5.15.167.4) on Windows 11 \\
 Non-determinism & Continuous batching; identical prompts are re-scored to measure it (Section 5.7) \\
 \bottomrule
@@ -425,16 +703,16 @@ Non-determinism & Continuous batching; identical prompts are re-scored to measur
 
 \section{The Original Evaluation (Exploratory; Validation Leak)}
 
-The first evaluation used GPT-3.5-turbo as target and GPT-4o as refiner on all BBH tasks. It is reproduced here only because the manuscript's framing referred to it, and Reviewer comments asked for its numbers. Its validation stage scored candidates on the optimizer's own training examples and its loop never scored the unrefined prompt (Section 3.2), single runs at temperature 0. The numbers are exploratory, are not evidence for MPIR, and were not used to compute any result in Section 5. The Gemini 3.5 Flash-Lite check used the same model as target and refiner, with the same defects; its baseline already averaged 92\%, leaving little headroom, and it was not analysed further.
+The first evaluation used GPT-3.5-turbo as target and GPT-4o as refiner on all BBH tasks. It is reproduced here for completeness, because the Introduction refers to it. Its validation stage scored candidates on the optimizer's own training examples and its loop never scored the unrefined prompt (Section 3.2), single runs at temperature 0. The numbers are exploratory, are not evidence for MPIR, and were not used to compute any result in Section 5. The Gemini 3.5 Flash-Lite check used the same model as target and refiner, with the same defects; its baseline already averaged 92\%, leaving little headroom, and it was not analysed further.
 
 \begin{table*}[htbp]
 \centering
 \footnotesize
-\caption{Table D1. Original GPT-3.5-turbo evaluation (accuracy \%, single run, leaked validation split) and Gemini 3.5 Flash-Lite check. PW = PromptWizard; Diff = PW+MPIR minus PW. Exploratory only.}
+\caption{Original GPT-3.5-turbo evaluation (accuracy \%, single run, leaked validation split) and Gemini 3.5 Flash-Lite check. PW = PromptWizard; Diff = PW+MPIR minus PW (points). Exploratory only.}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{lccccccccccc}
 \toprule
-\textbf{Task} & \textbf{Zero-shot} & \textbf{Expert} & \textbf{PW} & \textbf{PW+MPIR} & \textbf{Diff} & \textbf{APE} & \textbf{APE+MPIR} & \textbf{ProTeGi} & \textbf{ProTeGi+MPIR} & \textbf{Gem. PW} & \textbf{Gem. MPIR} \\
+\textbf{Task} & \textbf{Zero-shot} & \textbf{Expert} & \textbf{PW} & \textbf{PW+MPIR} & \textbf{Diff} & \textbf{APE} & \textbf{APE+MPIR} & \textbf{ProTeGi} & \textbf{ProTeGi+MPIR} & \textbf{Gemini PW} & \textbf{Gemini MPIR} \\
 \midrule
 hyperbaton & 74.6 & 84.4 & 62.2 & 84.0 & +21.8 & 82.7 & 85.8 & 80.9 & 88.9 & 100 & 100 \\
 disambiguation\_\allowbreak{}qa & 55.1 & 69.3 & 61.7 & 62.2 & +0.5 & 69.8 & 68.0 & 73.8 & 67.6 & 77 & 80 \\
@@ -469,15 +747,73 @@ The three pilot tasks ranked 1, 3 and 6 of 23 by the original PW+MPIR gain (hype
 
 \section{Round-Level Record of the Primary Variant}
 
-Per cell (task / optimizer, seed 42) and round, the outcome of the chained variant V2 with MPIR seed 1 (F fallback, E echo, D duplicate, V validated with its validation accuracy), then the baseline validation accuracy of P0 and the judge's rubric total out of 35 at round 1. Table E2 gives the same for the independent variant V1. Full logs for every variant, seed and round, including candidate texts and judge outputs, are in results/revision/rounds.
+Per cell (task / optimizer, seed 42) and round, the outcome of the chained variant V2 with MPIR seed 1 (F fallback, E echo, D duplicate, V validated with its validation accuracy), then the baseline validation accuracy of P0 and the judge's rubric total out of 35 at round 1. Table 16 gives the same for the independent variant V1. Full logs for every variant, seed and round, including candidate texts and judge outputs, are in results/revision/rounds.
+
+\begin{table*}[htbp]
+\centering
+\footnotesize
+\caption{Round-level outcomes, variant V2, MPIR seed 1 (an asterisk marks an accepted candidate).}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccccccc}
+\toprule
+\textbf{Cell} & \textbf{P0 val} & \textbf{R1} & \textbf{R2} & \textbf{R3} & \textbf{R4} & \textbf{R5} & \textbf{R6} & \textbf{R7} & \textbf{Judge /35} \\
+\midrule
+hyperbaton / promptwizard & 0.72 & E & E & E & E & E & V 0.72 & F & 31 \\
+hyperbaton / ape & 0.64 & F & E & E & F & F & V 0.00 & F & 33 \\
+hyperbaton / protegi & 0.16 & V 0.00 & F & V 0.00 & F & V 0.00 & F & F & 16 \\
+ruin\_\allowbreak{}names / promptwizard & 0.76 & E & E & E & F & E & E & E & 28 \\
+ruin\_\allowbreak{}names / ape & 0.28 & V 0.00 & F & V 0.00 & V 0.00 & F & F & F & 17 \\
+ruin\_\allowbreak{}names / protegi & 0.08 & V 0.00 & V 0.00 & F & F & F & V 0.00 & V 0.00 & 17 \\
+penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table / promptwizard & 0.84 & V 0.00 & F & F & F & F & F & F & 31 \\
+penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table / ape & 0.24 & V 0.00 & F & V 0.00 & F & F & F & F & 16 \\
+penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table / protegi & 0.00 & V 0.00 & V 0.00 & V 0.00 & V 0.00 & V 0.00 & V 0.00 & V 0.00 & 17 \\
+\bottomrule
+\end{tabular}
+}
+\end{table*}
+
+\begin{table*}[htbp]
+\centering
+\footnotesize
+\caption{Round-level outcomes, variant V1, MPIR seed 1 (an asterisk marks an accepted candidate).}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccccccc}
+\toprule
+\textbf{Cell} & \textbf{P0 val} & \textbf{R1} & \textbf{R2} & \textbf{R3} & \textbf{R4} & \textbf{R5} & \textbf{R6} & \textbf{R7} & \textbf{Judge /35} \\
+\midrule
+hyperbaton / promptwizard & 0.72 & E & E & E & V 0.68 & V 0.72 & V 0.76* & E & 29 \\
+hyperbaton / ape & 0.64 & V 0.00 & E & E & E & E & E & E & 32 \\
+hyperbaton / protegi & 0.16 & F & V 0.00 & V 0.00 & V 0.00 & V 0.00 & V 0.00 & F & 17 \\
+ruin\_\allowbreak{}names / promptwizard & 0.76 & E & E & E & V 0.00 & E & E & E & 31 \\
+ruin\_\allowbreak{}names / ape & 0.28 & V 0.00 & V 0.00 & V 0.00 & V 0.00 & V 0.00 & V 0.00 & V 0.00 & 16 \\
+ruin\_\allowbreak{}names / protegi & 0.08 & V 0.00 & F & V 0.00 & V 0.00 & F & V 0.00 & V 0.00 & 17 \\
+penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table / promptwizard & 0.84 & V 0.00 & V 0.00 & V 0.00 & V 0.00 & V 0.00 & V 0.00 & V 0.00 & 30 \\
+penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table / ape & 0.24 & F & V 0.00 & V 0.00 & V 0.00 & V 0.00 & V 0.00 & V 0.00 & 15 \\
+penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table / protegi & 0.00 & V 0.00 & V 0.00 & V 0.00 & V 0.00 & F & V 0.00 & V 0.00 & 16 \\
+\bottomrule
+\end{tabular}
+}
+\end{table*}
 
 \section{Protocol and Deviations}
 
-The decision rules of Section 4.1 were fixed in REVISION\_\allowbreak{}PROTOCOL.md before any revised experiment ran (commit 8fd1397). Dated amendments, all made before results were inspected: serving stack and measured throughput (about 1.2k tokens/s at first, then improved by fixing KV-cache thrash), which reduced the compute plan; oracle test scoring of every validated candidate only for MPIR seed 1; one validation score per candidate in G1; V2L with one seed and no oracle scoring; plain temperature-0.7 sampling without top-p; Tier-1 seed-42 cells run only in G2. The protocol and every amendment are in the repository; none is a registry entry.
+The decision rules of Section 4.1 were fixed in REVISION\_\allowbreak{}PROTOCOL.md before any revised experiment ran (commit 8fd1397, 2026-10-19). The amendments below are recorded in that file; none is an entry in a registry. Amendments 1 to 7 were made before the results of the affected experiment were inspected; amendments 8 and 9 were made after results were seen and are exploratory.
+
+\begin{itemize}
+\item \textbf{1. 2026-10-20, compute.} Serving stack vLLM 0.28.0 under WSL2 with measured throughput of about 1.2k tokens/s; oracle test scoring of every validated candidate for MPIR seed 1 only; one validation score per candidate in the main grid G1; V2L with one seed and no oracle scoring.
+\item \textbf{2. 2026-10-20, sampling.} Refiner sampling uses temperature 0.7 without top-p (the protocol text said top-p 0.95), because top-p was about three times slower on this stack.
+\item \textbf{3. 2026-10-20, grouping.} Tier-1 seed-42 cells are run only in the mechanism group G2, which contains the V2 runs with oracle scoring; G1 covers the other 36 cells.
+\item \textbf{4. 2026-10-20, refiners for D2.} Local 4B and 8B refiners were not run; the strongest-refiner role of D2 went to GPT-6 Luna and Qwen3-235B-A22B through OpenRouter (Section 4.1).
+\item \textbf{5. 2026-10-20 and 21, scale.} The main grid has 80 runs instead of the planned 135; MPIR seeds beyond 1 were cut after seed 1 was complete.
+\item \textbf{6. 2026-10-20, pooling.} Cell-level differences pool the MPIR seeds of a cell by averaging per-example outcomes (Section 4.1).
+\item \textbf{7. 2026-10-20, optimizer implementations.} No change to APE, ProTeGi or PromptWizard code or hyperparameters between the pilot and the extra seeds and tasks.
+\item \textbf{8. 2026-10-21, exploratory.} After the Qwen3-235B refiner showed strict-metric gains, the rubric-free gated rewrite with that refiner and a second MPIR seed were added (Section 5.6.1).
+\item \textbf{9. 2026-10-21, exploratory.} After an audit found that V1 and V2 candidates are scored without the answer-format line, the format-protected variants V1P and V2P were added, and the lenient parser was corrected to accept everything the strict parser accepts (Section 5.2).
+\end{itemize}
 
 
 \section*{Acknowledgment}
-The authors thank the reviewers for their constructive comments on earlier drafts of this manuscript. Generative AI tools were used to assist with improving the grammar and readability of the manuscript text and to generate initial code snippets during development; all AI-assisted text and code were reviewed, verified, and adapted by the authors, who take full responsibility for the manuscript's content, analyses, and conclusions.
+The authors thank the reviewers for their constructive comments on the first submission of this manuscript. Generative AI tools were used to assist with improving the grammar and readability of the manuscript text and to generate initial code snippets during development; all AI-assisted text and code were reviewed, verified, and adapted by the authors, who take full responsibility for the manuscript's content, analyses, and conclusions.
 
 \bibliographystyle{IEEEtran}
 \bibliography{cas-refs}

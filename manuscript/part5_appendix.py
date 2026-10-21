@@ -48,7 +48,7 @@ CODE([
 H2("A.2. Reference Prompts")
 P("The zero-shot condition uses the BBH authors' task description plus \"Let's think step by step\" and "
   "the answer-format line. The expert few-shot condition appends the authors' three worked "
-  "chain-of-thought exemplars ‹52›, each followed by a bare <ANS_START>(X)<ANS_END> tag. This tag "
+  "chain-of-thought exemplars ‹27›, each followed by a bare <ANS_START>(X)<ANS_END> tag. This tag "
   "is the property that exemplar-free prompts lack (Section 5.1).")
 CODE([
     "Q: Which of the following is a humorous edit of this artist or movie name: 'whitesnake'?",
@@ -89,12 +89,24 @@ CODE([
 ], caption="Figure B.2. ruin_names / PromptWizard: the refiner echoed the evaluation meta-prompt "
            "itself; the round scored 0.0 (abridged).", full=False)
 
+CODE([
+    "P0 (ProTeGi, hyperbaton):  Let's think step by step.  Wrap the final answer between <ANS_START> and <ANS_END>",
+    "Accepted candidate (Qwen3-235B refiner, round 7; validation 0.52 vs 0.16, test 39.5% vs 10.5%):",
+    "  You are a Senior Reasoning Assistant ... ### Instructions  1. Step Back ... 2. Reason Step-by-Step ...",
+    "  5. Follow Format Exactly ...  7. Final Answer: On a new line, wrap only the final answer with",
+    "  <ANS_START> and <ANS_END>.   ### Output Format Examples  [Question] A bat and a ball cost $1.10 ... [Answer] ...",
+], caption="Figure B.3. An accepted candidate from the strong refiner (abridged). It adds a role, step-back "
+           "and numbered steps, and also an explicit instruction to wrap the final answer on its own line and a "
+           "worked output example, which repairs the answer tag; the example is generic, not about adjective order. "
+           "The strict accuracy of this prompt is higher than that of P0 (39.5% against 10.5%) but its lenient "
+           "accuracy is lower (16% against 58%, Section 5.6).", full=False)
+
 # ===========================================================================
 H1("Appendix C. Pipeline Defects and Serving Configuration")
 P("Defects found while running the pipeline against a live model. Magnitudes are the symptoms recorded "
-  "at the time. Items 1-8 were fixed before any number reported in Section 5; items 9-11 were found "
-  "during this revision.")
-TABLE("Table C1. Defects found in the pipeline, their observed symptom and the fix.",
+  "at the time. Items 1-8 were fixed before any number reported in Section 5; items 9-13 were found "
+  "during this revision, items 12 and 13 late, after the main grid had run.")
+TABLE("Table 12. Defects found in the pipeline, their observed symptom and the fix.",
       header=["#", "Defect", "Observed symptom", "Fix"],
       rows=[
           ["1", "Response truncated by an under-provisioned context", "PromptWizard prompts left too little "
@@ -121,19 +133,27 @@ TABLE("Table C1. Defects found in the pipeline, their observed symptom and the f
            "Independent sampling and chained variants (Section 3.2)"],
           ["11", "APE search selected a degenerate prompt", "hyperbaton P0 is APE's own induction template",
            "Left in place and disclosed; same code as the pilot"],
+          ["12", "Candidates of V1 and V2 scored without the answer-format line", "The refinement request does not ask "
+           "to keep it; 93-95% of validated 1.7B candidates lack it and score exactly zero under strict extraction",
+           "Format-protected variants V1P and V2P (Section 3.2); asymmetry reported"],
+          ["13", "Lenient parser rejected a bare letter inside the tags", "Strict accepted what lenient rejected",
+           "Lenient now accepts everything strict accepts"],
       ], full=True, colw=[0.04, 0.26, 0.40, 0.30])
 P("Earlier pre-pilot fixes (a per-seed data-split collision, an unseeded random generator, mismatched "
   "scoring minibatches in APE, and swallowed API errors) are recorded in the repository's REBUILD.md.")
 
-TABLE("Table C2. Serving configuration.",
+TABLE("Table 13. Serving configuration.",
       header=["Item", "Value"],
       rows=[
           ["Inference engine", "vLLM 0.28.0 (V1 engine, model runner V2 disabled, flashinfer sampler disabled), PyTorch 2.13.0+cu132"],
           ["Target and default refiner", "Qwen/Qwen3-1.7B, revision 70d244c, bf16, no quantization"],
-          ["Capability-experiment refiners", "Qwen/Qwen3-4B-AWQ (74d4bd2) and Qwen/Qwen3-8B-AWQ (4da05a8), 4-bit AWQ"],
+          ["Capability-experiment refiners", "qwen/qwen3-235b-a22b-2507 and openai/gpt-6-luna (reasoning effort minimal) "
+           "through the OpenRouter API, 2026-10-20 and 21, temperature 0.7, 3000 new tokens; no local server"],
           ["Context and limits", "max model length 8192; max new tokens 1024 (target), 1500 / 3000 (meta calls); thinking disabled"],
           ["Decoding", "target: temperature 0; refiner: temperature 0.7 (0 for V0); seeds recorded per call"],
-          ["Server flags", "--gpu-memory-utilization 0.80 --max-num-seqs 96 --seed 0; prefix caching on"],
+          ["Server flags", "--gpu-memory-utilization 0.80-0.86 --max-num-seqs 64-128 --seed 0; the server was restarted "
+           "several times and its memory settings changed (fp8 KV cache was tried and not usable without nvcc; "
+           "prefix caching was off for one period); cached scores and generations were kept across restarts"],
           ["Hardware", "NVIDIA RTX 5000 Ada Generation Laptop GPU, 16 GB, driver 596.58; WSL2 (Ubuntu 24.04, kernel 5.15.167.4) on Windows 11"],
           ["Non-determinism", "Continuous batching; identical prompts are re-scored to measure it (Section 5.7)"],
       ], full=True, colw=[0.26, 0.74])
@@ -141,8 +161,7 @@ TABLE("Table C2. Serving configuration.",
 # ===========================================================================
 H1("Appendix D. The Original Evaluation (Exploratory; Validation Leak)")
 P("The first evaluation used GPT-3.5-turbo as target and GPT-4o as refiner on all BBH tasks. It is "
-  "reproduced here only because the manuscript's framing referred to it, and Reviewer comments asked for "
-  "its numbers. Its validation stage scored candidates on the optimizer's own training examples and its "
+  "reproduced here for completeness, because the Introduction refers to it. Its validation stage scored candidates on the optimizer's own training examples and its "
   "loop never scored the unrefined prompt (Section 3.2), single runs at temperature 0. The numbers are "
   "exploratory, are not evidence for MPIR, and were not used to compute any result in Section 5. The "
   "Gemini 3.5 Flash-Lite check used the same model as target and refiner, with the same defects; its "
@@ -173,10 +192,10 @@ if os.path.exists(_orig_path):
     rows.append(["Average", _f(avg_m[1]), _f(avg_m[5]), _f(avg_m[2]), _f(avg_m[4]),
                  f"{float(avg_m[4]) - float(avg_m[2]):+.1f}", _f(avg_a[1]), _f(avg_a[4]), _f(avg_a[2]),
                  _f(avg_a[5]), avg_g[1], avg_g[2]])
-    TABLE("Table D1. Original GPT-3.5-turbo evaluation (accuracy %, single run, leaked validation split) and "
-          "Gemini 3.5 Flash-Lite check. PW = PromptWizard; Diff = PW+MPIR minus PW. Exploratory only.",
+    TABLE("Table 14. Original GPT-3.5-turbo evaluation (accuracy %, single run, leaked validation split) and "
+          "Gemini 3.5 Flash-Lite check. PW = PromptWizard; Diff = PW+MPIR minus PW (points). Exploratory only.",
           header=["Task", "Zero-shot", "Expert", "PW", "PW+MPIR", "Diff", "APE", "APE+MPIR", "ProTeGi",
-                  "ProTeGi+MPIR", "Gem. PW", "Gem. MPIR"],
+                  "ProTeGi+MPIR", "Gemini PW", "Gemini MPIR"],
           rows=rows, full=True)
     ranked = sorted(deltas, key=lambda t: -t[1])
     rank_of = {name: i + 1 for i, (name, _) in enumerate(ranked)}
@@ -191,7 +210,7 @@ if os.path.exists(_orig_path):
 H1("Appendix E. Round-Level Record of the Primary Variant")
 P("Per cell (task / optimizer, seed 42) and round, the outcome of the chained variant V2 with MPIR seed 1 "
   "(F fallback, E echo, D duplicate, V validated with its validation accuracy), then the baseline "
-  "validation accuracy of P0 and the judge's rubric total out of 35 at round 1. Table E2 gives the same for "
+  "validation accuracy of P0 and the judge's rubric total out of 35 at round 1. Table 16 gives the same for "
   "the independent variant V1. Full logs for every variant, seed and round, including candidate texts and "
   "judge outputs, are in results/revision/rounds.")
 
@@ -214,7 +233,7 @@ def _round_rows(variant):
     return rows
 
 
-for _variant, _label in (("v2", "E1"), ("v1", "E2")):
+for _variant, _label in (("v2", "15"), ("v1", "16")):
     _rows = _round_rows(_variant)
     if _rows:
         TABLE(f"Table {_label}. Round-level outcomes, variant {_variant.upper()}, MPIR seed 1 (an asterisk marks "
@@ -225,9 +244,28 @@ for _variant, _label in (("v2", "E1"), ("v1", "E2")):
 # ===========================================================================
 H1("Appendix F. Protocol and Deviations")
 P("The decision rules of Section 4.1 were fixed in REVISION_PROTOCOL.md before any revised experiment "
-  "ran (commit 8fd1397). Dated amendments, all made before results were inspected: serving stack and "
-  "measured throughput (about 1.2k tokens/s at first, then improved by fixing KV-cache thrash), which "
-  "reduced the compute plan; oracle test scoring of every validated candidate only for MPIR seed 1; "
-  "one validation score per candidate in G1; V2L with one seed and no oracle scoring; plain "
-  "temperature-0.7 sampling without top-p; Tier-1 seed-42 cells run only in G2. The protocol and every "
-  "amendment are in the repository; none is a registry entry.")
+  "ran (commit 8fd1397, 2026-10-19). The amendments below are recorded in that file; none is an entry in a "
+  "registry. Amendments 1 to 7 were made before the results of the affected experiment were inspected; "
+  "amendments 8 and 9 were made after results were seen and are exploratory.")
+BULLETS([
+    ("1. 2026-10-20, compute.", "Serving stack vLLM 0.28.0 under WSL2 with measured throughput of about 1.2k "
+     "tokens/s; oracle test scoring of every validated candidate for MPIR seed 1 only; one validation score per "
+     "candidate in the main grid G1; V2L with one seed and no oracle scoring."),
+    ("2. 2026-10-20, sampling.", "Refiner sampling uses temperature 0.7 without top-p (the protocol text said "
+     "top-p 0.95), because top-p was about three times slower on this stack."),
+    ("3. 2026-10-20, grouping.", "Tier-1 seed-42 cells are run only in the mechanism group G2, which contains the "
+     "V2 runs with oracle scoring; G1 covers the other 36 cells."),
+    ("4. 2026-10-20, refiners for D2.", "Local 4B and 8B refiners were not run; the strongest-refiner role of D2 "
+     "went to GPT-6 Luna and Qwen3-235B-A22B through OpenRouter (Section 4.1)."),
+    ("5. 2026-10-20 and 21, scale.", "The main grid has 80 runs instead of the planned 135; MPIR seeds beyond 1 "
+     "were cut after seed 1 was complete."),
+    ("6. 2026-10-20, pooling.", "Cell-level differences pool the MPIR seeds of a cell by averaging per-example "
+     "outcomes (Section 4.1)."),
+    ("7. 2026-10-20, optimizer implementations.", "No change to APE, ProTeGi or PromptWizard code or hyperparameters "
+     "between the pilot and the extra seeds and tasks."),
+    ("8. 2026-10-21, exploratory.", "After the Qwen3-235B refiner showed strict-metric gains, the rubric-free gated "
+     "rewrite with that refiner and a second MPIR seed were added (Section 5.6.1)."),
+    ("9. 2026-10-21, exploratory.", "After an audit found that V1 and V2 candidates are scored without the "
+     "answer-format line, the format-protected variants V1P and V2P were added, and the lenient parser was "
+     "corrected to accept everything the strict parser accepts (Section 5.2)."),
+])

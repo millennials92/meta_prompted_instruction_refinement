@@ -5,72 +5,64 @@ from study_numbers import N  # noqa: F401
 # ===========================================================================
 H1("1. Introduction")
 
-P("The prompt is the specification, the interface and the test fixture of an LLM-based component at "
-  "once, and unlike source code it cannot be checked by a compiler. Large language models (LLMs) perform "
-  "strongly on tasks such as translation ‹101›, summarization ‹35› and question answering ‹102› "
-  "(see ‹34› for a survey), yet small changes in phrasing or formatting can change their accuracy "
-  "substantially ‹33,110›. Prompt design has therefore become a bottleneck for reliable deployment in "
-  "domains such as law and medicine ‹37,38›.")
+P("Large language models (LLMs) are used for translation ‹101›, summarization ‹35› and question answering "
+  "‹102› (see ‹34› for a survey), and are being applied in domains such as law and medicine ‹37,38›. Their "
+  "accuracy depends on the prompt, and small changes in phrasing or formatting can change it substantially "
+  "‹33,110›. Writing and tuning prompts is therefore a practical bottleneck for reliable deployment.")
 
 P("Two families of approaches address that bottleneck. Manual prompting applies heuristics distilled from "
   "practice, such as chain-of-thought reasoning ‹7›, role assignment ‹12› and few-shot demonstration "
   "‹4›; these are interpretable but need expertise and trial and error ‹32,3›. Automatic prompt "
   "optimization (APO) searches the space of prompts with the help of an LLM, using critique, mutation, "
-  "evolution or optimizer-style proposal loops ‹19,20,21,22,23›; it scales but may forfeit the "
-  "structure that human-written prompts carry ‹47›. A natural idea, which we call Meta-Prompted "
-  "Instruction Refinement (MPIR), is to add a cheap post-hoc stage after any APO run: ask an LLM to score "
-  "the optimized prompt against a rubric of manual heuristics, ask it to rewrite the prompt accordingly, "
-  "and keep the rewrite only if it scores better on held-out validation questions.")
+  "evolution or optimizer-style proposal loops ‹19,20,21,22,23›; it scales, but the prompts it produces "
+  "are often less structured and harder to interpret than human-written ones ‹47›. A natural idea, which we "
+  "call Meta-Prompted Instruction Refinement (MPIR), is to add a cheap post-hoc stage after any APO run: ask "
+  "an LLM to score the optimized prompt against a rubric of manual heuristics, ask it to rewrite the prompt "
+  "accordingly, and keep the rewrite only if it scores better on held-out validation questions.")
 
-P("This paper does not propose MPIR as a new method. It reports a pre-specified test of whether that "
-  "idea works when the same small open-weight model plays every role, and what the evidence does and does "
-  "not allow us to conclude. The study has a history that readers need in order to weigh it. An earlier "
-  "evaluation used GPT-4o as the refining model and GPT-3.5-turbo as the target on 23 Big-Bench Hard (BBH) "
-  "tasks ‹52›. It reported per-task gains over PromptWizard ‹23› on a majority of tasks but a pooled gain "
-  "that was not statistically significant (Appendix D reproduces those numbers). A later code audit found "
-  "two defects: the validation stage scored candidate prompts on the optimizer's own training examples, "
-  "and the refinement loop never scored the unrefined prompt, so a refinement was always accepted "
-  "whatever it scored. A manuscript describing that evaluation was desk-rejected by another journal "
-  "without external review. The numbers in it should be treated as exploratory and are not used as "
-  "evidence here.")
+P("Whether such a layer helps matters in practice. It costs a few model calls and can be added to any APO "
+  "pipeline, but if it does not help those calls are wasted, and an ungated version can make prompts worse. "
+  "A clean test is not trivial: the rewrite is produced by a model that may be no more capable than the "
+  "target, the gate uses a small validation set, and benchmark accuracy depends on how answers are "
+  "extracted. We therefore report a pre-specified test, and we treat a null result as informative.")
 
-P("We therefore asked a narrower question that the first evaluation could not answer: are the apparent "
-  "gains attributable to the rubric-guided refinement mechanism, or to the refining model being more "
-  "capable than the model it refines for? A first pilot with Qwen3-1.7B in every role found the refined "
-  "prompt byte-identical to the base prompt in all nine (task, optimizer) cells. Review of that pilot, "
-  "however, exposed weaknesses that we take seriously: the seven refinement rounds were not independent "
-  "attempts, the composition of the outcomes was not reported, the statistics were degenerate, the task "
-  "choice was biased, the capability-gap explanation was untested, and the evaluation harness floored "
-  "several baselines. This revision answers each of them with new experiments, specified in a "
-  "version-controlled protocol before they were run (Section 4.1).")
+P("The idea was first evaluated with GPT-4o as the refining model and GPT-3.5-turbo as the target on the "
+  "tasks of Big-Bench Hard (BBH) ‹27›. That evaluation reported per-task gains over PromptWizard ‹23› but a "
+  "pooled gain that was not significant (Appendix D reproduces its numbers). A later audit found that its "
+  "validation stage scored candidates on the optimizer's own training examples and that its loop never "
+  "scored the unrefined prompt. An earlier version of this study was submitted elsewhere and was not "
+  "externally reviewed; the first evaluation's numbers are exploratory and are not used as evidence "
+  "here. A pilot with Qwen3-1.7B in every role then found no effect, but its seven refinement rounds were "
+  "not independent attempts, and its statistics, task choice and answer-extraction harness were open to "
+  "criticism. This paper replaces the pilot with a new study.")
 
 P("We ask four research questions. RQ1: with the refinement loop repaired so that rounds are genuinely "
   "distinct attempts, does gated MPIR improve a base optimizer's prompt over many tasks, optimizers and "
-  "seeds? RQ2: is the failure to improve a property of the candidates or of the coarse validation gate? "
+  "seeds? RQ2: is a failure to improve a property of the candidates or of the coarse validation gate? "
   "RQ3: does a more capable refining model change the answer? RQ4: does the rubric judge measure "
-  "anything related to accuracy? @@SUMMARY@@")
+  "anything related to accuracy? (Terms such as cell and run are defined in Section 4.2.) "
+  "In brief: with a 1.7B refiner the layer changed the prompt in "
+  f"{N['main_grid']['runs_accepting']} of {N['main_grid']['runs']} runs and won in {N['main_grid']['wins']} "
+  f"of {N['main_grid']['n_cells']} cells, mainly because that refiner rarely produces a usable candidate that keeps "
+  "the answer format (RQ1, RQ2); a much larger refiner obtained strict-metric gains in several cells, but most "
+  "of them reverse under lenient scoring and a rubric-free rewrite reaches gains of the same kind (RQ3); and "
+  "the rubric score is only weakly related to accuracy (RQ4).")
 
 P("The contributions are:")
 BULLETS([
-    ("A repaired and instrumented refinement loop.",
+    ("A repaired, instrumented refinement loop.",
      "Rounds differ by sampling and, in the chained variant, by the history of rejected candidates; every "
-     "round is logged with an outcome category (fallback, echo-rejected, duplicate, validated), its "
-     "validation and test scores, and the judge's rubric total."),
+     "round is logged with its outcome (fallback, echo, duplicate, validated), its validation and test scores "
+     "and the judge's rubric total."),
     ("A pre-specified, multi-seed, multi-task evaluation.",
-     "45 base prompts (three optimizers, nine tasks, up to three seeds), with decision rules fixed in a "
-     "time-stamped protocol and a random, documented choice of six tasks to complement the three pilot tasks."),
-    ("Diagnostics that make a null result interpretable.",
-     "Oracle scoring of all candidates on the test split, acceptance-rule sensitivity, a serving-noise "
-     "floor and minimum detectable effect, a gated free-rewrite control, an uncorrected-algorithm "
-     "comparison, and a judge-validity analysis against a stronger reference judge."),
-    ("Harness findings.",
-     "Strict answer extraction floors some baselines; lenient re-scoring of the saved raw outputs and a "
-     "catalogue of the pipeline defects, with serving configuration, are reported (Appendix C)."),
+     "45 base prompts (three optimizers, nine tasks, up to three seeds), decision rules fixed in a "
+     "time-stamped protocol, and a random, documented choice of six tasks to complement the three pilot tasks."),
+    ("Diagnostics that make the result interpretable.",
+     "Oracle scoring of all candidates, acceptance-rule sensitivity, a serving-noise floor and minimum "
+     "detectable effect, gated and format-protected controls, strict and lenient answer extraction, a "
+     "comparison with the uncorrected algorithm and a judge-validity analysis; defects of the pipeline "
+     "and the serving configuration are catalogued (Appendix C)."),
 ])
-
-P("Section 2 reviews related work. Section 3 describes the layer under test. Section 4 gives the design "
-  "and statistics. Section 5 reports results, Section 6 discusses what they support and their limits, and "
-  "Section 7 concludes. Code, per-example predictions and per-round logs are public.")
 
 # ===========================================================================
 H1("2. Related Work")
@@ -86,11 +78,11 @@ P("Prompting steers an LLM through in-context learning without changing its weig
   "personas can hurt ‹16›, and a large study found that adding personas to system prompts does not "
   "reliably improve performance ‹104›. Step-back prompting abstracts key principles before solving ‹13›; a "
   "behavioural benchmark of 35 LLMs found that it fosters model-based behaviour in sequential decision "
-  "tasks ‹17›, which is weaker support for knowledge-intensive reasoning than the original step-back "
-  "evidence. Models attend unevenly to information in long contexts ‹15,14›, and vendor guidance reports "
-  "recency effects ‹43›; whether either matters for the short prompts studied here is an empirical "
+  "tasks ‹17›, although this is weaker evidence for knowledge-intensive reasoning than the original step-back "
+  "results. Models attend unevenly to information in long contexts ‹15,14›, and vendor guidance reports "
+  "recency effects for some models while reporting no difference for GPT-4-class models ‹43›; whether either matters for the short prompts studied here is an empirical "
   "question rather than a premise. Self-consistency, a decoding-time heuristic, samples several reasoning "
-  "paths and votes ‹66›; MPIR does not use it.")
+  "paths and votes ‹66›;")
 
 H2("2.2. Automatic Prompt Optimization and Meta-Prompting")
 P("APO methods generate, evaluate and select prompts iteratively ‹47›. APE induces instructions from "
