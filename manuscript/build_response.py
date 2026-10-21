@@ -14,7 +14,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from study_numbers import N  # noqa: E402
 
-TEMPLATE = r"C:\Users\vinh.dq4\.claude\uploads\f87e0ba5-b57b-42c8-8e6a-ebc2d3ad0026\77408ded-IEEE-Access-Response-to-Reviewers-template-6.26.23.docx"
+TEMPLATE = os.path.join(HERE, "templates", "IEEE-Access-Response-to-Reviewers-template.docx")
 OUT = os.path.join(HERE, "response_to_reviewers.docx")
 
 MG, CAP, NOISE, LEG, EX = N["main_grid"], N["capability"], N["noise"], N["legacy"], N["exemplar"]
