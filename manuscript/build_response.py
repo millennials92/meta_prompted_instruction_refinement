@@ -18,6 +18,7 @@ TEMPLATE = r"C:\Users\vinh.dq4\.claude\uploads\f87e0ba5-b57b-42c8-8e6a-ebc2d3ad0
 OUT = os.path.join(HERE, "response_to_reviewers.docx")
 
 MG, CAP, NOISE, LEG, EX = N["main_grid"], N["capability"], N["noise"], N["legacy"], N["exemplar"]
+CAPL = N["capability_lenient"]
 C, OR, PVR = N["composition"], N["oracle"], N["pilot_vs_rescore"]
 JV = N["judge_validity"]["judges"]
 
@@ -58,11 +59,11 @@ ENTRIES = [
      "Sections 4.6, 5.3 and 5.7 and Table 7 replace the old statistics; Section 5.10 (Table 11) gives the decision rules and outcomes."),
     ("Reviewer#1, Major comment 4",
      "Task selection (winner's curse), 'pre-registration' without registry/timestamp/rule text, single seed at temperature 0.",
-     "(a) We now state that the pilot tasks were chosen on a biased statistic, rank them in the original (leaked) results (Appendix D), and add six tasks drawn uniformly at random with a stated generator and seed (random.Random(20261019)). (b) 'Pre-registered' is withdrawn. The pilot's go/no-go rule was written in a version-controlled planning document (commit 7612aa0, 2026-09-03) before the pilot ran; several pipeline fixes were made while it ran, and these are listed. For this revision, REVISION_PROTOCOL.md (commit 8fd1397, 2026-10-19) fixed the decision rules before any revised experiment; its dated amendments, including one exploratory follow-up added after the results were seen, are listed. Neither is a registry entry and the paper says so. (c) Tier 1 now uses three seeds (42-44), and the main grid uses up to three MPIR seeds. We did not run all BBH tasks: nine of 27 task files were used.",
+     "(a) We now state that the pilot tasks were chosen on a biased statistic, rank them in the original (leaked) results (Appendix D), and add six tasks drawn uniformly at random with a stated generator and seed (random.Random(20261019)). (b) 'Pre-registered' is withdrawn. The pilot's go/no-go rule was written in a version-controlled planning document (commit 7612aa0, 2026-09-03) before the pilot ran; several pipeline fixes were made while it ran, and these are listed. For this revision, REVISION_PROTOCOL.md (commit 8fd1397, 2026-10-19) fixed the decision rules before any revised experiment; its dated amendments, including two exploratory additions made after results were seen, are listed. Neither is a registry entry and the paper says so. (c) Tier 1 now uses three seeds (42-44), and the main grid uses up to three MPIR seeds. We did not run all BBH tasks: nine of 27 task files were used.",
      "Sections 4.1 and 4.2, Appendix D and Appendix F; REVISION_PROTOCOL.md in the repository."),
     ("Reviewer#1, Major comment 5",
      "The capability-gap interpretation is untested; original results and the Gemini check are not shown; either rerun GPT-4o/GPT-3.5 (and Gemini) with a mid-sized open model added, or remove the claim.",
-     f"We could not rerun the GPT-4o/GPT-3.5-turbo configuration (no API access for that setup), so the claim that the layer 'depends on the refiner's capability' is no longer stated as a finding. We instead varied the refiner with the target fixed at Qwen3-1.7B: Qwen3-235B-A22B and GPT-6 Luna (through a router API). With Qwen3-235B the layer produced significant gains in {QW['wins']} of 9 cells (mean {pp(QW['mean_diff'])} points); with GPT-6 Luna in {LU['wins']} cell (mean {pp(LU['mean_diff'])} points). The gains occur where the base prompt fails on answer format, and the accepted candidates add a format instruction and example, so they do not isolate the rubric.{FOLLOW_TEXT} Local 4B/8B refiners were not run because the shared GPU was too slow for the extra servers. The original per-task GPT-3.5 results, with the validation leak flagged, and the Gemini check are in Appendix D.",
+     f"We could not rerun the GPT-4o/GPT-3.5-turbo configuration (no API access for that setup), so the claim that the layer 'depends on the refiner's capability' is no longer stated as a finding. We instead varied the refiner with the target fixed at Qwen3-1.7B: Qwen3-235B-A22B and GPT-6 Luna (through a router API). With Qwen3-235B the layer produced significant gains in {QW['wins']} of 9 cells (mean {pp(QW['mean_diff'])} points); with GPT-6 Luna in {LU['wins']} cell (mean {pp(LU['mean_diff'])} points). Under lenient answer extraction only one of these gains remains in the first seed (hyperbaton with PromptWizard; mean {pp(CAPL['v2|qwen235']['mean_diff'])} points, {CAPL['v2|qwen235']['losses']} significant losses), and in the second seed the lenient mean is {pp(N['follow_seed2_lenient']['mean_diff'])} points. The strict gains occur where the base prompt fails on answer format, and the accepted candidates add a format instruction and example, so they do not isolate the rubric.{FOLLOW_TEXT} Local 4B/8B refiners were not run because the shared GPU was too slow for the extra servers. The original per-task GPT-3.5 results, with the validation leak flagged, and the Gemini check are in Appendix D.",
      "Sections 5.6 and 6.1 and Table 9; Appendix D (Table 14); the abstract and conclusion state the limited scope."),
     ("Reviewer#1, Major comment 6",
      "The evaluation harness confounds the comparison; 'format compliance' is under-evidenced; the six pipeline bugs are described only in a log; give the serving configuration.",
@@ -70,7 +71,7 @@ ENTRIES = [
      "Section 5.1, Tables 4 and 5, Appendix C (Tables 12 and 13)."),
     ("Reviewer#1, Major comment 7",
      "The validation gate is coarse; the free-rewrite control has no gate; add a gated free rewrite, sensitivity to validation size and acceptance rule, and the P0 score distribution across repeated runs.",
-     f"We added a gated free rewrite (V3), scored every validated candidate on the test split, and re-applied four acceptance rules offline (strict, non-strict, mean of three validation scorings, and a larger gate formed from the validation split plus half of the test split). The gate is not the bottleneck: ungated candidates are on average {pp(OR['v1|1.7b']['mean_candidate_delta'])} and {pp(OR['v2|1.7b']['mean_candidate_delta'])} points relative to P0 (V1, V2), no cell has a candidate that beats P0 by 3 points, and validation tracks test accuracy (Spearman {N['val_test_corr']['all']['pooled_spearman']:.2f}). The statement that unstructured rewriting is 'at least as unreliable' as MPIR was removed. The repeated-scoring distribution of P0 is in Section 5.7.",
+     f"We added a gated free rewrite (V3), scored every validated candidate on the test split, and re-applied four acceptance rules offline (strict, non-strict, mean of three validation scorings, and a larger gate formed from the validation split plus half of the test split). The gate is not the bottleneck: ungated candidates are on average {pp(OR['v1|1.7b']['mean_candidate_delta'])} and {pp(OR['v2|1.7b']['mean_candidate_delta'])} points relative to P0 (V1, V2), no cell has a candidate that beats P0 by 3 points, and validation tracks test accuracy across candidates (Spearman {N['val_test_corr']['all']['pooled_spearman']:.2f}), although this is driven by candidates that score zero and is {N['val_test_corr']['all']['pos_val_1.7b']['spearman']:.2f} among plausible 1.7B candidates (n = {N['val_test_corr']['all']['pos_val_1.7b']['n']}). The statement that unstructured rewriting is 'at least as unreliable' as MPIR was removed. The repeated-scoring distribution of P0 is in Section 5.7.",
      "Sections 5.4, 5.5 and 5.7, Table 8."),
     ("Reviewer#1, Major comment 8",
      "The rubric and the judge are not validated; 'closely approximating expert human review' is unsupported; Objective 1 is declared achieved.",
@@ -110,7 +111,7 @@ ENTRIES = [
     ("Reviewer#1, Minor comment 12", "Practitioner recommendations generalize from one model size.",
      "The recommendations are rewritten with explicit scope qualifiers.", "Section 6.2."),
     ("Reviewer#1, Minor comment 13", "Free-rewrite results called 'inconsistent' and 'harmful'; +3.0 pp is 6 items.",
-     "The text now notes that the hyperbaton difference is 6 items and within noise.", "Section 5.5."),
+     "The text now notes that the hyperbaton difference is 4 test items and within noise.", "Section 5.5."),
     ("Reviewer#1, Minor comment 14", "Appendix A: the optimized prompt opens with an irrelevant question.",
      "Appendix A now states that the base prompts show the quality of the 1.7B-driven upstream baselines, which limits what refining them can show; the degenerate APE prompt is disclosed.", "Appendix A, Section 6.3.1."),
     ("Reviewer#1, Minor comment 15", "Cross-references (Sec. 4.5 as decision rule).",
@@ -134,9 +135,16 @@ ENTRIES = [
     ("Reviewer#1, Question 5", "Where and when was the pilot pre-registered; what changed after it began?",
      "It was not pre-registered in a registry. The rule was in REBUILD.md (commit 7612aa0, 2026-09-03), before the pilot. Pipeline changes made while the pilot ran are in Appendix C; the revision protocol and its amendments are in Appendix F.", "Sections 4.1, Appendices C and F."),
     ("Reviewer#1, Question 6", "Conclusions under lenient extraction; fraction of responses containing a correct option.",
-     "Lenient accuracy is reported for every base prompt; the conclusions about MPIR do not change, but the apparent weakness of exemplar-free baselines is largely a format effect.", "Section 5.1, Table 4."),
+     f"Lenient accuracy is reported for every base prompt and for the final prompts of the strong refiners. The apparent "
+     f"weakness of exemplar-free baselines is largely a format effect, and it changes the reading of the strong-refiner "
+     f"gains: under lenient extraction only one of them remains in the first seed (Section 5.6). The exemplar "
+     f"intervention gains {pp(EX['mean_gain_by_optimizer']['protegi'])} points for ProTeGi under strict and "
+     f"{pp(N['exemplar_lenient']['mean_by_optimizer']['protegi'])} under lenient extraction.", "Section 5.1, Table 4."),
     ("Reviewer#1, Question 7", "Stronger refiner than target with gate, harness and splits fixed.",
-     f"Done with Qwen3-235B-A22B and GPT-6 Luna (Section 5.6): wins in {QW['wins']} and {LU['wins']} of 9 cells.", "Section 5.6."),
+     f"Done with Qwen3-235B-A22B and GPT-6 Luna (Section 5.6): strict wins in {QW['wins']} and {LU['wins']} of 9 cells; "
+     f"under lenient extraction the first-seed Qwen3-235B result is {CAPL['v2|qwen235']['wins']} win and "
+     f"{CAPL['v2|qwen235']['losses']} significant losses, and the format-protected variants of the 1.7B refiner remain "
+     f"worse than P0.", "Section 5.6."),
     ("Reviewer#1, Question 8", "Was this work or the original evaluation described in an earlier submission, preprint or publication?",
      "The original evaluation was described in a manuscript submitted to another journal (AI Open) and desk-rejected without external review. It has not been published or posted as a preprint. This manuscript is a new study.", "Section 1."),
     # ------------------------------------------------------------------ Reviewer 2
@@ -151,7 +159,8 @@ ENTRIES = [
      "Reported in Tables 15 and 16 and Table 6, separating degraded candidates, ties and guard-intercepted outputs; full logs are in the repository.", "Appendix E, Table 6."),
     # ------------------------------------------------------------------ Reviewer 3
     ("Reviewer#3, Concern 1", "Run the experiment that answers the research question; the pilot removes the capability gap and shrinks the judge at the same time.",
-     f"We varied the refiner with the target fixed (Section 5.6). The question is only partly answered: a much larger refiner helps in some cells, GPT-6 Luna in fewer, and the gains coincide with a repaired answer format.{FOLLOW_TEXT} The original GPT-4o/GPT-3.5 setting was not rerun.", "Sections 5.6 and 6.1."),
+     f"We varied the refiner with the target fixed (Section 5.6). The question is only partly answered: a much larger refiner gains under strict scoring in some cells, GPT-6 Luna in fewer, and most of the strict gains do not hold "
+     f"under lenient scoring.{FOLLOW_TEXT} The original GPT-4o/GPT-3.5 setting was not rerun.", "Sections 5.6 and 6.1."),
     ("Reviewer#3, Concern 2", "Refine from the current best prompt or carry the critique history forward.",
      "Done (variant V2, chained); the independent variant V1 is also reported.", "Sections 3.2 and 5.3."),
     ("Reviewer#3, Concern 3", "Reframe the paper around what it shows.", "Title, abstract, introduction, Table 1 and conclusion are reframed.", "Throughout."),
@@ -195,11 +204,11 @@ def main():
         ("Summary of changes. ",
          "The revised manuscript is a new study. We repaired the refinement loop, added a time-stamped protocol, "
          f"and ran {MG['n_cells']} base prompts with three optimizers, nine tasks and up to three seeds, plus a "
-         "mechanism study, a refiner-capability study, a judge-validity analysis, a serving-noise measurement and "
-         "a format-exemplar intervention. We reframed the paper as a negative-result report. Two things we could "
+         "mechanism study, a refiner-capability study, format-protected variants, a judge-validity analysis, a "
+         "serving-noise measurement and a format-exemplar intervention. We reframed the paper as a negative-result report. Two things we could "
          "not do: rerun the GPT-4o/GPT-3.5-turbo configuration, and collect human ratings of the rubric. We "
          "say so in the manuscript. The new title is 'Does Rubric-Guided Refinement Improve Automatically "
-         "Optimized Prompts? A Pre-Specified Negative-Result Study with Small Open-Weight Models'. Section "
+         "Optimized Prompts? A Pre-Specified Negative-Result Study'. Section "
          "numbers below refer to the revised manuscript; code, per-round logs and generations are public."),
     ]
     for label, text in intro:

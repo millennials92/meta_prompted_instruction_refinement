@@ -645,6 +645,23 @@ def capability_lenient(runs: list[dict]) -> dict:
     return out
 
 
+def follow_seed2_lenient(runs: list[dict]) -> dict:
+    """Lenient final-vs-P0 differences for the second MPIR seed of the Qwen3-235B chained variant."""
+    cells = {}
+    for r in runs_where(runs, variant="v2", refiner="qwen235", mseed=2):
+        cell = cell_of(r)
+        a, b = _lenient_vector(cell, r["p0_hash"]), _lenient_vector(cell, r["final_hash"])
+        if a is None or b is None:
+            continue
+        res = paired_bootstrap(a >= 1, b >= 1)
+        cells[cell.key] = {"diff": res["diff"], "lo": res["lo"], "hi": res["hi"]}
+    if not cells:
+        return {}
+    return {"cells": cells, "wins": sum(1 for c in cells.values() if c["diff"] > 0 and c["lo"] > 0),
+            "losses": sum(1 for c in cells.values() if c["diff"] < 0 and c["hi"] < 0),
+            "mean_diff": float(np.mean([c["diff"] for c in cells.values()]))}
+
+
 def exemplar_lenient() -> dict:
     """Lenient accuracy before and after appending the single format exemplar (from the cached raw outputs)."""
     from .data import load_p0
@@ -687,6 +704,7 @@ def main() -> None:
     summary["winner_cells"] = winner_cells(runs)
     summary["capability_lenient"] = capability_lenient(runs)
     summary["exemplar_lenient"] = exemplar_lenient()
+    summary["follow_seed2_lenient"] = follow_seed2_lenient(runs)
     summary["noise"] = noise_floor()
     from .data import tier1_cells, tier2_cells
     summary["p0_parsing"] = p0_parsing(tier1_cells() + tier2_cells())

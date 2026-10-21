@@ -4,6 +4,8 @@ import json
 import os
 
 from blocks_api import H1, H2, H3, P, BULLETS, TABLE, CODE  # noqa: F401
+from scipy.stats import beta as _beta
+
 from study_numbers import N
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -141,13 +143,14 @@ for key, label in [("v0|1.7b", "V0 legacy"), ("v1|1.7b", "V1 independent"), ("v2
     c = C[key]
     rows.append([label, str(c["runs"]), str(c["rounds"]), str(c["fallback"]), str(c["echo"]), str(c["duplicate"]),
                  str(c["validated"]), f"{c['val_better']}/{c['val_equal']}/{c['val_worse']}", str(c["accepted"]),
-                 f"{c['runs_with_acceptance']}/{c['runs']}"])
+                 f"{c['runs_with_acceptance']}/{c['runs']}", f"{c['mean_distinct_candidates']:.1f}"])
 TABLE("Table 6. Outcome of every refinement round (all runs of a variant pooled; refiner Qwen3-1.7B unless "
       "stated). Fallback: no delimiters. Echo: template phrase. Duplicate: same text as an earlier prompt. "
       "Validated rounds are split by validation score against the baseline (better/equal/worse). The last "
-      "column counts runs whose final prompt differs from P0.",
+      "column pair gives the runs whose final prompt differs from P0 and the mean number of distinct candidate "
+      "prompts per run.",
       header=["Variant", "Runs", "Rounds", "Fallback", "Echo", "Dup.", "Validated", "Val. better/equal/worse",
-              "Accepted", "Runs changed"],
+              "Accepted", "Runs changed", "Distinct per run"],
       rows=rows, full=True)
 
 _prot = ""
@@ -166,9 +169,10 @@ P(f"For the 1.7B refiner, {share(V2['fallback'] + V2['echo'], V2['rounds'])}% of
   f"below the baseline, {V2['val_equal']} tied and {V2['val_better']} scored higher. Most validated candidates "
   "are far worse, not tied. An audit found a large part of the reason: the refinement request does not "
   "ask the refiner to keep the answer-format line, and "
-  f"{pct(LO['v1|1.7b']['share_without_tag'], 0)}% of the validated V1 and {pct(LO['v2|1.7b']['share_without_tag'], 0)}% "
-  "of the validated V2 candidates lack it, so they score exactly zero under strict extraction; the "
-  "rubric-free rewrite, whose prompt asks to preserve the answer format, loses it in none. The "
+  f"{pct(LO['v1|1.7b']['share_without_tag'], 0)}% of the oracle-scored V1 and {pct(LO['v2|1.7b']['share_without_tag'], 0)}% "
+  "of the oracle-scored V2 candidates (MPIR seed 1) lack it, so they score exactly zero under strict extraction; "
+  "the candidates of the rubric-free rewrite, which has the line appended in code, and of the protected "
+  "variants always carry it. The "
   "unprotected numbers therefore measure a failure of the 1.7B refiner to keep the format as much as a "
   "failure of the rubric. To separate the two we added the format-protected variants V1P and V2P, which "
   "append the answer-format line to every candidate. " + _prot +
@@ -185,8 +189,8 @@ P(f"With the 1.7B model refining its own prompts through the chained variant, th
   f"over cells is {pp(MG['mean_diff'], 2)} points (hierarchical bootstrap interval "
   f"[{pp(MG['hier']['lo'], 2)}, {pp(MG['hier']['hi'], 2)}], which is almost degenerate because 44 of 45 cells "
   f"are exactly zero), and {MG['wins']} of {MG['n_cells']} cells satisfy the win criterion. By the "
-  f"pre-specified rule (D1) the outcome is '{MG['verdict']}'; a rule-of-three bound puts the "
-  f"acceptance rate of this procedure below about {100 * 3 / MG['runs']:.0f}% of runs. The result does not "
+  f"pre-specified rule (D1) the outcome is '{MG['verdict']}'; the exact one-sided 95% upper bound "
+  f"on the acceptance rate of this procedure is {100 * _beta.ppf(0.975, MG['runs_accepting'] + 1, MG['runs'] - MG['runs_accepting']):.0f}% of runs. The result does not "
   "depend on the base optimizer: "
   + "; ".join(f"{OPT_NAME[o]} {GO[o]['accepted_runs']} of {GO[o]['runs']} runs changed" for o in OPTS) + ". "
   "D1 was specified and run for the unprotected V2, and Section 5.2 shows that this procedure is limited by "
@@ -218,8 +222,8 @@ P("To separate the candidates from the gate, every validated candidate of MPIR s
   f"full test split. Ungated, the mean test-accuracy change of a 1.7B-refiner candidate relative to its P0 is "
   f"{pp(O1['mean_candidate_delta'])} points for the independent variant ({O1['n_candidates']} candidates) and "
   f"{pp(O2['mean_candidate_delta'])} points for the chained variant ({O2['n_candidates']}), and no cell has a "
-  f"candidate that beats P0 by 3 points or more ({O1['cells_best_ge_3pts']} and {O2['cells_best_ge_3pts']} of 9 "
-  "cells); these candidates mostly lack the answer-format line (Section 5.2), so the figure largely "
+  f"candidate that beats P0 by 3 points or more ({O1['cells_best_ge_3pts']} of 9 and {O2['cells_best_ge_3pts']} of 8 "
+  "cells with a validated candidate); these candidates mostly lack the answer-format line (Section 5.2), so the figure largely "
   "reflects format loss. Candidates that keep the format are still not better on average: "
   + (f"{pp((OR['v1p|1.7b']['mean_candidate_delta'] * OR['v1p|1.7b']['n_candidates'] + OR['v2p|1.7b']['mean_candidate_delta'] * OR['v2p|1.7b']['n_candidates']) / (OR['v1p|1.7b']['n_candidates'] + OR['v2p|1.7b']['n_candidates']))} "
      f"points for the format-protected 1.7B candidates of V1P and V2P ({OR['v1p|1.7b']['n_candidates'] + OR['v2p|1.7b']['n_candidates']} candidates, none beating P0 by 3 points or more), "
@@ -267,18 +271,21 @@ P("In the pilot, the ungated rubric-free rewrite of the PromptWizard prompt chan
   f"{V1['runs_with_acceptance']} of {V1['runs']} for the independent rubric variant and "
   f"{CAP['v2|1.7b']['runs_accepting']} of {CAP['v2|1.7b']['runs']} for the chained one (Tier-1 runs). Part of this "
   "gap is the format asymmetry of Section 5.2, not the rewriting style. V3 has "
-  f"{CAP['v3|1.7b']['wins']} winning cells ({listing(w3)}) and {len(l3)} cells in which the gate accepted a "
-  f"harmful rewrite ({listing(l3)}), for a mean difference of {pp(CAP['v3|1.7b']['mean_diff'])} points. So the "
-  "gate does not reliably protect against harm either, since 25 questions are noisy. We cannot say that "
-  "unstructured rewriting is worse than rubric-guided refinement: the rubric-free variant did at least as well "
-  f"({pp(CAP['v3|1.7b']['mean_diff'])} against {pp(CAP['v1|1.7b']['mean_diff'])} and "
-  f"{pp(CAP['v2|1.7b']['mean_diff'])} points), and the rubric adds nothing detectable with this refiner.")
+  f"{CAP['v3|1.7b']['wins']} winning cells ({listing(w3)}) and {len(l3)} cell(s) in which the gate accepted a "
+  f"significantly harmful rewrite ({listing(l3)}), for a mean strict difference of {pp(CAP['v3|1.7b']['mean_diff'])} "
+  f"points; under lenient extraction it has {CAPL['v3|1.7b']['wins']} wins and {CAPL['v3|1.7b']['losses']} losses "
+  f"(mean {pp(CAPL['v3|1.7b']['mean_diff'])} points, against {pp(CAPL['v1|1.7b']['mean_diff'])} for V1 and "
+  f"{pp(CAPL['v2|1.7b']['mean_diff'])} for V2). So the gate does not reliably protect against harm, since 25 "
+  "questions are noisy, and neither variant helps with this refiner: the rubric-free rewrite has more strict "
+  "wins, partly because of the format asymmetry, and is not better under lenient scoring, so the rubric adds "
+  "nothing detectable and we cannot say that unstructured rewriting is worse.")
 
 # ===========================================================================
 H2("5.6. A More Capable Refiner (RQ3, D2)")
 rows = []
 for key, label in [("v1|1.7b", "Qwen3-1.7B (self), V1"), ("v2|1.7b", "Qwen3-1.7B (self), V2"),
-                   ("v3|1.7b", "Qwen3-1.7B (self), V3"), ("v2|qwen235", "Qwen3-235B-A22B, V2"),
+                   ("v3|1.7b", "Qwen3-1.7B (self), V3"), ("v1p|1.7b", "Qwen3-1.7B (self), V1P"),
+                   ("v2p|1.7b", "Qwen3-1.7B (self), V2P"), ("v2|qwen235", "Qwen3-235B-A22B, V2"),
                    ("v3|qwen235", "Qwen3-235B-A22B, V3"), ("v2|gpt6luna", "GPT-6 Luna, V2")]:
     if key not in CAP:
         continue
@@ -312,15 +319,19 @@ P(f"With Qwen3-235B-A22B as refiner, {QW['validated']} of {QW['rounds']} rounds 
   f"{CAP['v2|gpt6luna']['wins']} cell wins, against the required 3. With Qwen3-235B the strict rule is met, but "
   "only post hoc, since the role was assigned to GPT-6 Luna.")
 
-P("Strict accuracy is, however, the wrong judge of these gains. Under lenient extraction (Table 9) "
-  f"Qwen3-235B wins in {CAPL['v2|qwen235']['wins']} cell and loses in {CAPL['v2|qwen235']['losses']}, with a mean "
-  f"difference of {pp(CAPL['v2|qwen235']['mean_diff'])} points. The three ProTeGi cells in which the strict "
-  "gain is large are cells where the base prompt reasons about as well as before but wraps whole sentences "
-  "in the answer tags; the accepted candidate (Figure B.3) adds an explicit instruction to wrap the final "
-  "answer on its own line and a worked output example, which repairs the tag, while the model's "
-  "reasoning under the long structured prompt is worse (lenient accuracy falls, for example from "
+FS2L = N["follow_seed2_lenient"]
+P("Strict accuracy is, however, a poor judge of these gains. Under lenient extraction (Table 9), in the first "
+  f"MPIR seed Qwen3-235B wins in {CAPL['v2|qwen235']['wins']} cell and loses significantly in "
+  f"{CAPL['v2|qwen235']['losses']}, with a mean difference of {pp(CAPL['v2|qwen235']['mean_diff'])} points; in the "
+  f"second seed the lenient mean is {pp(FS2L['mean_diff'])} points with {FS2L['wins']} win and "
+  f"{FS2L['losses']} significant losses, so the other strict gains vanish there instead of reversing. The three "
+  "ProTeGi cells in which the strict gain is large are cells where the base prompt reasons about as well as "
+  "before but wraps whole sentences in the answer tags; the accepted candidate (Figure B.3) adds an explicit "
+  "instruction to wrap the final answer on its own line and a worked output example, which repairs the tag, "
+  "while lenient accuracy does not improve, and in the first seed falls (we did not test why; the long "
+  "structured prompt may make the 1.7B target reason worse), for example from "
   f"{pct(N['winner_cells']['qwen235|hyperbaton__protegi__s42']['p0_lenient'])}% to "
-  f"{pct(N['winner_cells']['qwen235|hyperbaton__protegi__s42']['final_lenient'])}% on hyperbaton with ProTeGi). "
+  f"{pct(N['winner_cells']['qwen235|hyperbaton__protegi__s42']['final_lenient'])}% on hyperbaton with ProTeGi. "
   "A gate that uses strict extraction accepts such candidates, which is a concrete way in which answer "
   "extraction and the gate interact. The single gain that holds under both metrics is "
   f"hyperbaton with PromptWizard, whose base prompt already had the tag (strict = lenient = "
@@ -328,8 +339,8 @@ P("Strict accuracy is, however, the wrong judge of these gains. Under lenient ex
   "refiners, add a role, a step-back and numbered reasoning steps and reach "
   f"{pct(N['winner_cells']['qwen235|hyperbaton__promptwizard__s42']['final_strict'], 0)}% and "
   f"{pct(N['winner_cells']['gpt6luna|hyperbaton__promptwizard__s42']['final_strict'], 0)}%. One cell out of nine, "
-  "on a base prompt that opens with an irrelevant sentence (Appendix A), is a gain that a rubric-based "
-  "rewrite can plausibly claim; there is no multiplicity correction and no replication on another task. "
+  "on a near-chance base prompt (59% against 50% chance) whose instruction is garbled, is a gain that a "
+  "rubric-based rewrite can plausibly claim; there is no multiplicity correction and no replication on another task. "
   "The two strong refiners differ, one belongs to the target's family and one was run with minimal reasoning, "
   "so capability, family and reasoning budget are confounded, and the experiment is an upper-bound probe, not a "
   "controlled capability scale.")
@@ -345,7 +356,8 @@ P("Because the strong-refiner signal appeared after the pre-specified analysis, 
   f"{pp(CAPL['v3|qwen235']['mean_diff'])} points. A refiner that does not use the rubric therefore reaches "
   "gains of the same kind, so the rubric is not what produces them. Second, a second MPIR seed of the "
   f"rubric-guided variant gives {pp(FS2['mean_diff'])} points and {FS2['wins']} winning cells, so the strict "
-  "pattern is stable across seeds.")
+  f"pattern is stable across seeds; under lenient extraction its mean is {pp(FS2L['mean_diff'])} points with "
+  f"{FS2L['wins']} win (hyperbaton with PromptWizard) and {FS2L['losses']} significant losses.")
 
 # ===========================================================================
 H2("5.7. Serving Noise and Minimum Detectable Effect")
@@ -396,8 +408,8 @@ P("The original loop accepted the first round's outcome whatever it scored. With
   f"returns P0, as the pilot's code did: the prompt changed in {LEG['legacy_changed_prompt']} of {LEG['n']} cells "
   f"and was worse than P0 in {LEG['legacy_worse']}, better in {LEG['legacy_better']}. Under the literal "
   "reading of protocol G6 (the first validated candidate is accepted unconditionally) the mean change is "
-  f"{pp(LG6['mean_delta'])} points. Two cells account for most of either loss, the repaired loop changes accuracy "
-  f"by {pp(LEG['mean_gated_delta'])} points on the same candidates, and the figure applies to this refiner only; "
+  f"{pp(LG6['mean_delta'])} points. Two cells account for most of the smaller loss, the repaired loop changes accuracy "
+  f"by {pp(LEG['mean_gated_delta'])} points on the same candidates, and the figures apply to this refiner only; "
   "its effect with the original GPT-4o refiner is unknown, because that configuration was not rerun.")
 
 H2("5.10. Decision Rules")

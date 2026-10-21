@@ -98,8 +98,9 @@ CODE([
 ], caption="Figure B.3. An accepted candidate from the strong refiner (abridged). It adds a role, step-back "
            "and numbered steps, and also an explicit instruction to wrap the final answer on its own line and a "
            "worked output example, which repairs the answer tag; the example is generic, not about adjective order. "
-           "The strict accuracy of this prompt is higher than that of P0 (39.5% against 10.5%) but its lenient "
-           "accuracy is lower (16% against 58%, Section 5.6).", full=False)
+           f"The strict accuracy of this prompt is higher than that of P0 (39.5% against 10.5%) but its lenient "
+           f"accuracy is lower ({100 * N['winner_cells']['qwen235|hyperbaton__protegi__s42']['final_lenient']:.0f}% "
+           f"against {100 * N['winner_cells']['qwen235|hyperbaton__protegi__s42']['p0_lenient']:.0f}%, Section 5.6).", full=False)
 
 # ===========================================================================
 H1("Appendix C. Pipeline Defects and Serving Configuration")
@@ -134,7 +135,7 @@ TABLE("Table 12. Defects found in the pipeline, their observed symptom and the f
           ["11", "APE search selected a degenerate prompt", "hyperbaton P0 is APE's own induction template",
            "Left in place and disclosed; same code as the pilot"],
           ["12", "Candidates of V1 and V2 scored without the answer-format line", "The refinement request does not ask "
-           "to keep it; 93-95% of validated 1.7B candidates lack it and score exactly zero under strict extraction",
+           "to keep it; 92-95% of validated 1.7B candidates lack it and score exactly zero under strict extraction",
            "Format-protected variants V1P and V2P (Section 3.2); asymmetry reported"],
           ["13", "Lenient parser rejected a bare letter inside the tags", "Strict accepted what lenient rejected",
            "Lenient now accepts everything strict accepts"],

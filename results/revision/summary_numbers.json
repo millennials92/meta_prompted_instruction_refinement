@@ -3819,6 +3819,58 @@
    "protegi": 0.10233333333333335
   }
  },
+ "follow_seed2_lenient": {
+  "cells": {
+   "hyperbaton__ape__s42": {
+    "diff": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "hyperbaton__promptwizard__s42": {
+    "diff": 0.205,
+    "lo": 0.12,
+    "hi": 0.29
+   },
+   "hyperbaton__protegi__s42": {
+    "diff": -0.045,
+    "lo": -0.135,
+    "hi": 0.045
+   },
+   "penguins_in_a_table__ape__s42": {
+    "diff": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "penguins_in_a_table__promptwizard__s42": {
+    "diff": -0.052083333333333336,
+    "lo": -0.16666666666666666,
+    "hi": 0.0625
+   },
+   "penguins_in_a_table__protegi__s42": {
+    "diff": 0.041666666666666664,
+    "lo": -0.09375,
+    "hi": 0.17708333333333334
+   },
+   "ruin_names__ape__s42": {
+    "diff": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "ruin_names__promptwizard__s42": {
+    "diff": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "ruin_names__protegi__s42": {
+    "diff": -0.07,
+    "lo": -0.14,
+    "hi": 0.0
+   }
+  },
+  "wins": 1,
+  "losses": 0,
+  "mean_diff": 0.008842592592592588
+ },
  "noise": {
   "cells": {
    "hyperbaton__promptwizard__s42": {

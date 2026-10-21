@@ -43,9 +43,9 @@ P("We ask four research questions. RQ1: with the refinement loop repaired so tha
   "anything related to accuracy? (Terms such as cell and run are defined in Section 4.2.) "
   "In brief: with a 1.7B refiner the layer changed the prompt in "
   f"{N['main_grid']['runs_accepting']} of {N['main_grid']['runs']} runs and won in {N['main_grid']['wins']} "
-  f"of {N['main_grid']['n_cells']} cells, mainly because that refiner rarely produces a usable candidate that keeps "
+  f"of {N['main_grid']['n_cells']} cells, because that refiner rarely produces a usable candidate and often drops "
   "the answer format (RQ1, RQ2); a much larger refiner obtained strict-metric gains in several cells, but most "
-  "of them reverse under lenient scoring and a rubric-free rewrite reaches gains of the same kind (RQ3); and "
+  "of them do not hold under lenient scoring and a rubric-free rewrite reaches gains of the same kind (RQ3); and "
   "the rubric score is only weakly related to accuracy (RQ4).")
 
 P("The contributions are:")
