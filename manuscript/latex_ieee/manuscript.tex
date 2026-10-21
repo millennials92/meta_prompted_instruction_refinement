@@ -14,6 +14,9 @@
 \renewcommand{\thesection}{\arabic{section}}
 \renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
 \renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
+\def\thesectiondis{\thesection.}
+\def\thesubsectiondis{\thesection.\arabic{subsection}}
+\def\thesubsubsectiondis{\thesection.\arabic{subsection}.\arabic{subsubsection}}
 
 \vol{14}
 \year{2026}
@@ -161,7 +164,7 @@ The pilot ran what we call the legacy loop: Psrc = P0 in every round, H empty an
 \centering
 \small
 \caption{Refinement variants studied. All use the same gate (strict improvement over the incumbent on 25 validation questions) and N = 7 rounds. V3 candidates, and those of V1P and V2P, carry the answer-format line; V1 and V2 candidates are scored as the refiner wrote them.}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.258\linewidth}>{\raggedright\arraybackslash}p{0.120\linewidth}>{\raggedright\arraybackslash}p{0.189\linewidth}>{\raggedright\arraybackslash}p{0.120\linewidth}>{\raggedright\arraybackslash}p{0.172\linewidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.232\linewidth}>{\raggedright\arraybackslash}p{0.146\linewidth}>{\raggedright\arraybackslash}p{0.189\linewidth}>{\raggedright\arraybackslash}p{0.103\linewidth}>{\raggedright\arraybackslash}p{0.189\linewidth}}
 \toprule
 \textbf{Variant} & \textbf{Refines} & \textbf{History} & \textbf{Sampling} & \textbf{Rubric text} \\
 \midrule
@@ -357,8 +360,8 @@ V1 independent & 27 & 189 & 23 & 46 & 0 & 120 & 2/21/97 & 2 & 2/27 \\
 V2 chained & 80 & 560 & 177 & 160 & 30 & 193 & 1/66/126 & 1 & 1/80 \\
 V2L original rubric & 9 & 63 & 26 & 14 & 4 & 19 & 0/4/15 & 0 & 0/9 \\
 V3 free rewrite (gated) & 27 & 189 & 0 & 0 & 87 & 102 & 19/23/60 & 18 & 16/27 \\
-V1P protected & 5 & 35 & 3 & 27 & 0 & 5 & 2/0/3 & 1 & 1/5 \\
-V2P protected & 5 & 35 & 17 & 13 & 0 & 5 & 0/0/5 & 0 & 0/5 \\
+V1P protected & 10 & 70 & 8 & 41 & 0 & 21 & 5/0/16 & 4 & 3/10 \\
+V2P protected & 8 & 56 & 28 & 13 & 0 & 15 & 0/0/15 & 0 & 0/8 \\
 V2, refiner Qwen3-235B & 18 & 126 & 9 & 5 & 0 & 112 & 52/4/56 & 21 & 10/18 \\
 V3, refiner Qwen3-235B & 9 & 63 & 0 & 0 & 19 & 44 & 15/4/25 & 8 & 5/9 \\
 V2, refiner GPT-6 Luna & 9 & 63 & 6 & 0 & 0 & 57 & 3/8/46 & 2 & 1/9 \\
@@ -367,7 +370,7 @@ V2, refiner GPT-6 Luna & 9 & 63 & 6 & 0 & 0 & 57 & 3/8/46 & 2 & 1/9 \\
 }
 \end{table*}
 
-For the 1.7B refiner, 60\% of the chained rounds (337 of 560) never reached validation because the response had no delimiters or echoed a template; of the 193 validated candidates 126 scored below the baseline, 66 tied and 1 scored higher. Most validated candidates are far worse, not tied. An audit found a large part of the reason: the refinement request does not ask the refiner to keep the answer-format line, and 93\% of the validated V1 and 95\% of the validated V2 candidates lack it, so they score exactly zero under strict extraction; the rubric-free rewrite, whose prompt asks to preserve the answer format, loses it in none. The unprotected numbers therefore measure a failure of the 1.7B refiner to keep the format as much as a failure of the rubric. To separate the two we added the format-protected variants V1P and V2P, which append the answer-format line to every candidate. With protection the 1.7B refiner still reaches validation in only 14\% (V1P, 35 rounds) and 14\% (V2P, 35 rounds) of rounds, and 2 of its 10 validated candidates beat the baseline on validation (Table 6). Refinement with the original, inconsistent rubric text (V2L) was no better: 0 accepted candidates in 63 rounds and 63\% of rounds lost to fallbacks or echoes, so the inconsistency in the rubric text is not what limits the 1.7B refiner.
+For the 1.7B refiner, 60\% of the chained rounds (337 of 560) never reached validation because the response had no delimiters or echoed a template; of the 193 validated candidates 126 scored below the baseline, 66 tied and 1 scored higher. Most validated candidates are far worse, not tied. An audit found a large part of the reason: the refinement request does not ask the refiner to keep the answer-format line, and 93\% of the validated V1 and 95\% of the validated V2 candidates lack it, so they score exactly zero under strict extraction; the rubric-free rewrite, whose prompt asks to preserve the answer format, loses it in none. The unprotected numbers therefore measure a failure of the 1.7B refiner to keep the format as much as a failure of the rubric. To separate the two we added the format-protected variants V1P and V2P, which append the answer-format line to every candidate. With protection the 1.7B refiner still reaches validation in only 30\% (V1P, 70 rounds) and 27\% (V2P, 56 rounds) of rounds, and 5 of its 36 validated candidates beat the baseline on validation (Table 6). The protected variants were run on the nine Tier-1 seed-42 cells and finished on 5 (V1P) and 8 (V2P) of them; the rest were not completed for compute reasons. Refinement with the original, inconsistent rubric text (V2L) was no better: 0 accepted candidates in 63 rounds and 63\% of rounds lost to fallbacks or echoes, so the inconsistency in the rubric text is not what limits the 1.7B refiner.
 
 \subsection{The Repaired Layer on 45 Cells (RQ1, D1)}
 
@@ -376,27 +379,27 @@ With the 1.7B model refining its own prompts through the chained variant, the fi
 \begin{table}[htbp]
 \centering
 \small
-\caption{Chained variant, 1.7B refiner: in each entry, the number of runs whose final prompt differs from P0 out of all MPIR runs of that task and optimizer, then the mean paired test-accuracy difference over those cells in points. * marks the Tier-1 tasks (split seeds 42 to 44, three cells per optimizer); Tier-2 tasks have split seed 42 only.}
+\caption{Chained variant, 1.7B refiner (PW = PromptWizard): in each entry, the number of runs whose final prompt differs from P0 out of all MPIR runs of that task and optimizer, then the mean paired test-accuracy difference over those cells in points. * marks the Tier-1 tasks (split seeds 42 to 44, three cells per optimizer); Tier-2 tasks have split seed 42 only.}
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.318\linewidth}>{\raggedright\arraybackslash}p{0.181\linewidth}>{\raggedright\arraybackslash}p{0.181\linewidth}>{\raggedright\arraybackslash}p{0.181\linewidth}}
 \toprule
-\textbf{Task} & \textbf{PromptWizard} & \textbf{APE} & \textbf{ProTeGi} \\
+\textbf{Task} & \textbf{PW} & \textbf{APE} & \textbf{ProTeGi} \\
 \midrule
-hyperbaton * & 1 of 7; -0.6 & 0 of 7; +0.0 & 0 of 5; +0.0 \\
-ruin\_\allowbreak{}names * & 0 of 7; +0.0 & 0 of 7; +0.0 & 0 of 5; +0.0 \\
-penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table * & 0 of 5; +0.0 & 0 of 7; +0.0 & 0 of 5; +0.0 \\
-temporal\_\allowbreak{}sequences & 0 of 2; +0.0 & 0 of 2; +0.0 & 0 of 1; +0.0 \\
-movie\_\allowbreak{}recommendation & 0 of 1; +0.0 & 0 of 2; +0.0 & 0 of 1; +0.0 \\
-disambiguation\_\allowbreak{}qa & 0 of 2; +0.0 & 0 of 2; +0.0 & 0 of 1; +0.0 \\
-geometric\_\allowbreak{}shapes & 0 of 2; +0.0 & 0 of 2; +0.0 & 0 of 1; +0.0 \\
-salient\_\allowbreak{}translation\_\allowbreak{}error\_\allowbreak{}detection & 0 of 1; +0.0 & 0 of 1; +0.0 & 0 of 1; +0.0 \\
-sports\_\allowbreak{}understanding & 0 of 1; +0.0 & 0 of 1; +0.0 & 0 of 1; +0.0 \\
+hyperbaton * & 1/7, -0.6 & 0/7, +0.0 & 0/5, +0.0 \\
+ruin\_\allowbreak{}names * & 0/7, +0.0 & 0/7, +0.0 & 0/5, +0.0 \\
+penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table * & 0/5, +0.0 & 0/7, +0.0 & 0/5, +0.0 \\
+temporal\_\allowbreak{}sequences & 0/2, +0.0 & 0/2, +0.0 & 0/1, +0.0 \\
+movie\_\allowbreak{}recommendation & 0/1, +0.0 & 0/2, +0.0 & 0/1, +0.0 \\
+disambiguation\_\allowbreak{}qa & 0/2, +0.0 & 0/2, +0.0 & 0/1, +0.0 \\
+geometric\_\allowbreak{}shapes & 0/2, +0.0 & 0/2, +0.0 & 0/1, +0.0 \\
+salient\_\allowbreak{}translation\_\allowbreak{}error\_\allowbreak{}detection & 0/1, +0.0 & 0/1, +0.0 & 0/1, +0.0 \\
+sports\_\allowbreak{}understanding & 0/1, +0.0 & 0/1, +0.0 & 0/1, +0.0 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \subsection{Is the Gate the Bottleneck? (RQ2, D3)}
 
-To separate the candidates from the gate, every validated candidate of MPIR seed 1 was also scored on the full test split. Ungated, the mean test-accuracy change of a 1.7B-refiner candidate relative to its P0 is -27.0 points for the independent variant (41 candidates) and -15.2 points for the chained variant (22), and no cell has a candidate that beats P0 by 3 points or more (0 and 0 of 9 cells); these candidates mostly lack the answer-format line (Section 5.2), so the figure largely reflects format loss. Candidates that keep the format are still not better on average: -8.8 points for the 1.7B rewrite (33 candidates) and -4.0 points for the Qwen3-235B candidates (58; best candidate per cell +4.0 points on average, 4 cells at +3 or more). D3 requires the best candidate to beat P0 by 3 points in at least 3 of 9 cells while the gated final prompt does not; it is not met for the 1.7B refiner. Validation accuracy tracks test accuracy across candidates (Spearman 0.92 over 262 oracle-scored candidates of all refiners), but this is driven by candidates that score zero; among 1.7B-refiner candidates with positive validation accuracy it is 0.47 (n = 25). The gate can therefore rank broken candidates but is a weaker guide among plausible ones, and a 25-question gate is noisy (Section 5.7). Table 8 re-applies other acceptance rules offline to the same candidates; cells with no validated candidate are omitted.
+To separate the candidates from the gate, every validated candidate of MPIR seed 1 was also scored on the full test split. Ungated, the mean test-accuracy change of a 1.7B-refiner candidate relative to its P0 is -27.0 points for the independent variant (41 candidates) and -15.2 points for the chained variant (22), and no cell has a candidate that beats P0 by 3 points or more (0 and 0 of 9 cells); these candidates mostly lack the answer-format line (Section 5.2), so the figure largely reflects format loss. Candidates that keep the format are still not better on average: -24.9 points for the format-protected 1.7B candidates of V1P and V2P (20 candidates, none beating P0 by 3 points or more), -8.8 points for the 1.7B rewrite (33 candidates) and -4.0 points for the Qwen3-235B candidates (58; best candidate per cell +4.0 points on average, 4 cells at +3 or more). D3 requires the best candidate to beat P0 by 3 points in at least 3 of 9 cells while the gated final prompt does not; it is not met for the 1.7B refiner. Validation accuracy tracks test accuracy across candidates (Spearman 0.92 over 275 oracle-scored candidates of all refiners), but this is driven by candidates that score zero; among 1.7B-refiner candidates with positive validation accuracy it is 0.37 (n = 27). The gate can therefore rank broken candidates but is a weaker guide among plausible ones, and a 25-question gate is noisy (Section 5.7). Table 8 re-applies other acceptance rules offline to the same candidates; cells with no validated candidate are omitted.
 
 \begin{table}[htbp]
 \centering
@@ -469,7 +472,7 @@ Each of the nine pilot base prompts was scored five times on the test and valida
 \begin{table*}[htbp]
 \centering
 \footnotesize
-\caption{Rubric totals (out of 35) assigned at temperature 0 to the base prompts and oracle-scored candidates (223 distinct prompts). Spearman correlations of the total with validation and with test accuracy are computed within each of the nine cells over the 262 oracle-scored candidates (median shown); the two judges' totals correlate at 0.38.}
+\caption{Rubric totals (out of 35) assigned at temperature 0 to the base prompts and oracle-scored candidates (223 distinct prompts). Spearman correlations of the total with validation and with test accuracy are computed within each of the nine cells over the 275 oracle-scored candidates (median shown); the two judges' totals correlate at 0.38.}
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.291\textwidth}>{\raggedright\arraybackslash}p{0.132\textwidth}>{\raggedright\arraybackslash}p{0.122\textwidth}>{\raggedright\arraybackslash}p{0.094\textwidth}>{\raggedright\arraybackslash}p{0.150\textwidth}>{\raggedright\arraybackslash}p{0.150\textwidth}}
 \toprule
 \textbf{Judge} & \textbf{Totals parsed} & \textbf{Mean total} & \textbf{SD} & \textbf{Spearman, val.} & \textbf{Spearman, test} \\
@@ -508,7 +511,7 @@ D3 & Best oracle candidate at least +3 pts in at least 3 of 9 cells although the
 
 \subsection{What the Evidence Supports}
 
-With Qwen3-1.7B as target and refiner, the rubric-guided layer, as specified, did not improve the prompts of any of three optimizers on any of nine tasks: the final prompt equalled P0 in 79 of 80 runs, and by the pre-specified rule the outcome is null (Section 5.3). The refinement rounds were made distinct by sampling and history, the failure is not caused by the inconsistent rubric text, and a rubric-free gated rewrite does at least as well (Section 5.5). The main reason is the refiner: most rounds never produce a usable candidate, and the unprotected candidates lose the answer-format line, so under strict extraction they score zero. With the format line appended the refiner still reaches validation in a minority of rounds and 2 of 10 validated candidates beat the baseline (Section 5.2). The null is therefore a result about a 1.7B model's ability to follow a long refinement instruction, and it says little about rubric-guided refinement by a capable model.
+With Qwen3-1.7B as target and refiner, the rubric-guided layer, as specified, did not improve the prompts of any of three optimizers on any of nine tasks: the final prompt equalled P0 in 79 of 80 runs, and by the pre-specified rule the outcome is null (Section 5.3). The refinement rounds were made distinct by sampling and history, the failure is not caused by the inconsistent rubric text, and a rubric-free gated rewrite does at least as well (Section 5.5). The main reason is the refiner: most rounds never produce a usable candidate, and the unprotected candidates lose the answer-format line, so under strict extraction they score zero. With the format line appended the refiner still reaches validation in a minority of rounds and 5 of 36 validated candidates beat the baseline (Section 5.2). The null is therefore a result about a 1.7B model's ability to follow a long refinement instruction, and it says little about rubric-guided refinement by a capable model.
 
 The evidence on a more capable refiner is mixed and exploratory. A much larger open-weight refiner produced significant strict gains in four cells in two MPIR seeds, and a strong closed refiner in one. Most of the strict gains are, however, repairs of the answer tag on base prompts that reason about as well as before; under lenient extraction they reverse, because the long structured rewrite makes the 1.7B target reason worse, and a rubric-free gated rewrite by the same refiner reaches gains of the same kind. The one gain that survives both metrics, hyperbaton with PromptWizard, is on a base prompt that opens with an irrelevant sentence, and it is a single cell. So the data do not show that the seven-criteria rubric helps; criterion-level ablations were not run, and the original GPT-4o and GPT-3.5-turbo configuration was not repeated, so the first evaluation's per-task gains remain unexplained and should not be cited as evidence for MPIR.
 
@@ -522,7 +525,7 @@ The following points follow from these experiments, with Qwen3 models, nine BBH 
 
 \subsubsection{Internal Validity}
 
-The serving stack is not deterministic: repeated scoring of one prompt spans 3.3 points on average (standard deviation 1.4), which the gate and the minimum detectable effect (5.0 points) take into account but cannot remove. The inference server was restarted several times and its memory settings were changed during the study; cached scores and generations were kept across restarts, so a few interrupted runs combine scorings taken under different settings, with differences of the order of the measured noise. The main grid has 80 runs instead of the planned 135, oracle scoring covers MPIR seed 1 only, the strong-refiner runs use one MPIR seed (a second for one refiner), and the format-protected variants cover the nine Tier-1 seed-42 cells only. Two audit findings, the format asymmetry of V1 and V2 and a lenient parser that rejected bare letters, were found late and corrected after the main grid had run; the main grid was not re-run with protection. The follow-up runs and the protected variants were added after results were seen. The APE prompt for hyperbaton is a degenerate artifact of our implementation (Appendix A), and many APE and ProTeGi base prompts are weak, which limits what refining them can show.
+The serving stack is not deterministic: repeated scoring of one prompt spans 3.3 points on average (standard deviation 1.4), which the gate and the minimum detectable effect (5.0 points) take into account but cannot remove. The inference server was restarted several times and its memory settings were changed during the study; cached scores and generations were kept across restarts, so a few interrupted runs combine scorings taken under different settings, with differences of the order of the measured noise. The main grid has 80 runs instead of the planned 135, oracle scoring covers MPIR seed 1 only, the strong-refiner runs use one MPIR seed (a second for one refiner), and the format-protected variants cover only part of the nine Tier-1 seed-42 cells (Section 5.2). Two audit findings, the format asymmetry of V1 and V2 and a lenient parser that rejected bare letters, were found late and corrected after the main grid had run; the main grid was not re-run with protection. The follow-up runs and the protected variants were added after results were seen. The APE prompt for hyperbaton is a degenerate artifact of our implementation (Appendix A), and many APE and ProTeGi base prompts are weak, which limits what refining them can show.
 
 \subsubsection{External Validity}
 
@@ -797,7 +800,7 @@ penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table / protegi & 0.00 &
 
 \section{Protocol and Deviations}
 
-The decision rules of Section 4.1 were fixed in REVISION\_\allowbreak{}PROTOCOL.md before any revised experiment ran (commit 8fd1397, 2026-10-19). The amendments below are recorded in that file; none is an entry in a registry. Amendments 1 to 7 were made before the results of the affected experiment were inspected; amendments 8 and 9 were made after results were seen and are exploratory.
+The decision rules of Section 4.1 were fixed in REVISION\_\allowbreak{}PROTOCOL.md before any revised experiment ran (commit 8fd1397, 2026-10-19). The amendments below are recorded in that file; none is an entry in a registry. Amendments 1 to 7 were made before the results of the affected experiment were inspected; amendments 8 and 9 were made after results were seen and are exploratory; V1P and V2P were stopped before all nine cells finished.
 
 \begin{itemize}
 \item \textbf{1. 2026-10-20, compute.} Serving stack vLLM 0.28.0 under WSL2 with measured throughput of about 1.2k tokens/s; oracle test scoring of every validated candidate for MPIR seed 1 only; one validation score per candidate in the main grid G1; V2L with one seed and no oracle scoring.

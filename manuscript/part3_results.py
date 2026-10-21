@@ -156,7 +156,10 @@ if V1P and V2P:
              f"{share(V1P['validated'], V1P['rounds'])}% (V1P, {V1P['rounds']} rounds) and "
              f"{share(V2P['validated'], V2P['rounds'])}% (V2P, {V2P['rounds']} rounds) of rounds, and "
              f"{V1P['val_better'] + V2P['val_better']} of its {V1P['validated'] + V2P['validated']} validated "
-             "candidates beat the baseline on validation (Table 6). ")
+             "candidates beat the baseline on validation (Table 6). The protected variants were run on the nine "
+             "Tier-1 seed-42 cells and finished on "
+             f"{N['capability']['v1p|1.7b']['cells']} (V1P) and {N['capability']['v2p|1.7b']['cells']} (V2P) of them; "
+             "the rest were not completed for compute reasons. ")
 P(f"For the 1.7B refiner, {share(V2['fallback'] + V2['echo'], V2['rounds'])}% of the chained rounds "
   f"({V2['fallback'] + V2['echo']} of {V2['rounds']}) never reached validation because the response had no "
   f"delimiters or echoed a template; of the {V2['validated']} validated candidates {V2['val_worse']} scored "
@@ -198,13 +201,14 @@ for t in TASKS_T1 + TASKS_T2:
     row = [t + (" *" if t in TASKS_T1 else "")]
     for o in OPTS:
         g = GT.get(f"{t}|{o}")
-        row.append("n/a" if g is None else f"{g['accepted_runs']} of {g['seeds']}; {pp(g['mean_diff'])}")
+        row.append("n/a" if g is None else f"{g['accepted_runs']}/{g['seeds']}, {pp(g['mean_diff'])}")
     rows.append(row)
-TABLE("Table 7. Chained variant, 1.7B refiner: in each entry, the number of runs whose final prompt differs from "
-      "P0 out of all MPIR runs of that task and optimizer, then the mean paired test-accuracy difference over "
+TABLE("Table 7. Chained variant, 1.7B refiner (PW = PromptWizard): in each entry, the number of runs whose final "
+      "prompt differs from P0 out of all MPIR runs of that task and optimizer, then the mean paired test-accuracy "
+      "difference over "
       "those cells in points. * marks the Tier-1 tasks (split seeds 42 to 44, three cells per optimizer); "
       "Tier-2 tasks have split seed 42 only.",
-      header=["Task", "PromptWizard", "APE", "ProTeGi"], rows=rows, full=True, colw=[0.37, 0.21, 0.21, 0.21])
+      header=["Task", "PW", "APE", "ProTeGi"], rows=rows, full=True, colw=[0.37, 0.21, 0.21, 0.21])
 
 # ===========================================================================
 H2("5.4. Is the Gate the Bottleneck? (RQ2, D3)")
@@ -217,7 +221,10 @@ P("To separate the candidates from the gate, every validated candidate of MPIR s
   f"candidate that beats P0 by 3 points or more ({O1['cells_best_ge_3pts']} and {O2['cells_best_ge_3pts']} of 9 "
   "cells); these candidates mostly lack the answer-format line (Section 5.2), so the figure largely "
   "reflects format loss. Candidates that keep the format are still not better on average: "
-  f"{pp(O3['mean_candidate_delta'])} points for the 1.7B rewrite ({O3['n_candidates']} candidates) and "
+  + (f"{pp((OR['v1p|1.7b']['mean_candidate_delta'] * OR['v1p|1.7b']['n_candidates'] + OR['v2p|1.7b']['mean_candidate_delta'] * OR['v2p|1.7b']['n_candidates']) / (OR['v1p|1.7b']['n_candidates'] + OR['v2p|1.7b']['n_candidates']))} "
+     f"points for the format-protected 1.7B candidates of V1P and V2P ({OR['v1p|1.7b']['n_candidates'] + OR['v2p|1.7b']['n_candidates']} candidates, none beating P0 by 3 points or more), "
+     if 'v1p|1.7b' in OR and 'v2p|1.7b' in OR else "")
+  + f"{pp(O3['mean_candidate_delta'])} points for the 1.7B rewrite ({O3['n_candidates']} candidates) and "
   f"{pp(OQ['mean_candidate_delta'])} points for the Qwen3-235B candidates ({OQ['n_candidates']}; best candidate "
   f"per cell {pp(OQ['mean_best_delta'])} points on average, {OQ['cells_best_ge_3pts']} cells at +3 or more). D3 "
   "requires the best candidate to beat P0 by 3 points in at least 3 of 9 cells while the gated final prompt "

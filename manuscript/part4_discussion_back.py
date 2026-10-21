@@ -72,7 +72,7 @@ P(f"The serving stack is not deterministic: repeated scoring of one prompt spans
   "generations were kept across restarts, so a few interrupted runs combine scorings taken under different "
   "settings, with differences of the order of the measured noise. The main grid has 80 runs instead of the "
   "planned 135, oracle scoring covers MPIR seed 1 only, the strong-refiner runs use one MPIR seed (a second "
-  "for one refiner), and the format-protected variants cover the nine Tier-1 seed-42 cells only. Two "
+  "for one refiner), and the format-protected variants cover only part of the nine Tier-1 seed-42 cells (Section 5.2). Two "
   "audit findings, the format asymmetry of V1 and V2 and a lenient parser that rejected bare letters, were "
   "found late and corrected after the main grid had run; the main grid was not re-run with protection. The "
   "follow-up runs and the protected variants were added after results were seen. The APE prompt for hyperbaton "

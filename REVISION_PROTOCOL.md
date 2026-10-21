@@ -146,3 +146,4 @@ open-weight reference judge only. One model family (Qwen3) is used.
   format line appended; exactly the same refiner outputs, only scored differently) and V2P (chained, protected).
   The lenient parser was also corrected to accept everything the strict parser accepts. D1 (the 45-cell grid) was
   specified and run for the unprotected V2 and is reported as such; the protected variants are exploratory.
+* 2026-10-21: the format-protected variants V1P and V2P were stopped before all nine Tier-1 cells finished (slow ProTeGi cells); coverage is reported in the paper.

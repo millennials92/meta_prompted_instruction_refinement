@@ -78,7 +78,7 @@ TABLE("Table 2. Refinement variants studied. All use the same gate (strict impro
           ["V3 gated free rewrite", "P0", "none", "τ = 0.7", "none (no rubric)"],
           ["V1P independent, format-protected", "P0", "none", "τ = 0.7", "corrected"],
           ["V2P chained, format-protected", "incumbent", "scored candidates", "τ = 0.7", "corrected"],
-      ], full=True, colw=[0.30, 0.14, 0.22, 0.14, 0.20])
+      ], full=True, colw=[0.27, 0.17, 0.22, 0.12, 0.22])
 
 H2("3.3. The Seven-Criteria Rubric")
 P("The rubric was assembled from the prompting literature ‹44,45›, industry guidance ‹40,41,42,43› and "

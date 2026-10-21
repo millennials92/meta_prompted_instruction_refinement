@@ -246,7 +246,7 @@ H1("Appendix F. Protocol and Deviations")
 P("The decision rules of Section 4.1 were fixed in REVISION_PROTOCOL.md before any revised experiment "
   "ran (commit 8fd1397, 2026-10-19). The amendments below are recorded in that file; none is an entry in a "
   "registry. Amendments 1 to 7 were made before the results of the affected experiment were inspected; "
-  "amendments 8 and 9 were made after results were seen and are exploratory.")
+  "amendments 8 and 9 were made after results were seen and are exploratory; V1P and V2P were stopped before all nine cells finished.")
 BULLETS([
     ("1. 2026-10-20, compute.", "Serving stack vLLM 0.28.0 under WSL2 with measured throughput of about 1.2k "
      "tokens/s; oracle test scoring of every validated candidate for MPIR seed 1 only; one validation score per "

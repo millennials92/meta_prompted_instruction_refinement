@@ -211,6 +211,9 @@ TEMPLATE = r"""\documentclass{{ieeeaccess}}
 \renewcommand{{\thesection}}{{\arabic{{section}}}}
 \renewcommand{{\thesubsection}}{{\thesection.\arabic{{subsection}}}}
 \renewcommand{{\thesubsubsection}}{{\thesubsection.\arabic{{subsubsection}}}}
+\def\thesectiondis{{\thesection.}}
+\def\thesubsectiondis{{\thesection.\arabic{{subsection}}}}
+\def\thesubsubsectiondis{{\thesection.\arabic{{subsection}}.\arabic{{subsubsection}}}}
 
 \vol{{14}}
 \year{{2026}}
