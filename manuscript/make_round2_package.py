@@ -61,6 +61,28 @@ def build_pkg():
         run(["pdflatex", "-interaction=nonstopmode", "manuscript.tex"], PKG)
 
 
+def conflict_of_interest():
+    tex = r"""\documentclass[11pt]{article}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{times}
+\usepackage{parskip}
+\setlength{\parindent}{0pt}
+\begin{document}
+\section*{Conflict of Interest Statement}
+\textbf{Manuscript:} Does Rubric-Guided Self-Refinement Improve Prompts from Small-Model Optimizers? A Scoped
+Negative-Result Study with Qwen3-1.7B (revised submission; Access-2026-54235, initial submission Access-2026-44920)
+
+None of the authors (Linh Nguyen, Quang-Vinh Dang, Minh Ngoc Dinh and Thuy Nguyen) has a conflict of interest to
+disclose. The same statement appears in the manuscript under ``Declaration of Competing Interest''.
+\end{document}
+"""
+    path = os.path.join(OUT, "conflict_of_interest.tex")
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write(tex)
+    run(["pdflatex", "-interaction=nonstopmode", "conflict_of_interest.tex"], OUT)
+    return os.path.join(OUT, "conflict_of_interest.pdf")
+
+
 def cover_letter():
     G, CT, AB = NEW["grid_v2f"], NEW["controls"], OFF["acceptance_bounds"]
     LC = LEN["all"]
@@ -73,7 +95,7 @@ def cover_letter():
 \setlength{\parindent}{0pt}
 \begin{document}
 \begin{flushright}
-November 2, 2026
+November 3, 2026
 \end{flushright}
 
 \textbf{Manuscript ID:} Access-2026-54235 (initial submission: Access-2026-44920)\\
@@ -136,9 +158,7 @@ def main():
                 p = os.path.join(root, f)
                 z.write(p, os.path.relpath(p, PKG))
     safe_copy(os.path.join(HERE, "response_to_reviewers_round2.docx"), os.path.join(UP, "2_Author_Response.docx"))
-    old_coi = os.path.join(ROOT, "submission_revision", "upload_ready", "3_Conflict_of_Interest.pdf")
-    if os.path.exists(old_coi):
-        safe_copy(old_coi, os.path.join(UP, "3_Conflict_of_Interest.pdf"))
+    safe_copy(conflict_of_interest(), os.path.join(UP, "3_Conflict_of_Interest.pdf"))
     subprocess.run([sys.executable, os.path.join(HERE, "highlight_diff.py"), OLD_PDF, clean,
                     os.path.join(UP, "4_Highlighted_Manuscript_of_Changes.pdf")], check=True)
     safe_copy(cover_letter(), os.path.join(UP, "5_Cover_Letter.pdf"))

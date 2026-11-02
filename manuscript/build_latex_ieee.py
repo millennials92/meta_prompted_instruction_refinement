@@ -218,7 +218,7 @@ TEMPLATE = r"""\documentclass{{ieeeaccess}}
 
 \vol{{14}}
 \year{{2026}}
-\history{{Manuscript received September 5, 2026; revised October 21, 2026.}}
+\history{{Manuscript received September 5, 2026; revised November 3, 2026.}}
 \doi{{to be assigned by IEEE upon acceptance}}
 
 \title{{{title}}}
