@@ -28,9 +28,9 @@ def FIG(path, caption, full=True):
     BLOCKS.append({"type": "figure", "path": path, "caption": caption, "full": full})
 
 
-def TABLE(caption, header, rows, full=True, note=None, colw=None):
+def TABLE(caption, header, rows, full=True, note=None, colw=None, wide=False):
     BLOCKS.append({"type": "table", "caption": caption, "header": header, "rows": rows,
-                    "full": full, "note": note, "colw": colw})
+                    "full": full, "note": note, "colw": colw, "wide": wide})
 
 
 def CODE(lines, caption=None, full=True):

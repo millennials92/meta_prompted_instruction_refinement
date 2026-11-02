@@ -139,7 +139,7 @@ TABLE("Table 12. Defects found in the pipeline, their observed symptom and the f
            "Format-protected variants V1P and V2P (Section 3.2); asymmetry reported"],
           ["13", "Lenient parser rejected a bare letter inside the tags", "Strict accepted what lenient rejected",
            "Lenient now accepts everything strict accepts"],
-      ], full=True, colw=[0.04, 0.26, 0.40, 0.30])
+      ], full=True, colw=[0.04, 0.26, 0.40, 0.30], wide=True)
 P("Earlier pre-pilot fixes (a per-seed data-split collision, an unseeded random generator, mismatched "
   "scoring minibatches in APE, and swallowed API errors) are recorded in the repository's REBUILD.md.")
 

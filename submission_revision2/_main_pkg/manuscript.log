@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.13)  2 NOV 2026 16:45
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.13)  2 NOV 2026 20:53
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1592,32 +1592,9 @@ Underfull \hbox (badness 10000) in paragraph at lines 829--829
  []
 
 
-Overfull \hbox (0.99768pt too wide) in paragraph at lines 854--854
-[]|\T1/times/b/n/9 10|  
- []
-
-
-Overfull \hbox (0.99768pt too wide) in paragraph at lines 855--855
-[]|\T1/times/b/n/9 11|  
- []
-
-
-Overfull \hbox (0.99768pt too wide) in paragraph at lines 856--856
-[]|\T1/times/b/n/9 12|  
- []
-
-
-Overfull \hbox (0.99768pt too wide) in paragraph at lines 857--857
-[]|\T1/times/b/n/9 13|  
- []
-
-
-Overfull \hbox (14.02211pt too wide) in paragraph at lines 841--860
+Overfull \hbox (17.69391pt too wide) in paragraph at lines 841--860
  [][] 
  []
-
-
-LaTeX Warning: Float too large for page by 69.5499pt on input line 860.
 
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
@@ -1645,12 +1622,12 @@ Underfull \hbox (badness 10000) has occurred while \output is active
 [21]
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 928.
+Package pdftex.def Info: notaglinelogo.png  used on input line 986.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 928.
+(Font)              using `T1/formata/m/it' instead on input line 986.
 
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -1673,16 +1650,17 @@ Underfull \hbox (badness 4454) in paragraph at lines 990--991
  []
 
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
+Overfull \hbox (42.2103pt too wide) in paragraph at lines 1005--1056
+ [][] 
+ []
 
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 994.
+(Font)              using `T1/formata/m/it' instead on input line 1061.
 
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 994.
+Package pdftex.def Info: notaglinelogo.png  used on input line 1061.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -1699,23 +1677,20 @@ Underfull \hbox (badness 10000) has occurred while \output is active
 []
  []
 
-[23]
+[23] (manuscript.bbl
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
-Overfull \hbox (42.2103pt too wide) in paragraph at lines 1005--1056
- [][] 
- []
+Underfull \vbox (badness 1688) has occurred while \output is active []
 
-(manuscript.bbl
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 35.
+Package pdftex.def Info: notaglinelogo.png  used on input line 51.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 35.
+(Font)              using `T1/formata/m/it' instead on input line 51.
 
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -1735,11 +1710,11 @@ Underfull \hbox (badness 10000) has occurred while \output is active
 [24]
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 35.
+(Font)              using `T1/formata/m/it' instead on input line 51.
 
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 35.
+Package pdftex.def Info: notaglinelogo.png  used on input line 51.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -1792,11 +1767,11 @@ i /
 
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 220.
+Package pdftex.def Info: notaglinelogo.png  used on input line 232.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 220.
+(Font)              using `T1/formata/m/it' instead on input line 232.
 
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -1845,11 +1820,11 @@ Underfull \hbox (badness 2443) in paragraph at lines 396--401
 
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 402.
+(Font)              using `T1/formata/m/it' instead on input line 414.
 
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 402.
+Package pdftex.def Info: notaglinelogo.png  used on input line 414.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -1967,11 +1942,11 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 Here is how much of TeX's memory you used:
  6756 strings out of 467871
  112887 string characters out of 5416923
- 580275 words of memory out of 5000000
+ 596275 words of memory out of 5000000
  35527 multiletter control sequences out of 15000+600000
  679891 words of font info for 161 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 72i,13n,117p,2013b,548s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 72i,13n,117p,2013b,550s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\vinh.dq4\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\t
 crm0800.pk> <C:\Users\vinh.dq4\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec
 /dpi600\tcrm1000.pk> <C:\Users\vinh.dq4\AppData\Local\MiKTeX\fonts/pk/ljfour/jk
@@ -1988,7 +1963,7 @@ e1/public/amsfonts/cm/cmsy7.pfb><./t1-formata-bold.pfb><./t1-formata-condmedium
 .pfb><./t1-formata-medium.pfb><./t1-formata-mediumitalic.pfb><./t1-formata-regu
 lar.pfb><./t1-giovannistd-bookitalic.pfb><C:/Users/vinh.dq4/AppData/Local/Progr
 ams/MiKTeX/fonts/type1/urw/courier/ucrr8a.pfb>
-Output written on manuscript.pdf (28 pages, 484987 bytes).
+Output written on manuscript.pdf (28 pages, 484539 bytes).
 PDF statistics:
  488 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)

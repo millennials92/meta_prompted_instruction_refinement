@@ -249,7 +249,7 @@ def latex_algo(b):
 def latex_table(b):
     ncols = len(b["header"])
     if b.get("colw"):
-        wide = bool(b.get("full")) and ncols >= 6
+        wide = bool(b.get("full")) and (ncols >= 6 or bool(b.get("wide")))
         unit = "\\textwidth" if wide else "\\linewidth"
         # Column padding (2 * \tabcolsep per column) is added on top of the p-column widths, so the nominal
         # fractions are scaled down to keep the whole table inside the text block.
@@ -261,7 +261,7 @@ def latex_table(b):
         colspec = "l" + "c" * (ncols - 1)
     # Tables with six or more columns span both IEEE columns (table*) at the width of the text block, so
     # their cell text stays legible instead of being shrunk to a single column's width.
-    star = bool(b.get("full")) and ncols >= 6
+    star = bool(b.get("full")) and (ncols >= 6 or bool(b.get("wide")))
     env = "table*" if star else "table"
     width = r"\textwidth" if star else r"\linewidth"
     lines = [r"\begin{" + env + r"}[htbp]",

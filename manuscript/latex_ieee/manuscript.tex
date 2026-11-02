@@ -834,11 +834,11 @@ Accepted candidate (Qwen3-235B refiner, round 7; validation 0.52 vs 0.16, test 3
 
 Defects found while running the pipeline against a live model. Magnitudes are the symptoms recorded at the time. Items 1-8 were fixed before any number reported in Section 5; items 9-11 were found in an audit after the pilot, and items 12 and 13 during the main grid, after it had run.
 
-\begin{table}[htbp]
+\begin{table*}[htbp]
 \centering
-\small
+\footnotesize
 \caption{Defects found in the pipeline, their observed symptom and the fix.}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.034\linewidth}>{\raggedright\arraybackslash}p{0.224\linewidth}>{\raggedright\arraybackslash}p{0.344\linewidth}>{\raggedright\arraybackslash}p{0.258\linewidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.038\textwidth}>{\raggedright\arraybackslash}p{0.244\textwidth}>{\raggedright\arraybackslash}p{0.376\textwidth}>{\raggedright\arraybackslash}p{0.282\textwidth}}
 \toprule
 \textbf{\#} & \textbf{Defect} & \textbf{Observed symptom} & \textbf{Fix} \\
 \midrule
@@ -857,7 +857,7 @@ Defects found while running the pipeline against a live model. Magnitudes are th
 13 & Lenient parser rejected a bare letter inside the tags & Strict accepted what lenient rejected & Lenient now accepts everything strict accepts \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
 Earlier pre-pilot fixes (a per-seed data-split collision, an unseeded random generator, mismatched scoring minibatches in APE, and swallowed API errors) are recorded in the repository's REBUILD.md.
 
