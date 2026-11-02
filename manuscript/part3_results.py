@@ -274,10 +274,10 @@ for _k, _c in _P1["cells"].items():
     _o = _k.split("__")[1]
     _by.setdefault(_o, []).append(_c["lenient"]["diff"] if _c["lenient"] else 0.0)
 _vol = lambda o: sum(_by[o]) / len(_by[o])
-P("V3F isolates the rubric. It has the same start prompt (P0 plus the bare-tag example), the same gate, the same "
+P("V3F is the rubric-free control. It has the same start prompt (P0 plus the bare-tag example), the same gate, the same "
   "re-attachment of the format line and the example, the same sampling and seven rounds as V2F, but the refiner receives "
-  "the rubric-free rewrite request of V3 and no evaluation step, and the rounds are independent. It was run "
-  f"with the 1.7B refiner on the same cells as V2F ({_P1['runs']} cells, one MPIR seed). V3F never ended in a fallback or an "
+  "the rubric-free rewrite request of V3 and no evaluation step, and the rounds are independent (so V3F differs from V2F in the rubric and also in the chaining, the evaluation call and the score history). It was run "
+  f"with the 1.7B refiner on all 45 cells (44 of them also completed by V2F; one MPIR seed). V3F never ended in a fallback or an "
   f"echo, against {_P2['fallback'] + _P2['echo']} of {_P2['rounds']} rounds for V2F; {_P1['validated']} of {_P1['rounds']} rounds "
   f"were validated ({_P2['validated']} of {_P2['rounds']} for V2F) and {_P1['val_better']} of them beat the baseline on "
   f"validation ({_P2['val_better']} for V2F). Candidates were accepted in {_P1['accepted_runs']} of {_P1['runs']} runs "
@@ -293,10 +293,12 @@ P(f"Over the {_PR['n']} cells that both variants completed, the paired differenc
   f"{_PR['lenient']['v3f_better']} cells, V2F in {_PR['lenient']['v2f_better']} and {_PR['lenient']['tied']} are tied. "
   "Scaled to the number of cells run, decision rule D1 gives 'mixed' for V3F (more than 2 and fewer than a third of the cells "
   "win, and the lenient mean is above +2.0 points). So with the 1.7B refiner and the answer format protected, a "
-  "rubric-free rewrite gives a modest gain and the rubric-guided variant gives none, which isolates the "
-  "rubric: for this refiner it hurts and does not merely fail to help. The likely mechanism is the length of the rubric "
-  "meta-prompt, which the 1.7B model answers with critiques instead of rewrites (the fallbacks and echoes above); we did "
-  "not test it, for example with a shortened rubric. The caveats are those of every probe here: one MPIR seed, a "
+  "rubric-free rewrite gives a modest gain and the rubric-guided variant gives none, and the rubric-guided variant is "
+  "worse than the rubric-free one by a paired interval that excludes zero over the 44 cells (over the nine Tier-1 cells alone "
+  "the interval includes zero). A possible reason, which we did not test, is the length of the rubric meta-prompt: the 1.7B "
+  "model answers it with critiques instead of rewrites (the fallbacks and echoes above); a shortened rubric would test it. "
+  "Because the two variants also differ in chaining and in the evaluation call, the comparison shows that the rubric-guided "
+  "variant does worse than a plain rewrite, and not that the rubric criteria are the cause. The caveats are those of every probe here: one MPIR seed, a "
   "25-question gate, no correction for multiple comparisons, and a gain measured against a baseline that already "
   "contains the bare-tag example.")
 
@@ -483,14 +485,14 @@ P("The second probe repeats the protected comparison with the strong refiners, Q
   f"{PP['v2f_gpt6luna']['lenient_wins']} wins and {PP['v2f_gpt6luna']['lenient_losses']} loss, against {pp(_tier_mean('v2f_1.7b'))} points "
   "for the 1.7B refiner on the same cells. This is the capability dependence that the unprotected probes could not show "
   "(rule D2 applied to lenient scoring and post hoc: for Qwen3-235B the mean exceeds that of the 1.7B refiner by more than 2.0 "
-  "points and at least 3 cells win). The rubric, however, is not what produces it: the rubric-free V3F gives "
+  "points and at least 3 cells win). The rubric is not shown to produce it: the rubric-free V3F gives "
   f"{pp(PP['v3f_qwen235']['lenient_mean'])} points with Qwen3-235B and {pp(PP['v3f_gpt6luna']['lenient_mean'])} with GPT-6 Luna, and "
   f"the paired V2F minus V3F difference is {pp(_Q['lenient']['mean'])} points [{pp(_Q['lenient']['lo'])}, {pp(_Q['lenient']['hi'])}] "
   f"for Qwen3-235B and {pp(_L['lenient']['mean'])} [{pp(_L['lenient']['lo'])}, {pp(_L['lenient']['hi'])}] for GPT-6 Luna, each over nine "
   "cells with one run per condition. The data therefore support three statements and no more: a capable refiner that keeps the answer "
-  "format can improve these prompts under a validated lenient metric; a rubric-free rewrite does about as well as the rubric-guided "
-  "variant, so the rubric is not shown to help (and it hurts the 1.7B refiner, Section 5.3.2); and nine cells with single runs "
-  "cannot detect a modest rubric benefit with a strong refiner.")
+  "format can improve these prompts under a validated lenient metric; a rubric-free rewrite reaches similar gains (the paired differences include zero, and with GPT-6 Luna the rubric-guided variant is ahead by a point or two), "
+  "so the rubric is not shown to help, and with the 1.7B refiner the rubric-guided variant does worse than the rubric-free one (Section 5.3.2); and nine cells with "
+  "single runs cannot exclude a modest rubric benefit with a strong refiner.")
 
 # ===========================================================================
 H2("5.7. Serving Noise and Minimum Detectable Effect")
@@ -613,7 +615,7 @@ P("Table 11 gives the outcome of each decision rule. D1 (RQ1) is null for the un
   f"null), while its rubric-free control V3F gives {PP['v3f_1.7b']['lenient_wins']} lenient wins and a lenient mean of "
   f"{pp(PP['v3f_1.7b']['lenient_mean'])} points (mixed). D2 (RQ3) is not met with GPT-6 Luna or the 8B refiner under the "
   "unprotected treatment and is met for Qwen3-235B under strict scoring only and post hoc; under the protected treatment and "
-  "lenient scoring it is met for Qwen3-235B (post hoc), but the rubric-free control does as well. D3 (RQ2) is not met for the "
+  "lenient scoring it is met for Qwen3-235B and GPT-6 Luna (post hoc), but the rubric-free control reaches similar gains. D3 (RQ2) is not met for the "
   "1.7B refiner: the candidates, not the gate, limit the result. The rubric score is weakly related to accuracy (RQ4).")
 
 _VR = []
@@ -662,8 +664,12 @@ TABLE("Table 11. Outcome of the decision rules (Section 4.1).",
            f"strict wins {PP['v3f_1.7b']['strict_wins']}, mean {pp(PP['v3f_1.7b']['strict_mean'])}; lenient wins "
            f"{PP['v3f_1.7b']['lenient_wins']}, losses {PP['v3f_1.7b']['lenient_losses']}, mean {pp(PP['v3f_1.7b']['lenient_mean'])}",
            "Mixed (more than 2 wins, fewer than a third)"],
-          ["D2, protected V2F, Qwen3-235B (post hoc, lenient)", "Mean +2.0 over the 1.7B refiner and at least 3 of 9 wins",
-           f"{pp(PP['v2f_qwen235']['lenient_mean'])}; {PP['v2f_qwen235']['lenient_wins']} wins", "Met, but not specific to the rubric (V3F similar)"],
+          ["D2, protected V2F, Qwen3-235B (post hoc, lenient)", "Mean +2.0 over the 1.7B refiner (same nine cells) and at least 3 of 9 wins",
+           f"{pp(PP['v2f_qwen235']['lenient_mean'] - _tier_mean('v2f_1.7b'))} over the 1.7B refiner; {PP['v2f_qwen235']['lenient_wins']} wins",
+           "Met, but V3F reaches similar gains"],
+          ["D2, protected V2F, GPT-6 Luna (post hoc, lenient)", "Same",
+           f"{pp(PP['v2f_gpt6luna']['lenient_mean'] - _tier_mean('v2f_1.7b'))} over the 1.7B refiner; {PP['v2f_gpt6luna']['lenient_wins']} wins",
+           "Met, but V3F reaches similar gains"],
           ["D2, GPT-6 Luna", "Mean +2.0 over 1.7B and at least 3 of 9 wins",
            f"{pp(CAP['v2|gpt6luna']['mean_diff'])}; {CAP['v2|gpt6luna']['wins']} win", "Not met"],
           ["D2, Qwen3-8B-AWQ (exploratory)", "Same",

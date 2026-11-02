@@ -71,3 +71,13 @@ Final proofread and flow reviews were applied (`manuscript/review_round2_final_*
 (fallbacks return P0, echoes are accepted), the 5.2 denominator, AI-use declaration, removal of review-history phrasing, restructured
 Sections 5.2, 5.3.1, 5.6, 5.10, 6.1 and 7, new reader's guide and roadmap. The upload set is in `submission_revision2/upload_ready/`.
 `submission_revision2/human_spotcheck_sheet.csv` (not for upload) lets the authors re-label 90 items to check the AI-made labels.
+
+## Final addition (rubric-free control and protected strong refiners)
+
+After the last proofread, V3F (rubric-free rewrite under the V2F protection) was run on 45 cells with the 1.7B refiner, and V2F and V3F
+were run with Qwen3-235B and GPT-6 Luna on the nine Tier-1 cells (`g7-v3f`, `g7-api`; analysis in `mpir_study/protected_probes.py`,
+results in `results/revision/rev2_protected_probes.json`). Findings: V3F lenient mean +3.8 points (11 wins of 45), V2F -0.4; paired V2F minus V3F
+-3.7 [-6.8, -1.1] over 44 cells; strong refiners under protection +7.3 (235B) and +3.4 (Luna) lenient, with V3F similar. An independent check
+(`manuscript/review_round2_v3f_check.md`) confirmed the numbers and led to softer causal wording (the variants also differ in chaining and
+in the evaluation call). The package in `submission_revision2/upload_ready/` was rebuilt with these results.
+The OpenRouter key used for these runs was passed by environment variable only and is not stored in the repository.

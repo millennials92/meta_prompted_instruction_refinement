@@ -35,9 +35,10 @@ P(f"With Qwen3-1.7B as target and refiner, the rubric-guided layer as originally
   f"{pp(PP['v3f_1.7b']['lenient_mean'])} points and {PP['v3f_1.7b']['lenient_wins']} winning cells in 45, and the paired difference "
   f"in favour of V3F is {pp(-PP['paired_1.7b_all']['lenient']['mean'])} points (interval "
   f"[{pp(-PP['paired_1.7b_all']['lenient']['hi'])}, {pp(-PP['paired_1.7b_all']['lenient']['lo'])}]; Section 5.3.2). So for a 1.7B "
-  "refiner the rubric is not neutral: the long rubric meta-prompt makes the refiner worse, while a plain rewrite request with a "
-  "protected format and a validation gate gives a modest gain.")
-P(f"With strong refiners the picture is the reverse in size and the same in kind (exploratory: nine cells, one run per "
+  "refiner the rubric-guided variant does worse than a plain rewrite request with a protected format and a validation gate, which "
+  "gives a modest gain; the variants also differ in chaining and in the evaluation call, and we did not test whether the length of "
+  "the rubric is the reason.")
+P(f"With strong refiners the gains are larger and the two variants are not separated (exploratory: nine cells, one run per "
   f"condition). Under the protected treatment Qwen3-235B and GPT-6 Luna improve the prompts under lenient scoring "
   f"({pp(PP['v2f_qwen235']['lenient_mean'])} and {pp(PP['v2f_gpt6luna']['lenient_mean'])} points), which is the capability "
   f"dependence the first-round design asked for, but the rubric-free variant does as well ({pp(PP['v3f_qwen235']['lenient_mean'])} and "
@@ -47,7 +48,7 @@ P(f"With strong refiners the picture is the reverse in size and the same in kind
   "is a single cell on a garbled, near-chance base prompt. Criterion-level ablations were not run and the original GPT-4o and "
   "GPT-3.5-turbo configuration was not repeated, so the first evaluation's per-task gains remain unexplained and should not be "
   "cited as evidence for MPIR. The data support this reading: gated rewriting that keeps the answer format can improve weak prompts "
-  "when the refiner is capable or the request is simple, and the seven-criterion rubric is not what produces the gain.")
+  "when the refiner is capable or the request is simple, and the seven-criterion rubric is not shown to produce the gain.")
 P("A second lesson concerns measurement. Answer extraction decides what the gate rewards: in our runs a strict gate accepted rewrites "
   "that repaired the tag even where lenient accuracy did not improve, and exemplar-free baselines look far weaker under strict scoring "
   "than under lenient scoring. Reporting a lenient metric next to the strict one exposed both effects.")
@@ -67,8 +68,8 @@ P("The following points follow from these experiments, with Qwen3 models, nine B
   "points on a few hundred questions are noise. (iv) When the refining model is as small as the target, expect "
   "most rewrites to be unusable (echoes, missing delimiters, a dropped answer format) and monitor that rate; "
   "protect the answer-format line and show one worked example of the bare tag, since the line alone did not restore "
-  "accuracy (Section 5.2). (v) If a refinement layer is used with a small model, start from a short rewrite request and not a long "
-  "rubric, keep the format line and one worked example, and validate on held-out data (Section 5.3.2).")
+  "accuracy (Section 5.2). (v) With a small refiner, a short rewrite request did better than the long rubric in our runs (Section 5.3.2, one seed, "
+  "with other differences between the variants); whatever is used, keep the format line and one worked example and validate on held-out data.")
 
 H2("6.3. Threats to Validity")
 H3("6.3.1. Internal Validity")
@@ -110,10 +111,10 @@ P("We re-tested a rubric-guided refinement layer on prompts from small-model opt
   f"the rubric-guided variant was accepted in {NEW['grid_v2f']['accepted_runs']} of {NEW['grid_v2f']['runs']} runs but won in "
   f"{NEW['grid_v2f']['lenient_wins_vs_start']} cell and lost significantly in {NEW['grid_v2f']['lenient_losses_vs_start']} under a "
   f"lenient metric that we validated on labelled responses, whereas its rubric-free control gained {pp(PP['v3f_1.7b']['lenient_mean'])} "
-  f"points on average and won in {PP['v3f_1.7b']['lenient_wins']} cells, so the rubric hurts a 1.7B refiner. Third, strong refiners "
+  f"points on average and won in {PP['v3f_1.7b']['lenient_wins']} cells, so for a 1.7B refiner the rubric-guided variant does worse than a plain rewrite. Third, strong refiners "
   f"(Qwen3-235B, GPT-6 Luna) improve the prompts under the protected treatment ({pp(PP['v2f_qwen235']['lenient_mean'])} and "
-  f"{pp(PP['v2f_gpt6luna']['lenient_mean'])} points under lenient scoring, nine cells, one run each), but a rubric-free rewrite does about "
-  "as well, so the rubric is not shown to be what helps. Fourth, two measurement lessons accompany these findings: strict answer "
+  f"{pp(PP['v2f_gpt6luna']['lenient_mean'])} points under lenient scoring, nine cells, one run each), but a rubric-free rewrite reaches "
+  "similar gains, so the rubric is not shown to be what helps. Fourth, two measurement lessons accompany these findings: strict answer "
   "extraction accounts for most of the apparent weakness of exemplar-free baselines, and identical prompts do not score identically "
   "on this serving stack.")
 P("These conclusions are limited to Qwen3-1.7B as target and as the small refiner, nine BBH tasks, three re-implemented "

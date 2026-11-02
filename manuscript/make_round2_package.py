@@ -26,6 +26,21 @@ OLD_PDF = os.path.join(ROOT, "submission_revision", "upload_ready", "1b_Main_Man
 KEEP_EXT = (".png", ".bib", ".cls", ".bst", ".sty", ".pfb", ".tfm", ".map", ".bbl", ".tex")
 
 
+def safe_copy(src, dst, tries=8):
+    """shutil.copy with retries: Windows occasionally refuses to open a freshly written file (virus scanner, indexer)."""
+    import time
+    for attempt in range(tries):
+        try:
+            if os.path.exists(dst):
+                os.remove(dst)
+            shutil.copy(src, dst)
+            return dst
+        except OSError:
+            if attempt == tries - 1:
+                raise
+            time.sleep(3)
+
+
 def run(cmd, cwd):
     subprocess.run(cmd, cwd=cwd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
@@ -77,10 +92,10 @@ refinement fails. The revised manuscript addresses it with new experiments and a
 \medskip
 What changed. (i) A positive control: the validation gate accepted a known-good candidate in %(gate)d of %(ncells)d cells in which it helps.
 (ii) A re-run of the main grid with a format- and example-preserving treatment on %(runs)d cells: candidates were accepted in
-%(acc)d runs, but under a lenient metric the final prompts won in %(lw)d cell(s) and lost significantly in %(ll)d.
+%(acc)d runs, but under a lenient metric the final prompts won in %(lw)d cell%(lws)s and lost significantly in %(ll)d.
 (iii) A validation of the lenient parser on 400 labelled responses (precision %(prec).1f\%%, recall %(rec).1f\%%); the labels
 and the audit of 80 sampled echo and fallback rounds were produced by a language-model assistant, not by human raters, and
-the manuscript says so. (iv) A rubric-free control under the same protection: a plain rewrite request gained %(v3m).1f points on average under lenient scoring (%(v3w)d winning cells of %(v3n)d), while the rubric-guided variant did not, and strong refiners (Qwen3-235B, GPT-6 Luna) improved the prompts under the protected treatment (%(q).1f and %(l).1f points, nine cells, one run each), but a rubric-free rewrite did as well; so the rubric is not shown to help. (v) Exact acceptance bounds (%(ub).1f\%% one-sided for 1 acceptance in 80 runs; the earlier 7\%% was
+the manuscript says so. (iv) A rubric-free control under the same protection: a plain rewrite request gained %(v3m).1f points on average under lenient scoring (%(v3w)d winning cells of %(v3n)d), while the rubric-guided variant did not, and strong refiners (Qwen3-235B, GPT-6 Luna) improved the prompts under the protected treatment (%(q).1f and %(l).1f points, nine cells, one run each), but a rubric-free rewrite reached similar gains; so the rubric is not shown to help. (v) Exact acceptance bounds (%(ub).1f\%% one-sided for 1 acceptance in 80 runs; the earlier 7\%% was
 the two-sided value), a paired comparison of the rubric-guided and rubric-free variants, a single-session rescoring of the
 exploratory prompts, an intermediate open-weight refiner (Qwen3-8B, %(midacc)s of 9 runs changed the prompt), cost per
 variant, and a list of all base prompts. (vi) The title and claims now state the scope (Qwen3-1.7B, nine tasks, weak base
@@ -99,7 +114,7 @@ On behalf of all authors,\\
 Quang-Vinh Dang
 \end{document}
 """ % {"gate": CT["known_good_accepted"], "ncells": CT["known_good_cells"], "runs": G["runs"], "acc": G["accepted_runs"],
-       "lw": G["lenient_wins_vs_start"], "ll": G["lenient_losses_vs_start"], "prec": 100 * LC["lenient"]["precision"],
+       "lw": G["lenient_wins_vs_start"], "lws": "" if G["lenient_wins_vs_start"] == 1 else "s", "ll": G["lenient_losses_vs_start"], "prec": 100 * LC["lenient"]["precision"],
        "rec": 100 * LC["lenient"]["recall"], "ub": 100 * AB["run_upper_one_sided_95"],
        "midacc": mid.get("accepted_runs", "n/a"), "v3m": 100 * PP["v3f_1.7b"]["lenient_mean"], "v3w": PP["v3f_1.7b"]["lenient_wins"], "v3n": PP["v3f_1.7b"]["runs"], "q": 100 * PP["v2f_qwen235"]["lenient_mean"], "l": 100 * PP["v2f_gpt6luna"]["lenient_mean"]}
     path = os.path.join(OUT, "cover_letter.tex")
@@ -112,7 +127,7 @@ def main():
     os.makedirs(UP, exist_ok=True)
     build_pkg()
     clean = os.path.join(PKG, "manuscript.pdf")
-    shutil.copy(clean, os.path.join(UP, "1b_Main_Manuscript.pdf"))
+    safe_copy(clean, os.path.join(UP, "1b_Main_Manuscript.pdf"))
     with zipfile.ZipFile(os.path.join(UP, "1a_Main_Manuscript_LaTeX_source.zip"), "w", zipfile.ZIP_DEFLATED) as z:
         for root, _, files in os.walk(PKG):
             for f in files:
@@ -120,13 +135,13 @@ def main():
                     continue
                 p = os.path.join(root, f)
                 z.write(p, os.path.relpath(p, PKG))
-    shutil.copy(os.path.join(HERE, "response_to_reviewers_round2.docx"), os.path.join(UP, "2_Author_Response.docx"))
+    safe_copy(os.path.join(HERE, "response_to_reviewers_round2.docx"), os.path.join(UP, "2_Author_Response.docx"))
     old_coi = os.path.join(ROOT, "submission_revision", "upload_ready", "3_Conflict_of_Interest.pdf")
     if os.path.exists(old_coi):
-        shutil.copy(old_coi, os.path.join(UP, "3_Conflict_of_Interest.pdf"))
+        safe_copy(old_coi, os.path.join(UP, "3_Conflict_of_Interest.pdf"))
     subprocess.run([sys.executable, os.path.join(HERE, "highlight_diff.py"), OLD_PDF, clean,
                     os.path.join(UP, "4_Highlighted_Manuscript_of_Changes.pdf")], check=True)
-    shutil.copy(cover_letter(), os.path.join(UP, "5_Cover_Letter.pdf"))
+    safe_copy(cover_letter(), os.path.join(UP, "5_Cover_Letter.pdf"))
     with zipfile.ZipFile(os.path.join(UP, "6_Supplementary_Material.zip"), "w", zipfile.ZIP_DEFLATED) as z:
         for p in ("REVISION_PROTOCOL.md", "REVISION2_STATUS.md", "REBUILD.md", "README.md"):
             fp = os.path.join(ROOT, p)

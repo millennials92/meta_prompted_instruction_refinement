@@ -20,7 +20,7 @@ ABSTRACT = (
     f"on average ({_V3['lenient_wins']} winning cells of {_V3['runs']}); the paired difference is "
     f"{_p(-_PR['mean'])} points [{_p(-_PR['hi'])}, {_p(-_PR['lo'])}] in its favour. Qwen3-235B and GPT-6 Luna improved the prompts under "
     f"protection ({_p(PP['v2f_qwen235']['lenient_mean'])} and {_p(PP['v2f_gpt6luna']['lenient_mean'])} points, nine cells, one run "
-    "each), but a rubric-free rewrite did as well. One answer-format exemplar changed strict accuracy by +19.5 (APE) and +42.3 "
+    "each), but a rubric-free rewrite reached similar gains. One answer-format exemplar changed strict accuracy by +19.5 (APE) and +42.3 "
     "(ProTeGi) points, mostly tag format, and identical prompts disagree on 6.5% of examples. The "
     "rubric is not shown to help; conclusions are limited to Qwen3 targets, nine tasks and these optimizers."
 )
