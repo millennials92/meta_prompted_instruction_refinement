@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.13)  2 NOV 2026 12:59
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.13)  2 NOV 2026 13:10
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -606,6 +606,9 @@ Underfull \hbox (badness 10000) has occurred while \output is active
  []
 
 [2 <./notaglinelogo.png>]
+Underfull \vbox (badness 2799) has occurred while \output is active []
+
+
 Overfull \hbox (8.9009pt too wide) in paragraph at lines 109--109
 []|\T1/times/b/n/9 EvoPrompt 
  []
@@ -627,11 +630,11 @@ Overfull \hbox (14.02211pt too wide) in paragraph at lines 103--118
 
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 121.
+(Font)              using `T1/formata/m/it' instead on input line 125.
 
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 121.
+Package pdftex.def Info: notaglinelogo.png  used on input line 125.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -689,14 +692,10 @@ Overfull \hbox (25.77771pt too wide) in paragraph at lines 170--184
  [][] 
  []
 
-
-Underfull \vbox (badness 1515) has occurred while \output is active []
-
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
 Package pdftex.def Info: notaglinelogo.png  used on input line 189.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
-
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
 (Font)              using `T1/formata/m/it' instead on input line 189.
@@ -833,12 +832,16 @@ Underfull \hbox (badness 10000) in paragraph at lines 226--226
  []
 
 
+Underfull \vbox (badness 5345) has occurred while \output is active []
+
+
+
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 240.
+(Font)              using `T1/formata/m/it' instead on input line 234.
 
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 240.
+Package pdftex.def Info: notaglinelogo.png  used on input line 234.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -855,7 +858,10 @@ Underfull \hbox (badness 10000) has occurred while \output is active
 []
  []
 
-[5]
+[5{C:/Users/vinh.dq4/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}
+]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
 Package pdftex.def Info: notaglinelogo.png  used on input line 255.
@@ -880,8 +886,7 @@ Underfull \hbox (badness 10000) has occurred while \output is active
 []
  []
 
-[6{C:/Users/vinh.dq4/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}
-]
+[6]
 Overfull \hbox (15.45155pt too wide) in paragraph at lines 274--274
 []|\T1/times/b/n/9 Component|  
  []
@@ -1949,7 +1954,7 @@ e1/public/amsfonts/cm/cmsy7.pfb><./t1-formata-bold.pfb><./t1-formata-condmedium
 .pfb><./t1-formata-medium.pfb><./t1-formata-mediumitalic.pfb><./t1-formata-regu
 lar.pfb><./t1-giovannistd-bookitalic.pfb><C:/Users/vinh.dq4/AppData/Local/Progr
 ams/MiKTeX/fonts/type1/urw/courier/ucrr8a.pfb>
-Output written on manuscript.pdf (26 pages, 476728 bytes).
+Output written on manuscript.pdf (26 pages, 476547 bytes).
 PDF statistics:
  482 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
