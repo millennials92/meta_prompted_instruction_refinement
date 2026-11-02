@@ -1,0 +1,3077 @@
+{
+ "v3f_1.7b": {
+  "runs": 45,
+  "rounds": 315,
+  "fallback": 0,
+  "echo": 0,
+  "duplicate": 124,
+  "validated": 191,
+  "val_better": 66,
+  "accepted_runs": 22,
+  "strict_wins": 11,
+  "strict_mean": 0.04131481481481481,
+  "cells_ge_mde": 12,
+  "lenient_wins": 11,
+  "lenient_losses": 3,
+  "lenient_mean": 0.03814814814814815,
+  "cells": {
+   "disambiguation_qa__ape__s42": {
+    "strict": {
+     "diff": 0.145,
+     "lo": 0.1,
+     "hi": 0.195,
+     "n": 200,
+     "discordant": 29,
+     "gained": 29,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.05,
+     "lo": 0.005,
+     "hi": 0.095,
+     "n": 200,
+     "discordant": 22,
+     "gained": 16,
+     "lost": 6
+    },
+    "accepted": true,
+    "start_test": 0.0,
+    "final_test": 0.145
+   },
+   "disambiguation_qa__promptwizard__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.6,
+    "final_test": 0.6
+   },
+   "disambiguation_qa__protegi__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.395,
+    "final_test": 0.395
+   },
+   "geometric_shapes__ape__s42": {
+    "strict": {
+     "diff": 0.01,
+     "lo": -0.025,
+     "hi": 0.045,
+     "n": 200,
+     "discordant": 14,
+     "gained": 8,
+     "lost": 6
+    },
+    "lenient": {
+     "diff": 0.01,
+     "lo": -0.025,
+     "hi": 0.045,
+     "n": 200,
+     "discordant": 14,
+     "gained": 8,
+     "lost": 6
+    },
+    "accepted": true,
+    "start_test": 0.34,
+    "final_test": 0.35
+   },
+   "geometric_shapes__promptwizard__s42": {
+    "strict": {
+     "diff": 0.28,
+     "lo": 0.2,
+     "hi": 0.36,
+     "n": 200,
+     "discordant": 80,
+     "gained": 68,
+     "lost": 12
+    },
+    "lenient": {
+     "diff": 0.28,
+     "lo": 0.2,
+     "hi": 0.36,
+     "n": 200,
+     "discordant": 80,
+     "gained": 68,
+     "lost": 12
+    },
+    "accepted": true,
+    "start_test": 0.605,
+    "final_test": 0.885
+   },
+   "geometric_shapes__protegi__s42": {
+    "strict": {
+     "diff": 0.11,
+     "lo": 0.055,
+     "hi": 0.17,
+     "n": 200,
+     "discordant": 36,
+     "gained": 29,
+     "lost": 7
+    },
+    "lenient": {
+     "diff": 0.1,
+     "lo": 0.045,
+     "hi": 0.155,
+     "n": 200,
+     "discordant": 34,
+     "gained": 27,
+     "lost": 7
+    },
+    "accepted": true,
+    "start_test": 0.26,
+    "final_test": 0.37
+   },
+   "hyperbaton__ape__s42": {
+    "strict": {
+     "diff": -0.045,
+     "lo": -0.09,
+     "hi": -0.005,
+     "n": 200,
+     "discordant": 19,
+     "gained": 5,
+     "lost": 14
+    },
+    "lenient": {
+     "diff": -0.045,
+     "lo": -0.09,
+     "hi": -0.005,
+     "n": 200,
+     "discordant": 19,
+     "gained": 5,
+     "lost": 14
+    },
+    "accepted": true,
+    "start_test": 0.725,
+    "final_test": 0.68
+   },
+   "hyperbaton__ape__s43": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.665,
+    "final_test": 0.665
+   },
+   "hyperbaton__ape__s44": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.52,
+    "final_test": 0.52
+   },
+   "hyperbaton__promptwizard__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.56,
+    "final_test": 0.56
+   },
+   "hyperbaton__promptwizard__s43": {
+    "strict": {
+     "diff": 0.08,
+     "lo": 0.0,
+     "hi": 0.16,
+     "n": 200,
+     "discordant": 70,
+     "gained": 43,
+     "lost": 27
+    },
+    "lenient": {
+     "diff": 0.08,
+     "lo": 0.0,
+     "hi": 0.16,
+     "n": 200,
+     "discordant": 70,
+     "gained": 43,
+     "lost": 27
+    },
+    "accepted": true,
+    "start_test": 0.645,
+    "final_test": 0.725
+   },
+   "hyperbaton__promptwizard__s44": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.535,
+    "final_test": 0.535
+   },
+   "hyperbaton__protegi__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.505,
+    "final_test": 0.505
+   },
+   "hyperbaton__protegi__s43": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.525,
+    "final_test": 0.525
+   },
+   "hyperbaton__protegi__s44": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.575,
+    "final_test": 0.575
+   },
+   "movie_recommendation__ape__s42": {
+    "strict": {
+     "diff": -0.02,
+     "lo": -0.06,
+     "hi": 0.02,
+     "n": 200,
+     "discordant": 18,
+     "gained": 7,
+     "lost": 11
+    },
+    "lenient": {
+     "diff": -0.02,
+     "lo": -0.06,
+     "hi": 0.02,
+     "n": 200,
+     "discordant": 18,
+     "gained": 7,
+     "lost": 11
+    },
+    "accepted": true,
+    "start_test": 0.62,
+    "final_test": 0.6
+   },
+   "movie_recommendation__promptwizard__s42": {
+    "strict": {
+     "diff": -0.115,
+     "lo": -0.185,
+     "hi": -0.045,
+     "n": 200,
+     "discordant": 53,
+     "gained": 15,
+     "lost": 38
+    },
+    "lenient": {
+     "diff": -0.115,
+     "lo": -0.185,
+     "hi": -0.045,
+     "n": 200,
+     "discordant": 53,
+     "gained": 15,
+     "lost": 38
+    },
+    "accepted": true,
+    "start_test": 0.605,
+    "final_test": 0.49
+   },
+   "movie_recommendation__protegi__s42": {
+    "strict": {
+     "diff": 0.23,
+     "lo": 0.16,
+     "hi": 0.3,
+     "n": 200,
+     "discordant": 64,
+     "gained": 55,
+     "lost": 9
+    },
+    "lenient": {
+     "diff": 0.14,
+     "lo": 0.075,
+     "hi": 0.205,
+     "n": 200,
+     "discordant": 50,
+     "gained": 39,
+     "lost": 11
+    },
+    "accepted": true,
+    "start_test": 0.435,
+    "final_test": 0.665
+   },
+   "penguins_in_a_table__ape__s42": {
+    "strict": {
+     "diff": -0.10416666666666667,
+     "lo": -0.20833333333333334,
+     "hi": 0.010416666666666666,
+     "n": 96,
+     "discordant": 30,
+     "gained": 10,
+     "lost": 20
+    },
+    "lenient": {
+     "diff": -0.08333333333333333,
+     "lo": -0.1875,
+     "hi": 0.020833333333333332,
+     "n": 96,
+     "discordant": 28,
+     "gained": 10,
+     "lost": 18
+    },
+    "accepted": true,
+    "start_test": 0.6770833333333334,
+    "final_test": 0.5729166666666666
+   },
+   "penguins_in_a_table__ape__s43": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.7291666666666666,
+    "final_test": 0.7291666666666666
+   },
+   "penguins_in_a_table__ape__s44": {
+    "strict": {
+     "diff": -0.16666666666666666,
+     "lo": -0.2708333333333333,
+     "hi": -0.0625,
+     "n": 96,
+     "discordant": 30,
+     "gained": 7,
+     "lost": 23
+    },
+    "lenient": {
+     "diff": -0.125,
+     "lo": -0.22916666666666666,
+     "hi": -0.020833333333333332,
+     "n": 96,
+     "discordant": 28,
+     "gained": 8,
+     "lost": 20
+    },
+    "accepted": true,
+    "start_test": 0.7708333333333334,
+    "final_test": 0.6041666666666666
+   },
+   "penguins_in_a_table__promptwizard__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.75,
+    "final_test": 0.75
+   },
+   "penguins_in_a_table__promptwizard__s43": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.6770833333333334,
+    "final_test": 0.6770833333333334
+   },
+   "penguins_in_a_table__promptwizard__s44": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.7604166666666666,
+    "final_test": 0.7604166666666666
+   },
+   "penguins_in_a_table__protegi__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.6666666666666666,
+    "final_test": 0.6666666666666666
+   },
+   "penguins_in_a_table__protegi__s43": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.7708333333333334,
+    "final_test": 0.7708333333333334
+   },
+   "penguins_in_a_table__protegi__s44": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.75,
+    "final_test": 0.75
+   },
+   "ruin_names__ape__s42": {
+    "strict": {
+     "diff": 0.205,
+     "lo": 0.13,
+     "hi": 0.28,
+     "n": 200,
+     "discordant": 69,
+     "gained": 55,
+     "lost": 14
+    },
+    "lenient": {
+     "diff": 0.205,
+     "lo": 0.13,
+     "hi": 0.28,
+     "n": 200,
+     "discordant": 69,
+     "gained": 55,
+     "lost": 14
+    },
+    "accepted": true,
+    "start_test": 0.34,
+    "final_test": 0.545
+   },
+   "ruin_names__ape__s43": {
+    "strict": {
+     "diff": 0.46,
+     "lo": 0.39,
+     "hi": 0.525,
+     "n": 200,
+     "discordant": 92,
+     "gained": 92,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.46,
+     "lo": 0.39,
+     "hi": 0.525,
+     "n": 200,
+     "discordant": 92,
+     "gained": 92,
+     "lost": 0
+    },
+    "accepted": true,
+    "start_test": 0.0,
+    "final_test": 0.46
+   },
+   "ruin_names__ape__s44": {
+    "strict": {
+     "diff": 0.28,
+     "lo": 0.21,
+     "hi": 0.355,
+     "n": 200,
+     "discordant": 72,
+     "gained": 64,
+     "lost": 8
+    },
+    "lenient": {
+     "diff": 0.28,
+     "lo": 0.21,
+     "hi": 0.355,
+     "n": 200,
+     "discordant": 72,
+     "gained": 64,
+     "lost": 8
+    },
+    "accepted": true,
+    "start_test": 0.345,
+    "final_test": 0.625
+   },
+   "ruin_names__promptwizard__s42": {
+    "strict": {
+     "diff": -0.045,
+     "lo": -0.12,
+     "hi": 0.03,
+     "n": 200,
+     "discordant": 59,
+     "gained": 25,
+     "lost": 34
+    },
+    "lenient": {
+     "diff": -0.045,
+     "lo": -0.12,
+     "hi": 0.03,
+     "n": 200,
+     "discordant": 59,
+     "gained": 25,
+     "lost": 34
+    },
+    "accepted": true,
+    "start_test": 0.6,
+    "final_test": 0.555
+   },
+   "ruin_names__promptwizard__s43": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.55,
+    "final_test": 0.55
+   },
+   "ruin_names__promptwizard__s44": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.49,
+    "final_test": 0.49
+   },
+   "ruin_names__protegi__s42": {
+    "strict": {
+     "diff": 0.11,
+     "lo": 0.03,
+     "hi": 0.19,
+     "n": 200,
+     "discordant": 68,
+     "gained": 45,
+     "lost": 23
+    },
+    "lenient": {
+     "diff": 0.11,
+     "lo": 0.03,
+     "hi": 0.19,
+     "n": 200,
+     "discordant": 68,
+     "gained": 45,
+     "lost": 23
+    },
+    "accepted": true,
+    "start_test": 0.385,
+    "final_test": 0.495
+   },
+   "ruin_names__protegi__s43": {
+    "strict": {
+     "diff": 0.135,
+     "lo": 0.055,
+     "hi": 0.215,
+     "n": 200,
+     "discordant": 69,
+     "gained": 48,
+     "lost": 21
+    },
+    "lenient": {
+     "diff": 0.135,
+     "lo": 0.055,
+     "hi": 0.215,
+     "n": 200,
+     "discordant": 69,
+     "gained": 48,
+     "lost": 21
+    },
+    "accepted": true,
+    "start_test": 0.395,
+    "final_test": 0.53
+   },
+   "ruin_names__protegi__s44": {
+    "strict": {
+     "diff": 0.14,
+     "lo": 0.065,
+     "hi": 0.215,
+     "n": 200,
+     "discordant": 64,
+     "gained": 46,
+     "lost": 18
+    },
+    "lenient": {
+     "diff": 0.14,
+     "lo": 0.065,
+     "hi": 0.215,
+     "n": 200,
+     "discordant": 64,
+     "gained": 46,
+     "lost": 18
+    },
+    "accepted": true,
+    "start_test": 0.395,
+    "final_test": 0.535
+   },
+   "salient_translation_error_detection__ape__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.41,
+    "final_test": 0.41
+   },
+   "salient_translation_error_detection__promptwizard__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.475,
+    "final_test": 0.475
+   },
+   "salient_translation_error_detection__protegi__s42": {
+    "strict": {
+     "diff": 0.035,
+     "lo": -0.04,
+     "hi": 0.11,
+     "n": 200,
+     "discordant": 61,
+     "gained": 34,
+     "lost": 27
+    },
+    "lenient": {
+     "diff": 0.04,
+     "lo": -0.025,
+     "hi": 0.105,
+     "n": 200,
+     "discordant": 40,
+     "gained": 24,
+     "lost": 16
+    },
+    "accepted": true,
+    "start_test": 0.185,
+    "final_test": 0.22
+   },
+   "sports_understanding__ape__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.64,
+    "final_test": 0.64
+   },
+   "sports_understanding__promptwizard__s42": {
+    "strict": {
+     "diff": -0.01,
+     "lo": -0.05,
+     "hi": 0.03,
+     "n": 200,
+     "discordant": 16,
+     "gained": 7,
+     "lost": 9
+    },
+    "lenient": {
+     "diff": -0.01,
+     "lo": -0.05,
+     "hi": 0.03,
+     "n": 200,
+     "discordant": 16,
+     "gained": 7,
+     "lost": 9
+    },
+    "accepted": true,
+    "start_test": 0.685,
+    "final_test": 0.675
+   },
+   "sports_understanding__protegi__s42": {
+    "strict": {
+     "diff": 0.035,
+     "lo": -0.04,
+     "hi": 0.11,
+     "n": 200,
+     "discordant": 57,
+     "gained": 32,
+     "lost": 25
+    },
+    "lenient": {
+     "diff": 0.02,
+     "lo": -0.045,
+     "hi": 0.085,
+     "n": 200,
+     "discordant": 46,
+     "gained": 25,
+     "lost": 21
+    },
+    "accepted": true,
+    "start_test": 0.5,
+    "final_test": 0.535
+   },
+   "temporal_sequences__ape__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.27,
+    "final_test": 0.27
+   },
+   "temporal_sequences__promptwizard__s42": {
+    "strict": {
+     "diff": 0.11,
+     "lo": 0.05,
+     "hi": 0.17,
+     "n": 200,
+     "discordant": 40,
+     "gained": 31,
+     "lost": 9
+    },
+    "lenient": {
+     "diff": 0.11,
+     "lo": 0.05,
+     "hi": 0.17,
+     "n": 200,
+     "discordant": 40,
+     "gained": 31,
+     "lost": 9
+    },
+    "accepted": true,
+    "start_test": 0.12,
+    "final_test": 0.23
+   },
+   "temporal_sequences__protegi__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.315,
+    "final_test": 0.315
+   }
+  }
+ },
+ "v2f_1.7b": {
+  "runs": 44,
+  "rounds": 308,
+  "fallback": 88,
+  "echo": 60,
+  "duplicate": 68,
+  "validated": 92,
+  "val_better": 20,
+  "accepted_runs": 15,
+  "strict_wins": 4,
+  "strict_mean": 0.007149621212121213,
+  "cells_ge_mde": 4,
+  "lenient_wins": 1,
+  "lenient_losses": 3,
+  "lenient_mean": -0.0043465909090909085,
+  "cells": {
+   "disambiguation_qa__ape__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.0,
+    "final_test": 0.0
+   },
+   "disambiguation_qa__promptwizard__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.6,
+    "final_test": 0.6
+   },
+   "disambiguation_qa__protegi__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.395,
+    "final_test": 0.395
+   },
+   "geometric_shapes__ape__s42": {
+    "strict": {
+     "diff": 0.01,
+     "lo": -0.025,
+     "hi": 0.045,
+     "n": 200,
+     "discordant": 14,
+     "gained": 8,
+     "lost": 6
+    },
+    "lenient": {
+     "diff": 0.015,
+     "lo": -0.025,
+     "hi": 0.05,
+     "n": 200,
+     "discordant": 15,
+     "gained": 9,
+     "lost": 6
+    },
+    "accepted": true,
+    "start_test": 0.34,
+    "final_test": 0.35
+   },
+   "geometric_shapes__protegi__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.26,
+    "final_test": 0.26
+   },
+   "hyperbaton__ape__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.725,
+    "final_test": 0.725
+   },
+   "hyperbaton__ape__s43": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.665,
+    "final_test": 0.665
+   },
+   "hyperbaton__ape__s44": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.52,
+    "final_test": 0.52
+   },
+   "hyperbaton__promptwizard__s42": {
+    "strict": {
+     "diff": -0.07,
+     "lo": -0.13,
+     "hi": -0.01,
+     "n": 200,
+     "discordant": 38,
+     "gained": 12,
+     "lost": 26
+    },
+    "lenient": {
+     "diff": -0.07,
+     "lo": -0.13,
+     "hi": -0.01,
+     "n": 200,
+     "discordant": 38,
+     "gained": 12,
+     "lost": 26
+    },
+    "accepted": true,
+    "start_test": 0.56,
+    "final_test": 0.49
+   },
+   "hyperbaton__promptwizard__s43": {
+    "strict": {
+     "diff": 0.0,
+     "lo": -0.055,
+     "hi": 0.055,
+     "n": 200,
+     "discordant": 32,
+     "gained": 16,
+     "lost": 16
+    },
+    "lenient": {
+     "diff": 0.035,
+     "lo": -0.02,
+     "hi": 0.09,
+     "n": 200,
+     "discordant": 33,
+     "gained": 20,
+     "lost": 13
+    },
+    "accepted": true,
+    "start_test": 0.645,
+    "final_test": 0.645
+   },
+   "hyperbaton__promptwizard__s44": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.535,
+    "final_test": 0.535
+   },
+   "hyperbaton__protegi__s42": {
+    "strict": {
+     "diff": 0.135,
+     "lo": 0.045,
+     "hi": 0.23,
+     "n": 200,
+     "discordant": 91,
+     "gained": 59,
+     "lost": 32
+    },
+    "lenient": {
+     "diff": -0.08,
+     "lo": -0.145,
+     "hi": -0.015,
+     "n": 200,
+     "discordant": 48,
+     "gained": 16,
+     "lost": 32
+    },
+    "accepted": true,
+    "start_test": 0.505,
+    "final_test": 0.64
+   },
+   "hyperbaton__protegi__s43": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.525,
+    "final_test": 0.525
+   },
+   "hyperbaton__protegi__s44": {
+    "strict": {
+     "diff": 0.04,
+     "lo": -0.02,
+     "hi": 0.1,
+     "n": 200,
+     "discordant": 38,
+     "gained": 23,
+     "lost": 15
+    },
+    "lenient": {
+     "diff": -0.04,
+     "lo": -0.08,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 16,
+     "gained": 4,
+     "lost": 12
+    },
+    "accepted": true,
+    "start_test": 0.575,
+    "final_test": 0.615
+   },
+   "movie_recommendation__ape__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.62,
+    "final_test": 0.62
+   },
+   "movie_recommendation__promptwizard__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.605,
+    "final_test": 0.605
+   },
+   "movie_recommendation__protegi__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.435,
+    "final_test": 0.435
+   },
+   "penguins_in_a_table__ape__s42": {
+    "strict": {
+     "diff": 0.03125,
+     "lo": -0.07291666666666667,
+     "hi": 0.13541666666666666,
+     "n": 96,
+     "discordant": 27,
+     "gained": 15,
+     "lost": 12
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": -0.10416666666666667,
+     "hi": 0.10416666666666667,
+     "n": 96,
+     "discordant": 26,
+     "gained": 13,
+     "lost": 13
+    },
+    "accepted": true,
+    "start_test": 0.6458333333333334,
+    "final_test": 0.6770833333333334
+   },
+   "penguins_in_a_table__ape__s43": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.7291666666666666,
+    "final_test": 0.7291666666666666
+   },
+   "penguins_in_a_table__ape__s44": {
+    "strict": {
+     "diff": -0.041666666666666664,
+     "lo": -0.14583333333333334,
+     "hi": 0.052083333333333336,
+     "n": 96,
+     "discordant": 24,
+     "gained": 10,
+     "lost": 14
+    },
+    "lenient": {
+     "diff": -0.041666666666666664,
+     "lo": -0.14583333333333334,
+     "hi": 0.052083333333333336,
+     "n": 96,
+     "discordant": 24,
+     "gained": 10,
+     "lost": 14
+    },
+    "accepted": true,
+    "start_test": 0.7708333333333334,
+    "final_test": 0.7291666666666666
+   },
+   "penguins_in_a_table__promptwizard__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.75,
+    "final_test": 0.75
+   },
+   "penguins_in_a_table__promptwizard__s43": {
+    "strict": {
+     "diff": 0.0,
+     "lo": -0.11458333333333333,
+     "hi": 0.11458333333333333,
+     "n": 96,
+     "discordant": 34,
+     "gained": 17,
+     "lost": 17
+    },
+    "lenient": {
+     "diff": 0.010416666666666666,
+     "lo": -0.10416666666666667,
+     "hi": 0.125,
+     "n": 96,
+     "discordant": 33,
+     "gained": 17,
+     "lost": 16
+    },
+    "accepted": true,
+    "start_test": 0.6770833333333334,
+    "final_test": 0.6770833333333334
+   },
+   "penguins_in_a_table__promptwizard__s44": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.7604166666666666,
+    "final_test": 0.7604166666666666
+   },
+   "penguins_in_a_table__protegi__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.6666666666666666,
+    "final_test": 0.6666666666666666
+   },
+   "penguins_in_a_table__protegi__s43": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.7708333333333334,
+    "final_test": 0.7708333333333334
+   },
+   "penguins_in_a_table__protegi__s44": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.75,
+    "final_test": 0.75
+   },
+   "ruin_names__ape__s42": {
+    "strict": {
+     "diff": 0.015,
+     "lo": -0.045,
+     "hi": 0.07,
+     "n": 200,
+     "discordant": 35,
+     "gained": 19,
+     "lost": 16
+    },
+    "lenient": {
+     "diff": 0.005,
+     "lo": -0.055,
+     "hi": 0.065,
+     "n": 200,
+     "discordant": 37,
+     "gained": 19,
+     "lost": 18
+    },
+    "accepted": true,
+    "start_test": 0.33,
+    "final_test": 0.345
+   },
+   "ruin_names__ape__s43": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.0,
+    "final_test": 0.0
+   },
+   "ruin_names__ape__s44": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.345,
+    "final_test": 0.345
+   },
+   "ruin_names__promptwizard__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.6,
+    "final_test": 0.6
+   },
+   "ruin_names__promptwizard__s43": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.55,
+    "final_test": 0.55
+   },
+   "ruin_names__promptwizard__s44": {
+    "strict": {
+     "diff": -0.11,
+     "lo": -0.2,
+     "hi": -0.02,
+     "n": 200,
+     "discordant": 86,
+     "gained": 32,
+     "lost": 54
+    },
+    "lenient": {
+     "diff": -0.11,
+     "lo": -0.2,
+     "hi": -0.02,
+     "n": 200,
+     "discordant": 86,
+     "gained": 32,
+     "lost": 54
+    },
+    "accepted": true,
+    "start_test": 0.49,
+    "final_test": 0.38
+   },
+   "ruin_names__protegi__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.385,
+    "final_test": 0.385
+   },
+   "ruin_names__protegi__s43": {
+    "strict": {
+     "diff": 0.015,
+     "lo": -0.045,
+     "hi": 0.08,
+     "n": 200,
+     "discordant": 41,
+     "gained": 22,
+     "lost": 19
+    },
+    "lenient": {
+     "diff": 0.015,
+     "lo": -0.045,
+     "hi": 0.08,
+     "n": 200,
+     "discordant": 41,
+     "gained": 22,
+     "lost": 19
+    },
+    "accepted": true,
+    "start_test": 0.395,
+    "final_test": 0.41
+   },
+   "ruin_names__protegi__s44": {
+    "strict": {
+     "diff": 0.01,
+     "lo": -0.05,
+     "hi": 0.07,
+     "n": 200,
+     "discordant": 38,
+     "gained": 20,
+     "lost": 18
+    },
+    "lenient": {
+     "diff": 0.01,
+     "lo": -0.05,
+     "hi": 0.07,
+     "n": 200,
+     "discordant": 38,
+     "gained": 20,
+     "lost": 18
+    },
+    "accepted": true,
+    "start_test": 0.395,
+    "final_test": 0.405
+   },
+   "salient_translation_error_detection__ape__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.41,
+    "final_test": 0.41
+   },
+   "salient_translation_error_detection__promptwizard__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.475,
+    "final_test": 0.475
+   },
+   "salient_translation_error_detection__protegi__s42": {
+    "strict": {
+     "diff": 0.12,
+     "lo": 0.045,
+     "hi": 0.2,
+     "n": 200,
+     "discordant": 62,
+     "gained": 43,
+     "lost": 19
+    },
+    "lenient": {
+     "diff": 0.005,
+     "lo": -0.055,
+     "hi": 0.065,
+     "n": 200,
+     "discordant": 39,
+     "gained": 20,
+     "lost": 19
+    },
+    "accepted": true,
+    "start_test": 0.185,
+    "final_test": 0.305
+   },
+   "sports_understanding__ape__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.64,
+    "final_test": 0.64
+   },
+   "sports_understanding__promptwizard__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.685,
+    "final_test": 0.685
+   },
+   "sports_understanding__protegi__s42": {
+    "strict": {
+     "diff": 0.085,
+     "lo": 0.02,
+     "hi": 0.15,
+     "n": 200,
+     "discordant": 47,
+     "gained": 32,
+     "lost": 15
+    },
+    "lenient": {
+     "diff": -0.02,
+     "lo": -0.09,
+     "hi": 0.05,
+     "n": 200,
+     "discordant": 46,
+     "gained": 21,
+     "lost": 25
+    },
+    "accepted": true,
+    "start_test": 0.5,
+    "final_test": 0.585
+   },
+   "temporal_sequences__ape__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.27,
+    "final_test": 0.27
+   },
+   "temporal_sequences__promptwizard__s42": {
+    "strict": {
+     "diff": 0.075,
+     "lo": 0.015,
+     "hi": 0.135,
+     "n": 200,
+     "discordant": 39,
+     "gained": 27,
+     "lost": 12
+    },
+    "lenient": {
+     "diff": 0.075,
+     "lo": 0.015,
+     "hi": 0.135,
+     "n": 200,
+     "discordant": 39,
+     "gained": 27,
+     "lost": 12
+    },
+    "accepted": true,
+    "start_test": 0.12,
+    "final_test": 0.195
+   },
+   "temporal_sequences__protegi__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.315,
+    "final_test": 0.315
+   }
+  }
+ },
+ "paired_1.7b_all": {
+  "n": 44,
+  "strict": {
+   "mean": -0.0296780303030303,
+   "lo": -0.06420454545454546,
+   "hi": 0.00034090909090908877,
+   "v2f_better": 11,
+   "v3f_better": 13,
+   "tied": 20,
+   "ci_excludes_zero": 16,
+   "cells": 44
+  },
+  "lenient": {
+   "mean": -0.03699810606060606,
+   "lo": -0.06808712121212121,
+   "hi": -0.010718750000000015,
+   "v2f_better": 9,
+   "v3f_better": 17,
+   "tied": 18,
+   "ci_excludes_zero": 14,
+   "cells": 44
+  }
+ },
+ "paired_1.7b_tier1": {
+  "n": 9,
+  "strict": {
+   "mean": -0.00564814814814815,
+   "lo": -0.07352777777777778,
+   "hi": 0.05630324074074065,
+   "v2f_better": 4,
+   "v3f_better": 3,
+   "tied": 2,
+   "ci_excludes_zero": 5,
+   "cells": 9
+  },
+  "lenient": {
+   "mean": -0.03185185185185185,
+   "lo": -0.08944444444444444,
+   "hi": 0.021481481481481476,
+   "v2f_better": 3,
+   "v3f_better": 4,
+   "tied": 2,
+   "ci_excludes_zero": 5,
+   "cells": 9
+  }
+ },
+ "v2f_qwen235": {
+  "runs": 9,
+  "rounds": 63,
+  "fallback": 0,
+  "echo": 5,
+  "duplicate": 3,
+  "validated": 55,
+  "val_better": 43,
+  "accepted_runs": 8,
+  "strict_wins": 4,
+  "strict_mean": 0.09240740740740741,
+  "cells_ge_mde": 5,
+  "lenient_wins": 3,
+  "lenient_losses": 0,
+  "lenient_mean": 0.07314814814814814,
+  "cells": {
+   "hyperbaton__ape__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.725,
+    "final_test": 0.725
+   },
+   "hyperbaton__promptwizard__s42": {
+    "strict": {
+     "diff": 0.125,
+     "lo": 0.045,
+     "hi": 0.205,
+     "n": 200,
+     "discordant": 67,
+     "gained": 46,
+     "lost": 21
+    },
+    "lenient": {
+     "diff": 0.125,
+     "lo": 0.045,
+     "hi": 0.205,
+     "n": 200,
+     "discordant": 67,
+     "gained": 46,
+     "lost": 21
+    },
+    "accepted": true,
+    "start_test": 0.56,
+    "final_test": 0.685
+   },
+   "hyperbaton__protegi__s42": {
+    "strict": {
+     "diff": 0.235,
+     "lo": 0.145,
+     "hi": 0.32,
+     "n": 200,
+     "discordant": 91,
+     "gained": 69,
+     "lost": 22
+    },
+    "lenient": {
+     "diff": 0.02,
+     "lo": -0.0701249999999999,
+     "hi": 0.11,
+     "n": 200,
+     "discordant": 86,
+     "gained": 45,
+     "lost": 41
+    },
+    "accepted": true,
+    "start_test": 0.505,
+    "final_test": 0.74
+   },
+   "penguins_in_a_table__ape__s42": {
+    "strict": {
+     "diff": -0.041666666666666664,
+     "lo": -0.16666666666666666,
+     "hi": 0.08333333333333333,
+     "n": 96,
+     "discordant": 38,
+     "gained": 17,
+     "lost": 21
+    },
+    "lenient": {
+     "diff": 0.010416666666666666,
+     "lo": -0.10416666666666667,
+     "hi": 0.125,
+     "n": 96,
+     "discordant": 33,
+     "gained": 17,
+     "lost": 16
+    },
+    "accepted": true,
+    "start_test": 0.6770833333333334,
+    "final_test": 0.6354166666666666
+   },
+   "penguins_in_a_table__promptwizard__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": -0.10416666666666667,
+     "hi": 0.10416666666666667,
+     "n": 96,
+     "discordant": 26,
+     "gained": 13,
+     "lost": 13
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": -0.10416666666666667,
+     "hi": 0.10416666666666667,
+     "n": 96,
+     "discordant": 26,
+     "gained": 13,
+     "lost": 13
+    },
+    "accepted": true,
+    "start_test": 0.75,
+    "final_test": 0.75
+   },
+   "penguins_in_a_table__protegi__s42": {
+    "strict": {
+     "diff": -0.041666666666666664,
+     "lo": -0.16666666666666666,
+     "hi": 0.07291666666666667,
+     "n": 96,
+     "discordant": 34,
+     "gained": 15,
+     "lost": 19
+    },
+    "lenient": {
+     "diff": -0.052083333333333336,
+     "lo": -0.16666666666666666,
+     "hi": 0.0625,
+     "n": 96,
+     "discordant": 33,
+     "gained": 14,
+     "lost": 19
+    },
+    "accepted": true,
+    "start_test": 0.6666666666666666,
+    "final_test": 0.625
+   },
+   "ruin_names__ape__s42": {
+    "strict": {
+     "diff": 0.26,
+     "lo": 0.18,
+     "hi": 0.34,
+     "n": 200,
+     "discordant": 82,
+     "gained": 67,
+     "lost": 15
+    },
+    "lenient": {
+     "diff": 0.26,
+     "lo": 0.18,
+     "hi": 0.34,
+     "n": 200,
+     "discordant": 82,
+     "gained": 67,
+     "lost": 15
+    },
+    "accepted": true,
+    "start_test": 0.34,
+    "final_test": 0.6
+   },
+   "ruin_names__promptwizard__s42": {
+    "strict": {
+     "diff": 0.065,
+     "lo": 0.0,
+     "hi": 0.13,
+     "n": 200,
+     "discordant": 47,
+     "gained": 30,
+     "lost": 17
+    },
+    "lenient": {
+     "diff": 0.065,
+     "lo": 0.0,
+     "hi": 0.13,
+     "n": 200,
+     "discordant": 47,
+     "gained": 30,
+     "lost": 17
+    },
+    "accepted": true,
+    "start_test": 0.6,
+    "final_test": 0.665
+   },
+   "ruin_names__protegi__s42": {
+    "strict": {
+     "diff": 0.23,
+     "lo": 0.145,
+     "hi": 0.315,
+     "n": 200,
+     "discordant": 86,
+     "gained": 66,
+     "lost": 20
+    },
+    "lenient": {
+     "diff": 0.23,
+     "lo": 0.145,
+     "hi": 0.315,
+     "n": 200,
+     "discordant": 86,
+     "gained": 66,
+     "lost": 20
+    },
+    "accepted": true,
+    "start_test": 0.385,
+    "final_test": 0.615
+   }
+  }
+ },
+ "v3f_qwen235": {
+  "runs": 9,
+  "rounds": 63,
+  "fallback": 0,
+  "echo": 0,
+  "duplicate": 0,
+  "validated": 63,
+  "val_better": 38,
+  "accepted_runs": 9,
+  "strict_wins": 4,
+  "strict_mean": 0.10078703703703704,
+  "cells_ge_mde": 5,
+  "lenient_wins": 3,
+  "lenient_losses": 0,
+  "lenient_mean": 0.0762962962962963,
+  "cells": {
+   "hyperbaton__ape__s42": {
+    "strict": {
+     "diff": 0.155,
+     "lo": 0.08,
+     "hi": 0.23,
+     "n": 200,
+     "discordant": 59,
+     "gained": 45,
+     "lost": 14
+    },
+    "lenient": {
+     "diff": 0.16,
+     "lo": 0.09,
+     "hi": 0.235,
+     "n": 200,
+     "discordant": 58,
+     "gained": 45,
+     "lost": 13
+    },
+    "accepted": true,
+    "start_test": 0.725,
+    "final_test": 0.88
+   },
+   "hyperbaton__promptwizard__s42": {
+    "strict": {
+     "diff": 0.39,
+     "lo": 0.315,
+     "hi": 0.46,
+     "n": 200,
+     "discordant": 84,
+     "gained": 81,
+     "lost": 3
+    },
+    "lenient": {
+     "diff": 0.39,
+     "lo": 0.315,
+     "hi": 0.46,
+     "n": 200,
+     "discordant": 84,
+     "gained": 81,
+     "lost": 3
+    },
+    "accepted": true,
+    "start_test": 0.56,
+    "final_test": 0.95
+   },
+   "hyperbaton__protegi__s42": {
+    "strict": {
+     "diff": 0.275,
+     "lo": 0.19,
+     "hi": 0.36,
+     "n": 200,
+     "discordant": 91,
+     "gained": 73,
+     "lost": 18
+    },
+    "lenient": {
+     "diff": 0.06,
+     "lo": -0.01,
+     "hi": 0.13,
+     "n": 200,
+     "discordant": 54,
+     "gained": 33,
+     "lost": 21
+    },
+    "accepted": true,
+    "start_test": 0.505,
+    "final_test": 0.78
+   },
+   "penguins_in_a_table__ape__s42": {
+    "strict": {
+     "diff": -0.0625,
+     "lo": -0.16666666666666666,
+     "hi": 0.041666666666666664,
+     "n": 96,
+     "discordant": 26,
+     "gained": 10,
+     "lost": 16
+    },
+    "lenient": {
+     "diff": -0.0625,
+     "lo": -0.16666666666666666,
+     "hi": 0.041666666666666664,
+     "n": 96,
+     "discordant": 26,
+     "gained": 10,
+     "lost": 16
+    },
+    "accepted": true,
+    "start_test": 0.6770833333333334,
+    "final_test": 0.6145833333333334
+   },
+   "penguins_in_a_table__promptwizard__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": -0.10416666666666667,
+     "hi": 0.10416666666666667,
+     "n": 96,
+     "discordant": 24,
+     "gained": 12,
+     "lost": 12
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": -0.10416666666666667,
+     "hi": 0.10416666666666667,
+     "n": 96,
+     "discordant": 24,
+     "gained": 12,
+     "lost": 12
+    },
+    "accepted": true,
+    "start_test": 0.75,
+    "final_test": 0.75
+   },
+   "penguins_in_a_table__protegi__s42": {
+    "strict": {
+     "diff": -0.010416666666666666,
+     "lo": -0.125,
+     "hi": 0.10416666666666667,
+     "n": 96,
+     "discordant": 31,
+     "gained": 15,
+     "lost": 16
+    },
+    "lenient": {
+     "diff": -0.020833333333333332,
+     "lo": -0.13541666666666666,
+     "hi": 0.09375,
+     "n": 96,
+     "discordant": 30,
+     "gained": 14,
+     "lost": 16
+    },
+    "accepted": true,
+    "start_test": 0.6666666666666666,
+    "final_test": 0.65625
+   },
+   "ruin_names__ape__s42": {
+    "strict": {
+     "diff": 0.145,
+     "lo": 0.07,
+     "hi": 0.22,
+     "n": 200,
+     "discordant": 65,
+     "gained": 47,
+     "lost": 18
+    },
+    "lenient": {
+     "diff": 0.145,
+     "lo": 0.07,
+     "hi": 0.22,
+     "n": 200,
+     "discordant": 65,
+     "gained": 47,
+     "lost": 18
+    },
+    "accepted": true,
+    "start_test": 0.34,
+    "final_test": 0.485
+   },
+   "ruin_names__promptwizard__s42": {
+    "strict": {
+     "diff": -0.065,
+     "lo": -0.135,
+     "hi": 0.005,
+     "n": 200,
+     "discordant": 51,
+     "gained": 19,
+     "lost": 32
+    },
+    "lenient": {
+     "diff": -0.065,
+     "lo": -0.135,
+     "hi": 0.005,
+     "n": 200,
+     "discordant": 51,
+     "gained": 19,
+     "lost": 32
+    },
+    "accepted": true,
+    "start_test": 0.6,
+    "final_test": 0.535
+   },
+   "ruin_names__protegi__s42": {
+    "strict": {
+     "diff": 0.08,
+     "lo": 0.0,
+     "hi": 0.16,
+     "n": 200,
+     "discordant": 66,
+     "gained": 41,
+     "lost": 25
+    },
+    "lenient": {
+     "diff": 0.08,
+     "lo": 0.0,
+     "hi": 0.16,
+     "n": 200,
+     "discordant": 66,
+     "gained": 41,
+     "lost": 25
+    },
+    "accepted": true,
+    "start_test": 0.385,
+    "final_test": 0.465
+   }
+  }
+ },
+ "paired_qwen235": {
+  "n": 9,
+  "strict": {
+   "mean": -0.008379629629629634,
+   "lo": -0.09671296296296296,
+   "hi": 0.07074189814814813,
+   "v2f_better": 4,
+   "v3f_better": 4,
+   "tied": 1,
+   "ci_excludes_zero": 5,
+   "cells": 9
+  },
+  "lenient": {
+   "mean": -0.003148148148148156,
+   "lo": -0.09388888888888888,
+   "hi": 0.07741087962962959,
+   "v2f_better": 4,
+   "v3f_better": 4,
+   "tied": 1,
+   "ci_excludes_zero": 5,
+   "cells": 9
+  }
+ },
+ "v2f_gpt6luna": {
+  "runs": 9,
+  "rounds": 63,
+  "fallback": 2,
+  "echo": 6,
+  "duplicate": 0,
+  "validated": 55,
+  "val_better": 34,
+  "accepted_runs": 7,
+  "strict_wins": 3,
+  "strict_mean": 0.05861111111111111,
+  "cells_ge_mde": 4,
+  "lenient_wins": 3,
+  "lenient_losses": 1,
+  "lenient_mean": 0.03356481481481482,
+  "cells": {
+   "hyperbaton__ape__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 200,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.725,
+    "final_test": 0.725
+   },
+   "hyperbaton__promptwizard__s42": {
+    "strict": {
+     "diff": 0.14,
+     "lo": 0.07,
+     "hi": 0.21,
+     "n": 200,
+     "discordant": 54,
+     "gained": 41,
+     "lost": 13
+    },
+    "lenient": {
+     "diff": 0.14,
+     "lo": 0.07,
+     "hi": 0.21,
+     "n": 200,
+     "discordant": 54,
+     "gained": 41,
+     "lost": 13
+    },
+    "accepted": true,
+    "start_test": 0.56,
+    "final_test": 0.7
+   },
+   "hyperbaton__protegi__s42": {
+    "strict": {
+     "diff": 0.29,
+     "lo": 0.21,
+     "hi": 0.37,
+     "n": 200,
+     "discordant": 84,
+     "gained": 71,
+     "lost": 13
+    },
+    "lenient": {
+     "diff": 0.075,
+     "lo": 0.01,
+     "hi": 0.14,
+     "n": 200,
+     "discordant": 47,
+     "gained": 31,
+     "lost": 16
+    },
+    "accepted": true,
+    "start_test": 0.505,
+    "final_test": 0.795
+   },
+   "penguins_in_a_table__ape__s42": {
+    "strict": {
+     "diff": -0.0625,
+     "lo": -0.15625,
+     "hi": 0.03125,
+     "n": 96,
+     "discordant": 22,
+     "gained": 8,
+     "lost": 14
+    },
+    "lenient": {
+     "diff": -0.0625,
+     "lo": -0.15625,
+     "hi": 0.03125,
+     "n": 96,
+     "discordant": 22,
+     "gained": 8,
+     "lost": 14
+    },
+    "accepted": true,
+    "start_test": 0.6770833333333334,
+    "final_test": 0.6145833333333334
+   },
+   "penguins_in_a_table__promptwizard__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "n": 96,
+     "discordant": 0,
+     "gained": 0,
+     "lost": 0
+    },
+    "accepted": false,
+    "start_test": 0.75,
+    "final_test": 0.75
+   },
+   "penguins_in_a_table__protegi__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": -0.09375,
+     "hi": 0.09375,
+     "n": 96,
+     "discordant": 22,
+     "gained": 11,
+     "lost": 11
+    },
+    "lenient": {
+     "diff": -0.010416666666666666,
+     "lo": -0.10416666666666667,
+     "hi": 0.08333333333333333,
+     "n": 96,
+     "discordant": 21,
+     "gained": 10,
+     "lost": 11
+    },
+    "accepted": true,
+    "start_test": 0.6666666666666666,
+    "final_test": 0.6666666666666666
+   },
+   "ruin_names__ape__s42": {
+    "strict": {
+     "diff": 0.205,
+     "lo": 0.12,
+     "hi": 0.29,
+     "n": 200,
+     "discordant": 79,
+     "gained": 60,
+     "lost": 19
+    },
+    "lenient": {
+     "diff": 0.205,
+     "lo": 0.12,
+     "hi": 0.29,
+     "n": 200,
+     "discordant": 79,
+     "gained": 60,
+     "lost": 19
+    },
+    "accepted": true,
+    "start_test": 0.34,
+    "final_test": 0.545
+   },
+   "ruin_names__promptwizard__s42": {
+    "strict": {
+     "diff": -0.12,
+     "lo": -0.2,
+     "hi": -0.04,
+     "n": 200,
+     "discordant": 70,
+     "gained": 23,
+     "lost": 47
+    },
+    "lenient": {
+     "diff": -0.12,
+     "lo": -0.2,
+     "hi": -0.04,
+     "n": 200,
+     "discordant": 70,
+     "gained": 23,
+     "lost": 47
+    },
+    "accepted": true,
+    "start_test": 0.6,
+    "final_test": 0.48
+   },
+   "ruin_names__protegi__s42": {
+    "strict": {
+     "diff": 0.075,
+     "lo": -0.01,
+     "hi": 0.16,
+     "n": 200,
+     "discordant": 75,
+     "gained": 45,
+     "lost": 30
+    },
+    "lenient": {
+     "diff": 0.075,
+     "lo": -0.01,
+     "hi": 0.16,
+     "n": 200,
+     "discordant": 75,
+     "gained": 45,
+     "lost": 30
+    },
+    "accepted": true,
+    "start_test": 0.385,
+    "final_test": 0.46
+   }
+  }
+ },
+ "v3f_gpt6luna": {
+  "runs": 9,
+  "rounds": 63,
+  "fallback": 0,
+  "echo": 0,
+  "duplicate": 1,
+  "validated": 62,
+  "val_better": 30,
+  "accepted_runs": 9,
+  "strict_wins": 3,
+  "strict_mean": 0.03930555555555556,
+  "cells_ge_mde": 3,
+  "lenient_wins": 2,
+  "lenient_losses": 1,
+  "lenient_mean": 0.014814814814814815,
+  "cells": {
+   "hyperbaton__ape__s42": {
+    "strict": {
+     "diff": 0.0,
+     "lo": -0.045,
+     "hi": 0.045,
+     "n": 200,
+     "discordant": 20,
+     "gained": 10,
+     "lost": 10
+    },
+    "lenient": {
+     "diff": 0.0,
+     "lo": -0.045,
+     "hi": 0.045,
+     "n": 200,
+     "discordant": 20,
+     "gained": 10,
+     "lost": 10
+    },
+    "accepted": true,
+    "start_test": 0.725,
+    "final_test": 0.725
+   },
+   "hyperbaton__promptwizard__s42": {
+    "strict": {
+     "diff": 0.195,
+     "lo": 0.13,
+     "hi": 0.265,
+     "n": 200,
+     "discordant": 55,
+     "gained": 47,
+     "lost": 8
+    },
+    "lenient": {
+     "diff": 0.195,
+     "lo": 0.13,
+     "hi": 0.265,
+     "n": 200,
+     "discordant": 55,
+     "gained": 47,
+     "lost": 8
+    },
+    "accepted": true,
+    "start_test": 0.56,
+    "final_test": 0.755
+   },
+   "hyperbaton__protegi__s42": {
+    "strict": {
+     "diff": 0.115,
+     "lo": 0.02,
+     "hi": 0.21,
+     "n": 200,
+     "discordant": 99,
+     "gained": 61,
+     "lost": 38
+    },
+    "lenient": {
+     "diff": -0.1,
+     "lo": -0.175,
+     "hi": -0.025,
+     "n": 200,
+     "discordant": 62,
+     "gained": 21,
+     "lost": 41
+    },
+    "accepted": true,
+    "start_test": 0.505,
+    "final_test": 0.62
+   },
+   "penguins_in_a_table__ape__s42": {
+    "strict": {
+     "diff": -0.052083333333333336,
+     "lo": -0.15625,
+     "hi": 0.052083333333333336,
+     "n": 96,
+     "discordant": 27,
+     "gained": 11,
+     "lost": 16
+    },
+    "lenient": {
+     "diff": -0.052083333333333336,
+     "lo": -0.15625,
+     "hi": 0.052083333333333336,
+     "n": 96,
+     "discordant": 27,
+     "gained": 11,
+     "lost": 16
+    },
+    "accepted": true,
+    "start_test": 0.6770833333333334,
+    "final_test": 0.625
+   },
+   "penguins_in_a_table__promptwizard__s42": {
+    "strict": {
+     "diff": -0.09375,
+     "lo": -0.20833333333333334,
+     "hi": 0.020833333333333332,
+     "n": 96,
+     "discordant": 31,
+     "gained": 11,
+     "lost": 20
+    },
+    "lenient": {
+     "diff": -0.09375,
+     "lo": -0.20833333333333334,
+     "hi": 0.020833333333333332,
+     "n": 96,
+     "discordant": 31,
+     "gained": 11,
+     "lost": 20
+    },
+    "accepted": true,
+    "start_test": 0.75,
+    "final_test": 0.65625
+   },
+   "penguins_in_a_table__protegi__s42": {
+    "strict": {
+     "diff": -0.010416666666666666,
+     "lo": -0.11458333333333333,
+     "hi": 0.09375,
+     "n": 96,
+     "discordant": 27,
+     "gained": 13,
+     "lost": 14
+    },
+    "lenient": {
+     "diff": -0.020833333333333332,
+     "lo": -0.125,
+     "hi": 0.08333333333333333,
+     "n": 96,
+     "discordant": 26,
+     "gained": 12,
+     "lost": 14
+    },
+    "accepted": true,
+    "start_test": 0.6666666666666666,
+    "final_test": 0.65625
+   },
+   "ruin_names__ape__s42": {
+    "strict": {
+     "diff": 0.045,
+     "lo": -0.03,
+     "hi": 0.115,
+     "n": 200,
+     "discordant": 55,
+     "gained": 32,
+     "lost": 23
+    },
+    "lenient": {
+     "diff": 0.05,
+     "lo": -0.025,
+     "hi": 0.125,
+     "n": 200,
+     "discordant": 56,
+     "gained": 33,
+     "lost": 23
+    },
+    "accepted": true,
+    "start_test": 0.34,
+    "final_test": 0.385
+   },
+   "ruin_names__promptwizard__s42": {
+    "strict": {
+     "diff": 0.03,
+     "lo": -0.035,
+     "hi": 0.095,
+     "n": 200,
+     "discordant": 44,
+     "gained": 25,
+     "lost": 19
+    },
+    "lenient": {
+     "diff": 0.03,
+     "lo": -0.035,
+     "hi": 0.095,
+     "n": 200,
+     "discordant": 44,
+     "gained": 25,
+     "lost": 19
+    },
+    "accepted": true,
+    "start_test": 0.6,
+    "final_test": 0.63
+   },
+   "ruin_names__protegi__s42": {
+    "strict": {
+     "diff": 0.125,
+     "lo": 0.045,
+     "hi": 0.205,
+     "n": 200,
+     "discordant": 71,
+     "gained": 48,
+     "lost": 23
+    },
+    "lenient": {
+     "diff": 0.125,
+     "lo": 0.045,
+     "hi": 0.205,
+     "n": 200,
+     "discordant": 71,
+     "gained": 48,
+     "lost": 23
+    },
+    "accepted": true,
+    "start_test": 0.385,
+    "final_test": 0.51
+   }
+  }
+ },
+ "paired_gpt6luna": {
+  "n": 9,
+  "strict": {
+   "mean": 0.01930555555555556,
+   "lo": -0.04569444444444445,
+   "hi": 0.08365856481481479,
+   "v2f_better": 4,
+   "v3f_better": 4,
+   "tied": 1,
+   "ci_excludes_zero": 3,
+   "cells": 9
+  },
+  "lenient": {
+   "mean": 0.018750000000000003,
+   "lo": -0.046157407407407404,
+   "hi": 0.08374999999999999,
+   "v2f_better": 4,
+   "v3f_better": 4,
+   "tied": 1,
+   "ci_excludes_zero": 3,
+   "cells": 9
+  }
+ }
+}

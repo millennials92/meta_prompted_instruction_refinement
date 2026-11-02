@@ -26,7 +26,7 @@ TEMPERATURE = 0.7  # plain temperature sampling; top-p was dropped (vLLM's non-f
 EVAL_MAX_TOKENS, REFINE_MAX_TOKENS = 1500, 3000
 HISTORY_KEEP, HISTORY_CHARS = 4, 800
 VALIDATION_REPS = 3
-VARIANTS = ("v0", "v1", "v2", "v2l", "v3", "v1p", "v2p", "v2f")
+VARIANTS = ("v0", "v1", "v2", "v2l", "v3", "v1p", "v2p", "v2f", "v3f")
 
 
 def base_variant(variant: str) -> str:
@@ -42,7 +42,7 @@ def start_prompt(spec: "RunSpec") -> str:
     """The prompt the loop starts from: P0, or for v2f P0 plus the bare-tag worked example (so that the gate's
     baseline already carries the format and a candidate cannot win merely by restoring it)."""
     p0 = load_p0(spec.cell)
-    return with_exemplar(p0, spec.cell.task) if spec.variant == "v2f" else p0
+    return with_exemplar(p0, spec.cell.task) if spec.variant in ("v2f", "v3f") else p0
 
 
 def protect_candidate(raw: str, task: str) -> str:
@@ -110,7 +110,7 @@ def _generate(spec: RunSpec, refiner: Endpoint, source: str, round_no: int, hist
 def generate_independent(spec: RunSpec) -> None:
     """Generation-only pass for the independent variants (they never depend on validation scores), so a
     large refiner can be served alone and the target scored afterwards."""
-    assert spec.variant in ("v0", "v1", "v3")
+    assert spec.variant in ("v0", "v1", "v3", "v3f")
     p0 = load_p0(spec.cell)
     for round_no in range(1, spec.rounds + 1):
         _generate(spec, REFINERS[spec.refiner], p0, round_no, [])
@@ -121,7 +121,7 @@ def _generate_uncached(spec: RunSpec, refiner: Endpoint, source: str, round_no: 
     variant = base_variant(spec.variant)
     sampled = variant != "v0"
     kwargs = {"temperature": TEMPERATURE if sampled else 0.0}
-    if variant == "v3":
+    if variant in ("v3", "v3f"):
         raw = chat(refiner, [{"role": "user", "content": FREE_REWRITE_PROMPT.format(prompt=source, variant_instruction="")}],
                    max_tokens=REFINE_MAX_TOKENS, seed=_seed(spec, round_no, 1), **kwargs)
         return {"judge_text": None, "refine_text": raw, "raw_candidate": raw.strip() or None}
@@ -141,9 +141,9 @@ def _classify(spec: RunSpec, raw_candidate: str | None, source: str, p0: str, se
     """(outcome, candidate_prompt). Outcomes: fallback, echo, duplicate, validated."""
     if not raw_candidate:
         return "fallback", None
-    if spec.variant != "v3" and any(marker in raw_candidate for marker in ECHO_MARKERS):
+    if spec.variant not in ("v3", "v3f") and any(marker in raw_candidate for marker in ECHO_MARKERS):
         return "echo", None
-    if spec.variant == "v2f":
+    if spec.variant in ("v2f", "v3f"):
         prompt = protect_candidate(raw_candidate, spec.cell.task)
     elif is_protected(spec.variant):
         prompt = final_prompt_template().format(instruction=raw_candidate.strip(), few_shot_examples="",

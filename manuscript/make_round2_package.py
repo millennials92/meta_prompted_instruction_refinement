@@ -16,7 +16,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 from study_numbers import N  # noqa: E402
-from rev2_numbers import OFF, NEW, LEN, MID  # noqa: E402
+from rev2_numbers import OFF, NEW, LEN, MID, PP  # noqa: E402
 
 OUT = os.path.join(ROOT, "submission_revision2")
 PKG = os.path.join(OUT, "_main_pkg")
@@ -80,15 +80,14 @@ What changed. (i) A positive control: the validation gate accepted a known-good 
 %(acc)d runs, but under a lenient metric the final prompts won in %(lw)d cell(s) and lost significantly in %(ll)d.
 (iii) A validation of the lenient parser on 400 labelled responses (precision %(prec).1f\%%, recall %(rec).1f\%%); the labels
 and the audit of 80 sampled echo and fallback rounds were produced by a language-model assistant, not by human raters, and
-the manuscript says so. (iv) Exact acceptance bounds (%(ub).1f\%% one-sided for 1 acceptance in 80 runs; the earlier 7\%% was
+the manuscript says so. (iv) A rubric-free control under the same protection: a plain rewrite request gained %(v3m).1f points on average under lenient scoring (%(v3w)d winning cells of %(v3n)d), while the rubric-guided variant did not, and strong refiners (Qwen3-235B, GPT-6 Luna) improved the prompts under the protected treatment (%(q).1f and %(l).1f points, nine cells, one run each), but a rubric-free rewrite did as well; so the rubric is not shown to help. (v) Exact acceptance bounds (%(ub).1f\%% one-sided for 1 acceptance in 80 runs; the earlier 7\%% was
 the two-sided value), a paired comparison of the rubric-guided and rubric-free variants, a single-session rescoring of the
 exploratory prompts, an intermediate open-weight refiner (Qwen3-8B, %(midacc)s of 9 runs changed the prompt), cost per
-variant, and a list of all base prompts. (v) The title and claims now state the scope (Qwen3-1.7B, nine tasks, weak base
+variant, and a list of all base prompts. (vi) The title and claims now state the scope (Qwen3-1.7B, nine tasks, weak base
 prompts), and ``pre-specified'' is replaced by ``protocol fixed in advance, with listed amendments''.
 
 \medskip
-What we could not do. We have no second target family, we could not rerun the strong closed and large refiners (no router
-access at this time), and we collected no human ratings. The paper lists these limits.
+What we could not do. We have no second target family and no human ratings, and the strong-refiner comparisons have one run per condition. The paper lists these limits.
 
 \medskip
 This manuscript is not under review elsewhere, and all authors have approved this submission. The author list is unchanged,
@@ -102,7 +101,7 @@ Quang-Vinh Dang
 """ % {"gate": CT["known_good_accepted"], "ncells": CT["known_good_cells"], "runs": G["runs"], "acc": G["accepted_runs"],
        "lw": G["lenient_wins_vs_start"], "ll": G["lenient_losses_vs_start"], "prec": 100 * LC["lenient"]["precision"],
        "rec": 100 * LC["lenient"]["recall"], "ub": 100 * AB["run_upper_one_sided_95"],
-       "midacc": mid.get("accepted_runs", "n/a")}
+       "midacc": mid.get("accepted_runs", "n/a"), "v3m": 100 * PP["v3f_1.7b"]["lenient_mean"], "v3w": PP["v3f_1.7b"]["lenient_wins"], "v3n": PP["v3f_1.7b"]["runs"], "q": 100 * PP["v2f_qwen235"]["lenient_mean"], "l": 100 * PP["v2f_gpt6luna"]["lenient_mean"]}
     path = os.path.join(OUT, "cover_letter.tex")
     open(path, "w", encoding="utf-8").write(text)
     run(["pdflatex", "-interaction=nonstopmode", "cover_letter.tex"], OUT)

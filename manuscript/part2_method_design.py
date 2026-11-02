@@ -62,7 +62,7 @@ P("The pilot ran what we call the legacy loop: Psrc = P0 in every round, H empty
   "differed only through serving non-determinism, not by design (Section 5.2 gives the number of distinct candidates). The repaired loop differs between rounds in two ways: independent mode "
   "samples at τ = 0.7 so each round is a fresh draw, and chained mode refines the current incumbent and "
   "shows the model the earlier candidates with their validation scores, as OPRO does with its "
-  "trajectory ‹22›. We study eight variants (Table 2). Two of them, V1P and V2P, are format-protected: the "
+  "trajectory ‹22›. We study nine variants (Table 2). Two of them, V1P and V2P, are format-protected: the "
   "answer-format line is appended to every candidate, as it is for the rubric-free rewrite and for the "
   "prompts of the base optimizers. They were added after an audit found that the refinement request does not "
   "ask the refiner to keep the answer-format line, which the 1.7B refiner then dropped in most candidates "
@@ -71,7 +71,9 @@ P("The pilot ran what we call the legacy loop: Psrc = P0 in every round, H empty
   "answer-format line and every worked example, whose loop starts from P0 extended with one bare-tag worked "
   "example of the answer format (so that the gate's baseline already carries the format and a candidate "
   "cannot win merely by restoring it), and in which any candidate that still lacks the format line or the "
-  "example has them re-attached in code. V2F is run on 44 of the 45 cells with one MPIR seed (one request exceeds the context window).")
+  "example has them re-attached in code. V2F is run on 44 of the 45 cells with one MPIR seed (one request exceeds the context window). V3F is its rubric-free "
+  "counterpart: the same start prompt, gate and re-attachment, but the refiner receives the rubric-free rewrite request of V3, "
+  "with independent rounds. V2F and V3F also run with the strong refiners on the nine Tier-1 seed-42 cells.")
 
 TABLE("Table 2. Refinement variants studied. All use the same gate (strict improvement over the "
       "incumbent on 25 validation questions) and N = 7 rounds. V3 candidates, and those of V1P, V2P and V2F, carry "
@@ -87,6 +89,8 @@ TABLE("Table 2. Refinement variants studied. All use the same gate (strict impro
           ["V2P chained, format-protected", "incumbent", "scored candidates", "τ = 0.7", "corrected"],
           ["V2F chained, format- and example-preserving", "incumbent (P0 + bare-tag example)",
            "scored candidates", "τ = 0.7", "corrected"],
+          ["V3F free rewrite, format- and example-preserving", "P0 + bare-tag example", "none", "τ = 0.7",
+           "none (no rubric)"],
       ], full=True, colw=[0.27, 0.17, 0.22, 0.12, 0.22])
 
 H2("3.3. The Seven-Criteria Rubric")
@@ -222,7 +226,7 @@ H2("4.3. Models and Serving")
 P("The target model is Qwen3-1.7B ‹68› with thinking disabled and greedy decoding, at most 1024 new "
   "tokens. The refining model is the same model in the main grid. In the capability experiment the refiner is "
   "Qwen3-235B-A22B (the 2507 instruct release, a mixture-of-experts model from the target's family) or GPT-6 "
-  "Luna ‹127›, both reached through the OpenRouter API on 2026-10-20 and 21 with temperature 0.7, a 3000-token "
+  "Luna ‹127›, both reached through the OpenRouter API on 2026-10-20 and 21 (and again on 2026-11-02 for the protected variants V2F and V3F) with temperature 0.7, a 3000-token "
   "limit and, for GPT-6 Luna, minimal reasoning effort. Meta-prompt calls allow 1500 (evaluation) and 3000 "
   "(refinement) new tokens. The target and the 1.7B refiner are served with vLLM ‹123› 0.28.0 under WSL2 on one "
   "16 GB RTX 5000 Ada GPU, bf16 weights, a maximum context of 8192 tokens (Appendix C). Greedy decoding is not bit-reproducible under continuous batching, so we measure the "

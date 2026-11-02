@@ -149,7 +149,7 @@ TABLE("Table 13. Serving configuration.",
           ["Inference engine", "vLLM 0.28.0 (V1 engine, model runner V2 disabled, flashinfer sampler disabled), PyTorch 2.13.0+cu132"],
           ["Target and default refiner", "Qwen/Qwen3-1.7B, revision 70d244c, bf16, no quantization"],
           ["Capability-experiment refiners", "qwen/qwen3-235b-a22b-2507 and openai/gpt-6-luna (reasoning effort minimal) "
-           "through the OpenRouter API, 2026-10-20 and 21, temperature 0.7, 3000 new tokens; no local server"],
+           "through the OpenRouter API, 2026-10-20 and 21 (V2, V3) and 2026-11-02 (V2F, V3F), temperature 0.7, 3000 new tokens; no local server"],
           ["Intermediate refiner", "Qwen/Qwen3-8B-AWQ served locally with vLLM next to the 1.7B target, "
            "--gpu-memory-utilization 0.88 (8B) and 0.36 (1.7B), 2026-11-02"],
           ["Context and limits", "max model length 8192; max new tokens 1024 (target), 1500 / 3000 (meta calls); thinking disabled"],
@@ -252,7 +252,7 @@ P("The decision rules of Section 4.1 were fixed in REVISION_PROTOCOL.md before a
   "ran (commit 8fd1397, 2026-10-19). The amendments below are recorded in that file; none is an entry in a "
   "registry. Amendments 1 to 7 were made before the results of the affected experiment were inspected; "
   "amendments 8 and 9 were made after results were seen and are exploratory; V1P and V2P were stopped before all nine cells finished. "
-  "Amendment 10 lists the later additions; they were decided after the main-grid results were known and are post hoc "
+  "Amendments 10 and 11 list the later additions; they were decided after the main-grid results were known and are post hoc "
   "in that sense, although none was chosen after seeing its own result.")
 BULLETS([
     ("1. 2026-10-20, compute.", "Serving stack vLLM 0.28.0 under WSL2 with measured throughput of about 1.2k "
@@ -284,4 +284,9 @@ BULLETS([
      "per-variant cost table. The grid size of the original protocol (135 runs) was not restored; V2F has one "
      "MPIR seed per cell. The original decision rules D1 to D3 were not changed, and D1 is restated for V2F "
      "and on the validated lenient metric."),
+    ("11. 2026-11-02, rubric-free control and protected strong refiners.",
+     "After the V2F results were known we added V3F, the rubric-free rewrite under the same protection (start prompt P0 plus a "
+     "bare-tag example, format line and example re-attached), on the same 45 cells with the 1.7B refiner, and ran V2F and V3F with "
+     "Qwen3-235B-A22B and GPT-6 Luna on the nine Tier-1 seed-42 cells, MPIR seed 1, oracle-scored (Sections 5.3.2 and 5.6.3). "
+     "These runs were decided after seeing V2F's results, and the V2F against V3F comparison is post hoc."),
 ])

@@ -13,3 +13,12 @@ def test_start_prompt_extends_p0_only_for_v2f():
     cell = Cell("hyperbaton", "protegi", 42)
     assert start_prompt(RunSpec(cell, "v2")) == load_p0(cell)
     assert EXEMPLAR_HEADER in start_prompt(RunSpec(cell, "v2f"))
+
+
+def test_v3f_starts_from_exemplar_prompt_and_protects_candidates():
+    cell = Cell("hyperbaton", "protegi", 42)
+    assert EXEMPLAR_HEADER in start_prompt(RunSpec(cell, "v3f"))
+    from mpir_study.mpir import _classify
+    spec = RunSpec(cell, "v3f")
+    outcome, prompt = _classify(spec, "Be careful and think.", start_prompt(spec), load_p0(cell), set())
+    assert outcome == "validated" and ANSWER_FORMAT in prompt and EXEMPLAR_HEADER in prompt

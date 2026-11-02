@@ -13,7 +13,7 @@ from docx.shared import Pt
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from study_numbers import N  # noqa: E402
-from rev2_numbers import OFF, NEW, LEN, MID  # noqa: E402
+from rev2_numbers import OFF, NEW, LEN, MID, PP  # noqa: E402
 
 TEMPLATE = os.path.join(HERE, "templates", "IEEE-Access-Response-to-Reviewers-template-6.26.23.docx")
 OUT = os.path.join(HERE, "response_to_reviewers_round2.docx")
@@ -25,6 +25,7 @@ AB, FA, AL, AS_, RT = (OFF["acceptance_bounds"], OFF["candidate_format_audit"], 
 PFM, RV, JZ, CO, BP = (OFF["protected_failure_modes"], OFF["rubric_vs_free"]["qwen235"],
                        OFF["judge_without_format_zeros"], OFF["cost"], OFF["base_prompt_inventory"])
 G, CT, RS = NEW["grid_v2f"], NEW["controls"], NEW["rescore"]
+V3F, PR, PQ, PL = PP["v3f_1.7b"], PP["paired_1.7b_all"]["lenient"], PP["paired_qwen235"]["lenient"], PP["paired_gpt6luna"]["lenient"]
 CTO = CT["by_optimizer"]
 LA, LB, LC = LEN["binary"], LEN["multi"], LEN["all"]
 
@@ -56,8 +57,8 @@ ENTRIES = [
      "New Section 5.1.1 with Table R.1, revised Section 4.5, Sections 5.3.1 and 6.3.3."),
     ("Reviewer#1, Major comment 4 (rubric not isolated; 'similar gains' not tested)",
      "No paired cell-level V2-V3 comparison with an interval; one or two runs per condition; one V3 'win' (+2.8) is below the MDE; capability, family and reasoning budget are confounded; 4B/8B refiners were not run. Provide paired differences across enough runs, add an intermediate open-weight refiner and ideally a second target family, or report as exploratory.",
-     f"Table R.2 gives the paired V2-V3 difference per cell with intervals for the Qwen3-235B refiner. Over the {RV['n_cells']} cells the mean is {pp(RV['mean_v2_minus_v3'])} points (interval [{pp(RV['lo'])}, {pp(RV['hi'])}]; {RV['cells_v2_better']} cells favour V2, {RV['cells_v3_better']} favour V3, {RV['cells_tied']} tie; the paired interval excludes zero in {RV['cells_ci_excludes_zero']}); with the second V2 seed it is {pp(RV['mean_v2seed2_minus_v3'])}. The data therefore cannot separate 'the rubric adds nothing' from 'the rubric adds a modest benefit', and we withdrew 'a rubric-free rewrite reaches similar strict gains' as a statement of equivalence. The +2.8 point V3 win (1.7B refiner, ruin_names with ProTeGi) is now labelled as below the 5-point MDE. {MID_TEXT} We could not add a second target family within this revision, and we report the strong-refiner results as exploratory.",
-     "Sections 5.5, 5.6.1 (Table R.2), 5.6.2, 6.1 and 6.3.2 and the abstract."),
+     f"We isolated the rubric directly. V3F is the rubric-free rewrite under exactly the protection of V2F (same start prompt, gate, re-attachment and rounds). With the 1.7B refiner on the same cells, V3F gains {pp(V3F['lenient_mean'])} points on average under lenient scoring ({V3F['lenient_wins']} winning cells, {V3F['lenient_losses']} losses; accepted in {V3F['accepted_runs']} of {V3F['runs']} runs), whereas V2F gains {pp(G['lenient_mean_diff_vs_start'])}; the paired V2F minus V3F difference over {PP['paired_1.7b_all']['n']} cells is {pp(PR['mean'])} points (interval [{pp(PR['lo'])}, {pp(PR['hi'])}]), so for a 1.7B refiner the rubric hurts. With strong refiners under the same protection (nine cells, one run each) V2F gains {pp(PP['v2f_qwen235']['lenient_mean'])} (Qwen3-235B) and {pp(PP['v2f_gpt6luna']['lenient_mean'])} points (GPT-6 Luna) under lenient scoring, but the rubric-free V3F gains {pp(PP['v3f_qwen235']['lenient_mean'])} and {pp(PP['v3f_gpt6luna']['lenient_mean'])}, with paired differences of {pp(PQ['mean'])} [{pp(PQ['lo'])}, {pp(PQ['hi'])}] and {pp(PL['mean'])} [{pp(PL['lo'])}, {pp(PL['hi'])}] points: the rubric is not shown to help, and these nine-cell comparisons cannot exclude a small benefit. For the unprotected probes, Table R.2 gives the paired V2-V3 difference per cell with intervals for Qwen3-235B (mean {pp(RV['mean_v2_minus_v3'])} points, interval [{pp(RV['lo'])}, {pp(RV['hi'])}]); the +2.8 point V3 win (1.7B refiner, ruin_names with ProTeGi) is labelled as below the 5-point MDE. {MID_TEXT} We could not add a second target family, and the strong-refiner results remain exploratory (one run per condition and cell).",
+     "Sections 5.3.2 (V3F), 5.5, 5.6.1 (Table R.2), 5.6.2, 5.6.3 (Table R.6), 6.1 and 6.3.2, and the abstract."),
     ("Reviewer#1, Major comment 5 (claims and labels overstate the evidence)",
      "'Pre-specified', 'the uncorrected loop lowered accuracy by about 14 points', and 'Automatically Optimized Prompts' are stronger than the evidence. Use 'protocol fixed in advance, with listed amendments', restate the -13.6 as a simulation on V1 candidates, make the title and research questions explicit about the 1.7B/Qwen3 scope and base-prompt quality.",
      "We agree with all three. 'Pre-specified' is replaced by 'protocol fixed in advance, with listed amendments' (Section 4.1 is retitled; Appendix F lists ten amendments, including those of this revision). The -13.6 point figure is restated as 'in a simulation that applies the original accept-first rule to the oracle-scored candidates of the independent variant V1 (one MPIR seed, nine Tier-1 cells)', with the note that the actual legacy loop produced identical prompts in all nine pilot cells; the -29.2 figure is identified as the literal reading of protocol G6. The title now reads 'Does Rubric-Guided Self-Refinement Improve Prompts from Small-Model Optimizers? A Scoped Negative-Result Study with Qwen3-1.7B', and Appendix G lists the kind of each of the 45 base prompts.",
@@ -115,8 +116,8 @@ ENTRIES = [
     # ------------------------------------------------------------------------------- Reviewer 2
     ("Reviewer#2, Weakness 1 (the negative conclusion relies on a very small refiner)",
      "The primary negative conclusion relies heavily on Qwen3-1.7B as the refiner, which is already known to struggle with long multi-criteria meta-prompts.",
-     f"We agree that this is the main limitation, and the manuscript now says so in the title, abstract and conclusion. Three additions bear on it. First, a format- and example-preserving variant (V2F) removes the dominant, avoidable failure of the 1.7B refiner (the dropped format) and still gives lenient wins in {G['lenient_wins_vs_start']} of {G['runs']} cells and {G['lenient_losses_vs_start']} significant losses. Second, the gate accepts a known-good candidate in {CT['known_good_accepted']} of {CT['known_good_cells']} cells in which it helps, so the null is not an artefact of an unreachable gate. Third, {MID_TEXT} The 235B and GPT-6 Luna probes remain exploratory, and the conclusions are explicitly limited to small self-refiners and to the stronger refiners tested.",
-     "Title, abstract, Sections 5.3.1, 5.6.2, 6.1 and 7."),
+     f"We agree, and the new experiments test exactly this. (i) The long rubric meta-prompt is indeed what a 1.7B refiner handles badly: under the same protection, a plain rubric-free rewrite request gains {pp(V3F['lenient_mean'])} points on average (lenient) while the rubric-guided variant gains {pp(G['lenient_mean_diff_vs_start'])} (paired difference {pp(PR['mean'])} [{pp(PR['lo'])}, {pp(PR['hi'])}] against the rubric). (ii) With strong refiners under the protected treatment, gains appear ({pp(PP['v2f_qwen235']['lenient_mean'])} for Qwen3-235B and {pp(PP['v2f_gpt6luna']['lenient_mean'])} for GPT-6 Luna under lenient scoring, against {pp(G['lenient_mean_diff_vs_start'])} for the 1.7B refiner), so capability matters, but the rubric-free variant does about as well, so the rubric is still not shown to help. (iii) The gate accepts a known-good candidate in {CT['known_good_accepted']} of {CT['known_good_cells']} cells in which it helps, and a local intermediate refiner (Qwen3-8B-AWQ) was added. The conclusions are now stated as about the rubric-guided layer, with scope limits (nine cells and one run per condition for the strong refiners).",
+     "Title, abstract, Sections 5.3.1, 5.3.2, 5.6.2, 5.6.3, 6.1 and 7."),
 ]
 
 
@@ -149,10 +150,10 @@ def main():
          "The revised manuscript is retitled 'Does Rubric-Guided Self-Refinement Improve Prompts from Small-Model "
          "Optimizers? A Scoped Negative-Result Study with Qwen3-1.7B'. In response to the main concern, that the primary "
          "treatment could not succeed, we added a positive control for the gate, a format- and example-preserving "
-         "re-run of the main grid, a validation of the lenient metric on labelled responses, an audit of sampled "
+         "re-run of the main grid, a validation of the lenient metric on labelled responses, a rubric-free control under the same protection (V3F), protected runs with the strong refiners, an audit of sampled "
          "echo and fallback rounds, exact acceptance bounds, a paired rubric versus rubric-free comparison, a rescoring "
          "of the exploratory prompts in one serving session, a cost table and an intermediate open-weight refiner. "
-         "We could not add a second target family, rerun the strong refiners (no router access at this time) or collect "
+         "We could not add a second target family or collect "
          "human ratings, and the audit and lenient-parser labels were produced by a language-model assistant, not by "
          "human raters; the manuscript says so. Section numbers refer to the revised manuscript. Code, per-round logs, "
          "samples and labels are public. Submission history: Access-2026-44920 (initial submission), Access-2026-54235 "

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.13)  2 NOV 2026 13:10
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.13)  2 NOV 2026 16:13
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -606,9 +606,6 @@ Underfull \hbox (badness 10000) has occurred while \output is active
  []
 
 [2 <./notaglinelogo.png>]
-Underfull \vbox (badness 2799) has occurred while \output is active []
-
-
 Overfull \hbox (8.9009pt too wide) in paragraph at lines 109--109
 []|\T1/times/b/n/9 EvoPrompt 
  []
@@ -688,17 +685,21 @@ Overfull \hbox (6.95952pt too wide) in paragraph at lines 181--181
  []
 
 
-Overfull \hbox (25.77771pt too wide) in paragraph at lines 170--184
+Overfull \hbox (25.77771pt too wide) in paragraph at lines 170--185
  [][] 
  []
 
+
+Underfull \vbox (badness 1831) has occurred while \output is active []
+
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 189.
+Package pdftex.def Info: notaglinelogo.png  used on input line 190.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
+
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 189.
+(Font)              using `T1/formata/m/it' instead on input line 190.
 
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -717,131 +718,127 @@ Underfull \hbox (badness 10000) has occurred while \output is active
 
 [4 <./figures/figure_3.png>]
 LaTeX Font Info:    Trying to load font information for T1+pcr on input line 19
-8.
+9.
 
 (C:\Users\vinh.dq4\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\t1pcr.fd
 File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
 )
-Underfull \hbox (badness 10000) in paragraph at lines 200--200
+Underfull \hbox (badness 10000) in paragraph at lines 201--201
 []\T1/pcr/m/n/9 You are a Senior Prompt Engineer with
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 201--201
+Underfull \hbox (badness 10000) in paragraph at lines 202--202
 []\T1/pcr/m/n/9 1. Evaluate prompts using a
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 201--201
+Underfull \hbox (badness 10000) in paragraph at lines 202--202
 \T1/pcr/m/n/9 7-criteria rubric. 2. Refine prompts
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 205--205
+Underfull \hbox (badness 10000) in paragraph at lines 206--206
 []\T1/pcr/m/n/9 1. Review Prompt 2. Apply Rubric
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 206--206
+Underfull \hbox (badness 10000) in paragraph at lines 207--207
 []\T1/pcr/m/n/9 3. Score & Justify: score 1-5, one
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 206--206
+Underfull \hbox (badness 10000) in paragraph at lines 207--207
 \T1/pcr/m/n/9 strength, one weakness, a rationale
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 207--207
+Underfull \hbox (badness 10000) in paragraph at lines 208--208
 []\T1/pcr/m/n/9 4. Calculate Total: cumulative score
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 208--208
+Underfull \hbox (badness 10000) in paragraph at lines 209--209
 []\T1/pcr/m/n/9 5. Recommend 7-10 actionable
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 208--208
+Underfull \hbox (badness 10000) in paragraph at lines 209--209
 \T1/pcr/m/n/9 improvements 6. Report in the
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 210--210
+Underfull \hbox (badness 10000) in paragraph at lines 211--211
 []\T1/pcr/m/n/9 1. Role Prompting 2. Step Back
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 210--210
+Underfull \hbox (badness 10000) in paragraph at lines 211--211
 \T1/pcr/m/n/9 3. Guided Chain of Thought 4.
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 211--211
+Underfull \hbox (badness 10000) in paragraph at lines 212--212
 []\T1/pcr/m/n/9 5. Output Format with Examples 6.
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 211--211
+Underfull \hbox (badness 10000) in paragraph at lines 212--212
 \T1/pcr/m/n/9 Worked Reasoning in Examples 7.
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 213--213
+Underfull \hbox (badness 10000) in paragraph at lines 214--214
 []\T1/pcr/m/n/9 1. Role Prompting - X/5 - Strength:
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 213--213
+Underfull \hbox (badness 10000) in paragraph at lines 214--214
 \T1/pcr/m/n/9 ... - Improvement: ... - Rationale:
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 214--214
+Underfull \hbox (badness 10000) in paragraph at lines 215--215
 []\T1/pcr/m/n/9 (continue for all 7 criteria) **Total
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 222--222
+Underfull \hbox (badness 10000) in paragraph at lines 223--223
 []\T1/pcr/m/n/9 Refine the prompt by applying all
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 223--223
+Underfull \hbox (badness 10000) in paragraph at lines 224--224
 []\T1/pcr/m/n/9 Make sure to wrap the refined prompt
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 225--225
+Underfull \hbox (badness 10000) in paragraph at lines 226--226
 []\T1/pcr/m/n/9 [chained mode adds: Earlier
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 225--225
+Underfull \hbox (badness 10000) in paragraph at lines 226--226
 \T1/pcr/m/n/9 refinement attempts ... did NOT beat
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 226--226
+Underfull \hbox (badness 10000) in paragraph at lines 227--227
 []\T1/pcr/m/n/9 validation questions; do not repeat
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 226--226
+Underfull \hbox (badness 10000) in paragraph at lines 227--227
 \T1/pcr/m/n/9 them: Attempt k (validation accuracy
  []
 
 
-Underfull \vbox (badness 5345) has occurred while \output is active []
-
-
-
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 234.
+(Font)              using `T1/formata/m/it' instead on input line 241.
 
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 234.
+Package pdftex.def Info: notaglinelogo.png  used on input line 241.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -858,42 +855,35 @@ Underfull \hbox (badness 10000) has occurred while \output is active
 []
  []
 
-[5{C:/Users/vinh.dq4/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}
+[5]
+File: notaglinelogo.png Graphic file (type png)
+<use notaglinelogo.png>
+Package pdftex.def Info: notaglinelogo.png  used on input line 253.
+(pdftex.def)             Requested size: 91.32pt x 23.1352pt.
+
+
+LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
+(Font)              using `T1/formata/m/it' instead on input line 253.
+
+
+Overfull \hbox (505.12177pt too wide) has occurred while \output is active
+[]
+ []
+
+
+Overfull \hbox (505.12177pt too wide) has occurred while \output is active
+[]
+ []
+
+
+Underfull \hbox (badness 10000) has occurred while \output is active
+[]
+ []
+
+[6{C:/Users/vinh.dq4/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}
 ]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-File: notaglinelogo.png Graphic file (type png)
-<use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 255.
-(pdftex.def)             Requested size: 91.32pt x 23.1352pt.
-
-
-LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 255.
-
-
-Overfull \hbox (505.12177pt too wide) has occurred while \output is active
-[]
- []
-
-
-Overfull \hbox (505.12177pt too wide) has occurred while \output is active
-[]
- []
-
-
-Underfull \hbox (badness 10000) has occurred while \output is active
-[]
- []
-
-[6]
-Overfull \hbox (15.45155pt too wide) in paragraph at lines 274--274
+Overfull \hbox (15.45155pt too wide) in paragraph at lines 275--275
 []|\T1/times/b/n/9 Component|  
- []
-
-
-Overfull \hbox (29.23079pt too wide) in paragraph at lines 276--276
-[]|\T1/times/b/n/9 PromptWizard|  
  []
 
 
@@ -917,8 +907,8 @@ Overfull \hbox (29.23079pt too wide) in paragraph at lines 280--280
  []
 
 
-Overfull \hbox (3.0768pt too wide) in paragraph at lines 283--283
-[]|\T1/times/b/n/9 ProTeGi|  
+Overfull \hbox (29.23079pt too wide) in paragraph at lines 281--281
+[]|\T1/times/b/n/9 PromptWizard|  
  []
 
 
@@ -927,17 +917,22 @@ Overfull \hbox (3.0768pt too wide) in paragraph at lines 284--284
  []
 
 
-Overfull \hbox (14.02211pt too wide) in paragraph at lines 272--291
+Overfull \hbox (3.0768pt too wide) in paragraph at lines 285--285
+[]|\T1/times/b/n/9 ProTeGi|  
+ []
+
+
+Overfull \hbox (14.02211pt too wide) in paragraph at lines 273--292
  [][] 
  []
 
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 296.
+(Font)              using `T1/formata/m/it' instead on input line 294.
 
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 296.
+Package pdftex.def Info: notaglinelogo.png  used on input line 294.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -955,26 +950,22 @@ Underfull \hbox (badness 10000) has occurred while \output is active
  []
 
 [7]
-Overfull \hbox (42.20258pt too wide) in paragraph at lines 319--334
+Overfull \hbox (42.20258pt too wide) in paragraph at lines 320--335
  [][] 
  []
 
 
-Overfull \hbox (13.78142pt too wide) in paragraph at lines 340--349
+Overfull \hbox (13.78142pt too wide) in paragraph at lines 341--350
  [][] 
  []
-
-
-Underfull \vbox (badness 1281) has occurred while \output is active []
 
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 356.
+Package pdftex.def Info: notaglinelogo.png  used on input line 353.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
-
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 356.
+(Font)              using `T1/formata/m/it' instead on input line 353.
 
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -992,17 +983,17 @@ Underfull \hbox (badness 10000) has occurred while \output is active
  []
 
 [8]
-Overfull \hbox (66.71896pt too wide) in paragraph at lines 360--373
+Overfull \hbox (66.71896pt too wide) in paragraph at lines 361--374
  [] 
  []
 
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 406.
+(Font)              using `T1/formata/m/it' instead on input line 407.
 
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 406.
+Package pdftex.def Info: notaglinelogo.png  used on input line 407.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -1022,12 +1013,12 @@ Underfull \hbox (badness 10000) has occurred while \output is active
 [9]
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 414.
+Package pdftex.def Info: notaglinelogo.png  used on input line 415.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 414.
+(Font)              using `T1/formata/m/it' instead on input line 415.
 
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -1045,22 +1036,22 @@ Underfull \hbox (badness 10000) has occurred while \output is active
  []
 
 [10]
-Overfull \hbox (14.67097pt too wide) in paragraph at lines 423--423
+Overfull \hbox (14.67097pt too wide) in paragraph at lines 424--424
 []|\T1/times/b/n/9 PromptWizard|  
  []
 
 
-Overfull \hbox (14.02211pt too wide) in paragraph at lines 419--426
+Overfull \hbox (14.02211pt too wide) in paragraph at lines 420--427
  [][] 
  []
 
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 439.
+(Font)              using `T1/formata/m/it' instead on input line 440.
 
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 439.
+Package pdftex.def Info: notaglinelogo.png  used on input line 440.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -1078,26 +1069,22 @@ Underfull \hbox (badness 10000) has occurred while \output is active
  []
 
 [11]
-Overfull \hbox (19.14592pt too wide) in paragraph at lines 450--451
+Overfull \hbox (19.14592pt too wide) in paragraph at lines 457--458
 []|\T1/times/b/n/9 Better/worse 
  []
 
 
-Overfull \hbox (26.2665pt too wide) in paragraph at lines 448--470
+Overfull \hbox (26.2665pt too wide) in paragraph at lines 455--477
  [][] 
  []
 
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 475.
+Package pdftex.def Info: notaglinelogo.png  used on input line 482.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
-
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 475.
+(Font)              using `T1/formata/m/it' instead on input line 482.
 
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -1116,26 +1103,21 @@ Underfull \hbox (badness 10000) has occurred while \output is active
 
 [12]
 LaTeX Font Info:    Trying to load font information for TS1+times on input line
- 481.
-LaTeX Font Info:    No file TS1times.fd. on input line 481.
+ 488.
+LaTeX Font Info:    No file TS1times.fd. on input line 488.
 
 
 LaTeX Font Warning: Font shape `TS1/times/m/n' undefined
 (Font)              using `TS1/cmr/m/n' instead
-(Font)              for symbol `textdagger' on input line 481.
-
-
-Overfull \hbox (25.77771pt too wide) in paragraph at lines 513--529
- [] 
- []
+(Font)              for symbol `textdagger' on input line 488.
 
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 532.
+(Font)              using `T1/formata/m/it' instead on input line 511.
 
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 532.
+Package pdftex.def Info: notaglinelogo.png  used on input line 511.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -1153,11 +1135,14 @@ Underfull \hbox (badness 10000) has occurred while \output is active
  []
 
 [13]
+Overfull \hbox (25.77771pt too wide) in paragraph at lines 520--536
+ [] 
+ []
+
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
 Package pdftex.def Info: notaglinelogo.png  used on input line 540.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
-
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
 (Font)              using `T1/formata/m/it' instead on input line 540.
@@ -1178,52 +1163,17 @@ Underfull \hbox (badness 10000) has occurred while \output is active
  []
 
 [14]
-Overfull \hbox (41.17747pt too wide) in paragraph at lines 549--557
+Overfull \hbox (41.17747pt too wide) in paragraph at lines 580--588
  [][] 
- []
-
-
-Overfull \hbox (42.71898pt too wide) in paragraph at lines 564--574
- [] 
- []
-
-
-Overfull \hbox (0.6477pt too wide) in paragraph at lines 601--601
-[]|\T1/times/b/n/9 intermediate 
- []
-
-
-Overfull \hbox (8.12714pt too wide) in paragraph at lines 602--602
-\T1/times/b/n/9 chained/free|  
- []
-
-
-Overfull \hbox (25.77773pt too wide) in paragraph at lines 589--606
- [] 
- []
-
-
-Overfull \hbox (9.58144pt too wide) in paragraph at lines 619--619
-\T1/times/b/n/9 ploratory)|  
- []
-
-
-Overfull \hbox (14.02211pt too wide) in paragraph at lines 612--624
- [][] 
- []
-
-
-Overfull \hbox (41.18517pt too wide) in paragraph at lines 631--645
- [] 
  []
 
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 648.
+(Font)              using `T1/formata/m/it' instead on input line 591.
 
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 648.
+Package pdftex.def Info: notaglinelogo.png  used on input line 591.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -1241,16 +1191,51 @@ Underfull \hbox (badness 10000) has occurred while \output is active
  []
 
 [15]
-Underfull \vbox (badness 3536) has occurred while \output is active []
+Overfull \hbox (42.71898pt too wide) in paragraph at lines 595--605
+ [] 
+ []
+
+
+Overfull \hbox (0.6477pt too wide) in paragraph at lines 634--634
+[]|\T1/times/b/n/9 intermediate 
+ []
+
+
+Overfull \hbox (8.12714pt too wide) in paragraph at lines 635--635
+\T1/times/b/n/9 chained/free|  
+ []
+
+
+Overfull \hbox (25.77773pt too wide) in paragraph at lines 620--639
+ [] 
+ []
+
+
+Overfull \hbox (9.58144pt too wide) in paragraph at lines 654--654
+\T1/times/b/n/9 ploratory)|  
+ []
+
+
+Overfull \hbox (14.02211pt too wide) in paragraph at lines 645--659
+ [][] 
+ []
+
+
+Overfull \hbox (41.18517pt too wide) in paragraph at lines 666--680
+ [] 
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 649.
+Package pdftex.def Info: notaglinelogo.png  used on input line 683.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 649.
+(Font)              using `T1/formata/m/it' instead on input line 683.
 
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -1268,16 +1253,13 @@ Underfull \hbox (badness 10000) has occurred while \output is active
  []
 
 [16]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 668.
+(Font)              using `T1/formata/m/it' instead on input line 683.
 
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 668.
+Package pdftex.def Info: notaglinelogo.png  used on input line 683.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -1295,20 +1277,14 @@ Underfull \hbox (badness 10000) has occurred while \output is active
  []
 
 [17]
-Underfull \vbox (badness 1968) has occurred while \output is active []
-
-
-Underfull \hbox (badness 2781) in paragraph at lines 679--680
-\T1/times/b/n/10 We re-tested a rubric-guided re-fine-ment layer on
- []
-
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 689.
+Package pdftex.def Info: notaglinelogo.png  used on input line 697.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
+
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 689.
+(Font)              using `T1/formata/m/it' instead on input line 697.
 
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -1326,166 +1302,20 @@ Underfull \hbox (badness 10000) has occurred while \output is active
  []
 
 [18]
-Underfull \hbox (badness 1668) in paragraph at lines 699--700
-\T1/times/b/n/10 Dang: Con-cep-tu-al-iza-tion, Method-ol-ogy, Su-per-vi-sion,
- []
+Underfull \vbox (badness 7759) has occurred while \output is active []
 
 
-LaTeX Font Warning: Font shape `T1/pcr/n/n' undefined
-(Font)              using `T1/pcr/m/n' instead on input line 710.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 711--711
-[]\T1/pcr/n/n/9 How could I determine the accuracy of
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 713--713
-[]\T1/pcr/n/n/9 [Question] Here is a table where the
- []
-
-
-Overfull \hbox (13.3262pt too wide) in paragraph at lines 714--714
-[]\T1/pcr/n/n/9 each subsequent line is a penguin: name,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 715--715
-[]\T1/pcr/n/n/9 weight (kg) Louis, 7, 50, 11 Bernard,
- []
-
-
-Overfull \hbox (29.52618pt too wide) in paragraph at lines 716--716
-[]\T1/pcr/n/n/9 What is the name of the 60 cm tall penguin? 
- []
-
-
-Overfull \hbox (24.12619pt too wide) in paragraph at lines 717--717
-[]\T1/pcr/n/n/9 Options: (A) Louis (B) Bernard (C) Vincent
- []
-
-
-Overfull \hbox (7.92621pt too wide) in paragraph at lines 718--718
-[]\T1/pcr/n/n/9 [Answer] ... Therefore, the name of the
- []
-
-
-Overfull \hbox (61.92615pt too wide) in paragraph at lines 719--719
-[]\T1/pcr/n/n/9 **Final Answer:** (C) Vincent <ANS_START>(C)<ANS_
- []
-
-
-Overfull \hbox (13.3262pt too wide) in paragraph at lines 720--720
-[]\T1/pcr/n/n/9 [... two further worked examples omitted
- []
-
-
-Overfull \hbox (18.7262pt too wide) in paragraph at lines 721--721
-[]\T1/pcr/n/n/9 Wrap the final answer between <ANS_START>
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 727--727
-[]\T1/pcr/n/n/9 I gave a friend an instruction. Based
- []
-
-
-Overfull \hbox (24.12619pt too wide) in paragraph at lines 728--728
-[]\T1/pcr/n/n/9 produced the following input-output pairs: 
- []
-
-
-Overfull \hbox (18.7262pt too wide) in paragraph at lines 729--729
-[]\T1/pcr/n/n/9 [Question] Which sentence has the correct
- []
-
-
-Overfull \hbox (7.92621pt too wide) in paragraph at lines 731--731
-[]\T1/pcr/n/n/9 [... further input-output pairs omitted
- []
-
-
-Overfull \hbox (18.7262pt too wide) in paragraph at lines 733--733
-[]\T1/pcr/n/n/9 Wrap the final answer between <ANS_START>
- []
-
-
-Overfull \hbox (7.92621pt too wide) in paragraph at lines 743--743
-[]\T1/pcr/n/n/9 Q: Which of the following is a humorous
- []
-
-
-Overfull \hbox (56.52615pt too wide) in paragraph at lines 743--743
-\T1/pcr/n/n/9 edit of this artist or movie name: 'whitesnake'? 
- []
-
-
-Overfull \hbox (7.92621pt too wide) in paragraph at lines 744--744
-[]\T1/pcr/n/n/9 Options: (A) whitesnape (B) whitesnapke
- []
-
-
-Overfull \hbox (7.92621pt too wide) in paragraph at lines 745--745
-[]\T1/pcr/n/n/9 A: Let's think step by step. ... So the
- []
-
-
-Overfull \hbox (40.32617pt too wide) in paragraph at lines 754--754
-[]\T1/pcr/n/n/9 You are given a task-solving prompt generated
- []
-
-
-Overfull \hbox (2.52621pt too wide) in paragraph at lines 755--755
-[]\T1/pcr/n/n/9 Rewrite the prompt to improve clarity,
- []
-
-
-Overfull \hbox (18.7262pt too wide) in paragraph at lines 755--755
-\T1/pcr/n/n/9 readability, and instruction organization
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 756--756
-[]\T1/pcr/n/n/9 preserving the original task meaning.
- []
-
-
-Overfull \hbox (24.12619pt too wide) in paragraph at lines 756--756
-\T1/pcr/n/n/9 Preserve the original task, answer format,
- []
-
-
-Overfull \hbox (13.3262pt too wide) in paragraph at lines 757--757
-[]\T1/pcr/n/n/9 Do not use any prompt-evaluation rubric.
- []
-
-
-Overfull \hbox (2.52621pt too wide) in paragraph at lines 757--757
-\T1/pcr/n/n/9 Output only the rewritten task-solving
- []
-
-
-Overfull \hbox (7.92621pt too wide) in paragraph at lines 758--758
-[]\T1/pcr/n/n/9 Original prompt: <START> {prompt} <END> 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 769--769
-[]\T1/pcr/n/n/9 I gave a friend an instruction. Based
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 769--769
-\T1/pcr/n/n/9 on the instruction they produced the
+Underfull \hbox (badness 2781) in paragraph at lines 714--715
+\T1/times/b/n/10 We re-tested a rubric-guided re-fine-ment layer on
  []
 
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 769.
+(Font)              using `T1/formata/m/it' instead on input line 715.
 
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 769.
+Package pdftex.def Info: notaglinelogo.png  used on input line 715.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -1503,120 +1333,121 @@ Underfull \hbox (badness 10000) has occurred while \output is active
  []
 
 [19]
-Underfull \hbox (badness 10000) in paragraph at lines 770--770
-[]\T1/pcr/n/n/9 input-output pairs: [Question] Which
+Underfull \hbox (badness 1668) in paragraph at lines 736--737
+\T1/times/b/n/10 Dang: Con-cep-tu-al-iza-tion, Method-ol-ogy, Su-per-vi-sion,
+ []
+
+
+LaTeX Font Warning: Font shape `T1/pcr/n/n' undefined
+(Font)              using `T1/pcr/m/n' instead on input line 747.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 748--748
+[]\T1/pcr/n/n/9 How could I determine the accuracy of
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 750--750
+[]\T1/pcr/n/n/9 [Question] Here is a table where the
+ []
+
+
+Overfull \hbox (13.3262pt too wide) in paragraph at lines 751--751
+[]\T1/pcr/n/n/9 each subsequent line is a penguin: name,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 752--752
+[]\T1/pcr/n/n/9 weight (kg) Louis, 7, 50, 11 Bernard,
+ []
+
+
+Overfull \hbox (29.52618pt too wide) in paragraph at lines 753--753
+[]\T1/pcr/n/n/9 What is the name of the 60 cm tall penguin? 
+ []
+
+
+Overfull \hbox (24.12619pt too wide) in paragraph at lines 754--754
+[]\T1/pcr/n/n/9 Options: (A) Louis (B) Bernard (C) Vincent
+ []
+
+
+Overfull \hbox (7.92621pt too wide) in paragraph at lines 755--755
+[]\T1/pcr/n/n/9 [Answer] ... Therefore, the name of the
+ []
+
+
+Overfull \hbox (61.92615pt too wide) in paragraph at lines 756--756
+[]\T1/pcr/n/n/9 **Final Answer:** (C) Vincent <ANS_START>(C)<ANS_
+ []
+
+
+Overfull \hbox (13.3262pt too wide) in paragraph at lines 757--757
+[]\T1/pcr/n/n/9 [... two further worked examples omitted
+ []
+
+
+Overfull \hbox (18.7262pt too wide) in paragraph at lines 758--758
+[]\T1/pcr/n/n/9 Wrap the final answer between <ANS_START>
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 764--764
+[]\T1/pcr/n/n/9 I gave a friend an instruction. Based
+ []
+
+
+Overfull \hbox (24.12619pt too wide) in paragraph at lines 765--765
+[]\T1/pcr/n/n/9 produced the following input-output pairs: 
+ []
+
+
+Overfull \hbox (18.7262pt too wide) in paragraph at lines 766--766
+[]\T1/pcr/n/n/9 [Question] Which sentence has the correct
+ []
+
+
+Overfull \hbox (7.92621pt too wide) in paragraph at lines 768--768
+[]\T1/pcr/n/n/9 [... further input-output pairs omitted
  []
 
 
 Overfull \hbox (18.7262pt too wide) in paragraph at lines 770--770
-\T1/pcr/n/n/9 sentence has the correct adjective order:
+[]\T1/pcr/n/n/9 Wrap the final answer between <ANS_START>
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 771--771
-[]\T1/pcr/n/n/9 The task is to determine the correct
+Overfull \hbox (7.92621pt too wide) in paragraph at lines 780--780
+[]\T1/pcr/n/n/9 Q: Which of the following is a humorous
  []
 
 
-Overfull \hbox (18.7262pt too wide) in paragraph at lines 779--779
-[]\T1/pcr/n/n/9 ### Task Overview You are a Senior Prompt
+Overfull \hbox (56.52615pt too wide) in paragraph at lines 780--780
+\T1/pcr/n/n/9 edit of this artist or movie name: 'whitesnake'? 
  []
 
 
-Overfull \hbox (13.3262pt too wide) in paragraph at lines 779--779
-\T1/pcr/n/n/9 Engineer ... ### Prompt Under Evaluation
+Overfull \hbox (7.92621pt too wide) in paragraph at lines 781--781
+[]\T1/pcr/n/n/9 Options: (A) whitesnape (B) whitesnapke
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 780--780
-[]\T1/pcr/n/n/9 ### Seven-Criteria Evaluation Rubric
+Overfull \hbox (7.92621pt too wide) in paragraph at lines 782--782
+[]\T1/pcr/n/n/9 A: Let's think step by step. ... So the
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 787--787
-[]\T1/pcr/n/n/9 P0 (ProTeGi, hyperbaton): Let's think
+Overfull \hbox (40.32617pt too wide) in paragraph at lines 791--791
+[]\T1/pcr/n/n/9 You are given a task-solving prompt generated
  []
-
-
-Overfull \hbox (29.52618pt too wide) in paragraph at lines 787--787
-\T1/pcr/n/n/9 step by step. Wrap the final answer between
- []
-
-
-Overfull \hbox (7.92621pt too wide) in paragraph at lines 788--788
-[]\T1/pcr/n/n/9 Accepted candidate (Qwen3-235B refiner,
- []
-
-
-Overfull \hbox (2.52621pt too wide) in paragraph at lines 788--788
-\T1/pcr/n/n/9 round 7; validation 0.52 vs 0.16, test
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 789--789
-[]\T1/pcr/n/n/9 You are a Senior Reasoning Assistant
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 789--789
-\T1/pcr/n/n/9 ... ### Instructions 1. Step Back ...
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 790--790
-[]\T1/pcr/n/n/9 5. Follow Format Exactly ... 7. Final
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 790--790
-\T1/pcr/n/n/9 Answer: On a new line, wrap only the
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 791--791
-[]\T1/pcr/n/n/9 <ANS_START> and <ANS_END>. ### Output
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 791--791
-\T1/pcr/n/n/9 Format Examples [Question] A bat and
- []
-
-
-Overfull \hbox (0.99768pt too wide) in paragraph at lines 816--816
-[]|\T1/times/b/n/9 10|  
- []
-
-
-Overfull \hbox (0.99768pt too wide) in paragraph at lines 817--817
-[]|\T1/times/b/n/9 11|  
- []
-
-
-Overfull \hbox (0.99768pt too wide) in paragraph at lines 818--818
-[]|\T1/times/b/n/9 12|  
- []
-
-
-Overfull \hbox (0.99768pt too wide) in paragraph at lines 819--819
-[]|\T1/times/b/n/9 13|  
- []
-
-
-Overfull \hbox (14.02211pt too wide) in paragraph at lines 803--822
- [][] 
- []
-
-
-LaTeX Warning: Float too large for page by 69.5499pt on input line 822.
 
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 850.
+Package pdftex.def Info: notaglinelogo.png  used on input line 792.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 850.
+(Font)              using `T1/formata/m/it' instead on input line 792.
 
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -1634,17 +1465,165 @@ Underfull \hbox (badness 10000) has occurred while \output is active
  []
 
 [20]
-Underfull \hbox (badness 4454) in paragraph at lines 952--953
-[]\T1/times/b/n/10 7. 2026-10-20, op-ti-mizer im-ple-men-ta-tions. No
+Overfull \hbox (2.52621pt too wide) in paragraph at lines 792--792
+[]\T1/pcr/n/n/9 Rewrite the prompt to improve clarity,
  []
 
 
+Overfull \hbox (18.7262pt too wide) in paragraph at lines 792--792
+\T1/pcr/n/n/9 readability, and instruction organization
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 793--793
+[]\T1/pcr/n/n/9 preserving the original task meaning.
+ []
+
+
+Overfull \hbox (24.12619pt too wide) in paragraph at lines 793--793
+\T1/pcr/n/n/9 Preserve the original task, answer format,
+ []
+
+
+Overfull \hbox (13.3262pt too wide) in paragraph at lines 794--794
+[]\T1/pcr/n/n/9 Do not use any prompt-evaluation rubric.
+ []
+
+
+Overfull \hbox (2.52621pt too wide) in paragraph at lines 794--794
+\T1/pcr/n/n/9 Output only the rewritten task-solving
+ []
+
+
+Overfull \hbox (7.92621pt too wide) in paragraph at lines 795--795
+[]\T1/pcr/n/n/9 Original prompt: <START> {prompt} <END> 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 806--806
+[]\T1/pcr/n/n/9 I gave a friend an instruction. Based
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 806--806
+\T1/pcr/n/n/9 on the instruction they produced the
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 807--807
+[]\T1/pcr/n/n/9 input-output pairs: [Question] Which
+ []
+
+
+Overfull \hbox (18.7262pt too wide) in paragraph at lines 807--807
+\T1/pcr/n/n/9 sentence has the correct adjective order:
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 808--808
+[]\T1/pcr/n/n/9 The task is to determine the correct
+ []
+
+
+Overfull \hbox (18.7262pt too wide) in paragraph at lines 816--816
+[]\T1/pcr/n/n/9 ### Task Overview You are a Senior Prompt
+ []
+
+
+Overfull \hbox (13.3262pt too wide) in paragraph at lines 816--816
+\T1/pcr/n/n/9 Engineer ... ### Prompt Under Evaluation
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 817--817
+[]\T1/pcr/n/n/9 ### Seven-Criteria Evaluation Rubric
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 824--824
+[]\T1/pcr/n/n/9 P0 (ProTeGi, hyperbaton): Let's think
+ []
+
+
+Overfull \hbox (29.52618pt too wide) in paragraph at lines 824--824
+\T1/pcr/n/n/9 step by step. Wrap the final answer between
+ []
+
+
+Overfull \hbox (7.92621pt too wide) in paragraph at lines 825--825
+[]\T1/pcr/n/n/9 Accepted candidate (Qwen3-235B refiner,
+ []
+
+
+Overfull \hbox (2.52621pt too wide) in paragraph at lines 825--825
+\T1/pcr/n/n/9 round 7; validation 0.52 vs 0.16, test
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 826--826
+[]\T1/pcr/n/n/9 You are a Senior Reasoning Assistant
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 826--826
+\T1/pcr/n/n/9 ... ### Instructions 1. Step Back ...
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 827--827
+[]\T1/pcr/n/n/9 5. Follow Format Exactly ... 7. Final
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 827--827
+\T1/pcr/n/n/9 Answer: On a new line, wrap only the
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 828--828
+[]\T1/pcr/n/n/9 <ANS_START> and <ANS_END>. ### Output
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 828--828
+\T1/pcr/n/n/9 Format Examples [Question] A bat and
+ []
+
+
+Overfull \hbox (0.99768pt too wide) in paragraph at lines 853--853
+[]|\T1/times/b/n/9 10|  
+ []
+
+
+Overfull \hbox (0.99768pt too wide) in paragraph at lines 854--854
+[]|\T1/times/b/n/9 11|  
+ []
+
+
+Overfull \hbox (0.99768pt too wide) in paragraph at lines 855--855
+[]|\T1/times/b/n/9 12|  
+ []
+
+
+Overfull \hbox (0.99768pt too wide) in paragraph at lines 856--856
+[]|\T1/times/b/n/9 13|  
+ []
+
+
+Overfull \hbox (14.02211pt too wide) in paragraph at lines 840--859
+ [][] 
+ []
+
+
+LaTeX Warning: Float too large for page by 69.5499pt on input line 859.
+
+
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 954.
+(Font)              using `T1/formata/m/it' instead on input line 981.
 
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 954.
+Package pdftex.def Info: notaglinelogo.png  used on input line 981.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -1662,19 +1641,14 @@ Underfull \hbox (badness 10000) has occurred while \output is active
  []
 
 [21]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 956.
+Package pdftex.def Info: notaglinelogo.png  used on input line 985.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 956.
+(Font)              using `T1/formata/m/it' instead on input line 985.
 
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -1692,18 +1666,24 @@ Underfull \hbox (badness 10000) has occurred while \output is active
  []
 
 [22]
-Overfull \hbox (42.2103pt too wide) in paragraph at lines 966--1017
- [][] 
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+Underfull \hbox (badness 4454) in paragraph at lines 989--990
+[]\T1/times/b/n/10 7. 2026-10-20, op-ti-mizer im-ple-men-ta-tions. No
  []
 
-(manuscript.bbl
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 162.
+(Font)              using `T1/formata/m/it' instead on input line 992.
 
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 162.
+Package pdftex.def Info: notaglinelogo.png  used on input line 992.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -1721,14 +1701,19 @@ Underfull \hbox (badness 10000) has occurred while \output is active
  []
 
 [23]
+Overfull \hbox (42.2103pt too wide) in paragraph at lines 1004--1055
+ [][] 
+ []
+
+(manuscript.bbl
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 162.
+Package pdftex.def Info: notaglinelogo.png  used on input line 101.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 162.
+(Font)              using `T1/formata/m/it' instead on input line 101.
 
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -1746,6 +1731,30 @@ Underfull \hbox (badness 10000) has occurred while \output is active
  []
 
 [24]
+
+LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
+(Font)              using `T1/formata/m/it' instead on input line 101.
+
+File: notaglinelogo.png Graphic file (type png)
+<use notaglinelogo.png>
+Package pdftex.def Info: notaglinelogo.png  used on input line 101.
+(pdftex.def)             Requested size: 91.32pt x 23.1352pt.
+
+Overfull \hbox (505.12177pt too wide) has occurred while \output is active
+[]
+ []
+
+
+Overfull \hbox (505.12177pt too wide) has occurred while \output is active
+[]
+ []
+
+
+Underfull \hbox (badness 10000) has occurred while \output is active
+[]
+ []
+
+[25]
 LaTeX Font Info:    Calculating math sizes for size <7.61> on input line 212.
 
 Underfull \hbox (badness 4531) in paragraph at lines 207--214
@@ -1799,19 +1808,14 @@ Underfull \hbox (badness 2351) in paragraph at lines 286--290
 \T1/times/m/n/8 prompt op-ti-miza-tion,'' arXiv preprint arXiv:2502.04295,
  []
 
-
-Underfull \hbox (badness 5847) in paragraph at lines 325--328
-[]\T1/times/m/n/8 D. Shah, S. Badhe, N. Kathro-tia, and P. Ti-wari,
- []
-
-
-LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 345.
-
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 345.
+Package pdftex.def Info: notaglinelogo.png  used on input line 290.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
+
+LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
+(Font)              using `T1/formata/m/it' instead on input line 290.
+
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
 []
@@ -1827,7 +1831,12 @@ Underfull \hbox (badness 10000) has occurred while \output is active
 []
  []
 
-[25]
+[26]
+Underfull \hbox (badness 5847) in paragraph at lines 325--328
+[]\T1/times/m/n/8 D. Shah, S. Badhe, N. Kathro-tia, and P. Ti-wari,
+ []
+
+
 Underfull \hbox (badness 2443) in paragraph at lines 396--401
 []\T1/times/m/n/8 X. Bouthillier, P. De-lau-nay, M. Bronzi, A. Trofi-mov,
  []
@@ -1891,19 +1900,42 @@ Overfull \hbox (26.8435pt too wide) in paragraph at lines 446--452
 []the-[]openai-[]api$ 
  []
 
-)
+
+LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
+(Font)              using `T1/formata/m/it' instead on input line 478.
+
+File: notaglinelogo.png Graphic file (type png)
+<use notaglinelogo.png>
+Package pdftex.def Info: notaglinelogo.png  used on input line 478.
+(pdftex.def)             Requested size: 91.32pt x 23.1352pt.
+
+Overfull \hbox (505.12177pt too wide) has occurred while \output is active
+[]
+ []
+
+
+Overfull \hbox (505.12177pt too wide) has occurred while \output is active
+[]
+ []
+
+
+Underfull \hbox (badness 10000) has occurred while \output is active
+[]
+ []
+
+[27])
 File: bullet.png Graphic file (type png)
 <use bullet.png>
-Package pdftex.def Info: bullet.png  used on input line 1043.
+Package pdftex.def Info: bullet.png  used on input line 1081.
 (pdftex.def)             Requested size: 4.99878pt x 14.68387pt.
 File: notaglinelogo.png Graphic file (type png)
 <use notaglinelogo.png>
-Package pdftex.def Info: notaglinelogo.png  used on input line 1045.
+Package pdftex.def Info: notaglinelogo.png  used on input line 1083.
 (pdftex.def)             Requested size: 91.32pt x 23.1352pt.
 
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 1045.
+(Font)              using `T1/formata/m/it' instead on input line 1083.
 
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -1920,7 +1952,9 @@ Underfull \hbox (badness 10000) has occurred while \output is active
 []
  []
 
-[26] (manuscript.aux)
+[28
+
+] (manuscript.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
@@ -1931,13 +1965,13 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  ) 
 Here is how much of TeX's memory you used:
- 6756 strings out of 467871
- 112887 string characters out of 5416923
- 565275 words of memory out of 5000000
- 35527 multiletter control sequences out of 15000+600000
- 679891 words of font info for 161 fonts, out of 8000000 for 9000
+ 6761 strings out of 467871
+ 112972 string characters out of 5416923
+ 579275 words of memory out of 5000000
+ 35531 multiletter control sequences out of 15000+600000
+ 681409 words of font info for 165 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 72i,12n,117p,1882b,548s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 72i,13n,117p,2013b,546s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\vinh.dq4\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\t
 crm0800.pk> <C:\Users\vinh.dq4\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec
 /dpi600\tcrm1000.pk> <C:\Users\vinh.dq4\AppData\Local\MiKTeX\fonts/pk/ljfour/jk
@@ -1954,9 +1988,9 @@ e1/public/amsfonts/cm/cmsy7.pfb><./t1-formata-bold.pfb><./t1-formata-condmedium
 .pfb><./t1-formata-medium.pfb><./t1-formata-mediumitalic.pfb><./t1-formata-regu
 lar.pfb><./t1-giovannistd-bookitalic.pfb><C:/Users/vinh.dq4/AppData/Local/Progr
 ams/MiKTeX/fonts/type1/urw/courier/ucrr8a.pfb>
-Output written on manuscript.pdf (26 pages, 476547 bytes).
+Output written on manuscript.pdf (28 pages, 484017 bytes).
 PDF statistics:
- 482 PDF objects out of 1000 (max. 8388607)
+ 488 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  29 words of extra memory for PDF output out of 10000 (max. 10000000)
 

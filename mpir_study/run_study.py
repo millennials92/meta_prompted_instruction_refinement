@@ -43,6 +43,14 @@ def specs_for(group: str, mseeds: tuple[int, ...]) -> list[tuple[RunSpec, bool]]
         # Second revision: format- and example-preserving chained refinement, 1.7B self-refiner, all 45 cells.
         return [(RunSpec(c, "v2f", "1.7b", m, val_reps=1), False) for c in tier1_cells() + tier2_cells()
                 for m in mseeds]
+    if group == "g7-v3f":
+        # Rubric-free gated rewrite under the same protection as V2F (start prompt P0 + bare-tag example, format line and
+        # example re-attached), 1.7B refiner, the same cells as g5-fix.
+        return [(RunSpec(c, "v3f", "1.7b", m, val_reps=1), False) for c in tier1_cells() + tier2_cells() for m in mseeds]
+    if group == "g7-api":
+        # V2F and V3F with the strong refiners (OpenRouter) on the nine Tier-1 seed-42 cells, MPIR seed 1, oracle-scored.
+        return [(RunSpec(c, v, r, 1, val_reps=1), True) for r in ("qwen235", "gpt6luna") for v in ("v2f", "v3f")
+                for c in pilot_cells]
     if group == "g6-8b":
         # Second revision: intermediate open-weight refiner (Qwen3-8B-AWQ, local), rubric (V2) and rubric-free (V3)
         # on the nine Tier-1 seed-42 cells, MPIR seed 1, oracle-scored, so V2 - V3 can be paired per cell.
