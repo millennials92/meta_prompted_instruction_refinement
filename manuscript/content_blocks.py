@@ -7,8 +7,8 @@
 
 from blocks_api import BLOCKS  # noqa: F401  (re-exported for the build scripts)
 
-TITLE = ("Does Rubric-Guided Refinement Improve Automatically Optimized Prompts? "
-         "A Pre-Specified Negative-Result Study")
+TITLE = ("Does Rubric-Guided Self-Refinement Improve Prompts from Small-Model Optimizers? "
+         "A Scoped Negative-Result Study with Qwen3-1.7B")
 
 AUTHORS = [
     {"name": "Linh Nguyen", "affil_idx": [1], "corresponding": False, "email": "s4021009@rmit.edu.vn"},
@@ -41,3 +41,4 @@ import part2_method_design  # noqa: E402,F401
 import part3_results  # noqa: E402,F401
 import part4_discussion_back  # noqa: E402,F401
 import part5_appendix  # noqa: E402,F401
+import part5b_appendix_g  # noqa: E402,F401

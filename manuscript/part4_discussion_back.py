@@ -24,7 +24,7 @@ H1("6. Discussion")
 H2("6.1. What the Evidence Supports")
 P(f"With Qwen3-1.7B as target and refiner, the rubric-guided layer, as specified, did not improve the prompts of "
   f"any of three optimizers on any of nine tasks: the final prompt equalled P0 in "
-  f"{MG['runs'] - MG['runs_accepting']} of {MG['runs']} runs, and by the pre-specified rule the outcome is "
+  f"{MG['runs'] - MG['runs_accepting']} of {MG['runs']} runs, and by the decision rule fixed in advance the outcome is "
   f"null (Section 5.3). The refinement rounds were made distinct by sampling and history, the failure is "
   "not caused by the inconsistent rubric text, and a rubric-free gated rewrite is not worse under lenient "
   "scoring (Section 5.5). The main reason is the refiner: most rounds never produce a usable candidate, and the "

@@ -24,7 +24,7 @@ P("Whether such a layer helps matters in practice. It costs a few model calls an
   "pipeline, but if it does not help those calls are wasted, and an ungated version can make prompts worse. "
   "A clean test is not trivial: the rewrite is produced by a model that may be no more capable than the "
   "target, the gate uses a small validation set, and benchmark accuracy depends on how answers are "
-  "extracted. We therefore report a pre-specified test, and we treat a null result as informative.")
+  "extracted. We therefore report a test whose decision rules were fixed in advance (with dated amendments), and we treat a null result as informative.")
 
 P("The idea was first evaluated with GPT-4o as the refining model and GPT-3.5-turbo as the target on the "
   "tasks of Big-Bench Hard (BBH) ‹27›. That evaluation reported per-task gains over PromptWizard ‹23› but a "
@@ -54,7 +54,7 @@ BULLETS([
      "Rounds differ by sampling and, in the chained variant, by the history of rejected candidates; every "
      "round is logged with its outcome (fallback, echo, duplicate, validated), its validation and test scores "
      "and the judge's rubric total."),
-    ("A pre-specified, multi-seed, multi-task evaluation.",
+    ("A multi-seed, multi-task evaluation with rules fixed in advance.",
      "45 base prompts (three optimizers, nine tasks, up to three seeds), decision rules fixed in a "
      "time-stamped protocol, and a random, documented choice of six tasks to complement the three pilot tasks."),
     ("Diagnostics that make the result interpretable.",
@@ -73,13 +73,10 @@ P("Prompting steers an LLM through in-context learning without changing its weig
   "no structural feedback and over-fit to the few examples they try ‹32›. Experienced authors rely on "
   "heuristics. Few-shot demonstrations help ‹4,103›, though Min et al. show that format, label space and "
   "input distribution matter more than label correctness ‹6›. Chain-of-thought prompting decomposes "
-  "multistep problems ‹7,8›, and coherent, relevant reasoning steps matter more than length ‹9,10›. Role "
+  "multistep problems ‹7,8›, and the relevance of the reasoning steps to the question and their correct order matter more than the validity of each step ‹10›. Role "
   "prompting assigns a persona to guide reasoning ‹12›, but its benefit is inconsistent: poorly aligned "
   "personas can hurt ‹16›, and a large study found that adding personas to system prompts does not "
-  "reliably improve performance ‹104›. Step-back prompting abstracts key principles before solving ‹13›; a "
-  "behavioural benchmark of 35 LLMs found that it fosters model-based behaviour in sequential decision "
-  "tasks ‹17›, although this is weaker evidence for knowledge-intensive reasoning than the original step-back "
-  "results. Models attend unevenly to information in long contexts ‹15,14›, and vendor guidance reports "
+  "reliably improve performance ‹104›. Step-back prompting abstracts key principles before solving ‹13›. Models attend unevenly to information in long contexts ‹15,14›, and vendor guidance reports "
   "recency effects for some models while reporting no difference for GPT-4-class models ‹43›; whether either matters for the short prompts studied here is an empirical "
   "question rather than a premise. Self-consistency, a decoding-time heuristic, samples several reasoning "
   "paths and votes ‹66›;")

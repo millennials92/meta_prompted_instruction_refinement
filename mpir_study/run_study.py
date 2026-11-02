@@ -39,6 +39,15 @@ def specs_for(group: str, mseeds: tuple[int, ...]) -> list[tuple[RunSpec, bool]]
         # rubric-free rewrite and for the base optimizers' own prompts (added after the F1 audit finding).
         return ([(RunSpec(c, "v1p", "1.7b", m), m == 1) for c in pilot_cells for m in mseeds]
                 + [(RunSpec(c, "v2p", "1.7b", 1), True) for c in pilot_cells])
+    if group == "g5-fix":
+        # Second revision: format- and example-preserving chained refinement, 1.7B self-refiner, all 45 cells.
+        return [(RunSpec(c, "v2f", "1.7b", m, val_reps=1), False) for c in tier1_cells() + tier2_cells()
+                for m in mseeds]
+    if group == "g6-8b":
+        # Second revision: intermediate open-weight refiner (Qwen3-8B-AWQ, local), rubric (V2) and rubric-free (V3)
+        # on the nine Tier-1 seed-42 cells, MPIR seed 1, oracle-scored, so V2 - V3 can be paired per cell.
+        return ([(RunSpec(c, "v2", "8b", 1), True) for c in pilot_cells]
+                + [(RunSpec(c, "v3", "8b", 1), True) for c in pilot_cells])
     if group == "g3-4b":
         return [(RunSpec(c, v, "4b", m), m == 1) for c in pilot_cells for v in ("v1", "v2") for m in mseeds]
     if group == "g3-8b":

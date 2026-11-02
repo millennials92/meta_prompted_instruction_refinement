@@ -90,3 +90,14 @@ def parse_rubric_total(text: str) -> tuple[float | None, int | None]:
         return float(match.group(1)), int(match.group(2))
     parts = [float(x) for x in _CRITERION.findall(text)]
     return (sum(parts), 5 * len(parts)) if len(parts) >= 3 else (None, None)
+
+
+# v2f (format- and example-preserving chained refinement, added in the second revision): the same requests plus an
+# explicit instruction to keep the answer-format line and the worked examples untouched.
+PRESERVE_CLAUSE = """
+
+Important: keep the final answer-format instruction ("Wrap the final answer between <ANS_START> and <ANS_END>")
+and every worked example that is already in the prompt exactly as it is. Improve only the instructions around them."""
+REFINEMENT_REQUEST_F = REFINEMENT_REQUEST + PRESERVE_CLAUSE
+HISTORY_REQUEST_F = HISTORY_REQUEST + PRESERVE_CLAUSE
+EXEMPLAR_HEADER = "Here is a worked example of the required answer format:"

@@ -194,7 +194,9 @@ if os.path.exists(_orig_path):
                  f"{float(avg_m[4]) - float(avg_m[2]):+.1f}", _f(avg_a[1]), _f(avg_a[4]), _f(avg_a[2]),
                  _f(avg_a[5]), avg_g[1], avg_g[2]])
     TABLE("Table 14. Original GPT-3.5-turbo evaluation (accuracy %, single run, leaked validation split) and "
-          "Gemini 3.5 Flash-Lite check. PW = PromptWizard; Diff = PW+MPIR minus PW (points). Exploratory only.",
+          "Gemini 3.5 Flash-Lite check. PW = PromptWizard; Diff = PW+MPIR minus PW (points). Exploratory only; it "
+          "reproduces results that we declare invalid. One run per cell; the Gemini columns are blank for tasks "
+          "that were not run.",
           header=["Task", "Zero-shot", "Expert", "PW", "PW+MPIR", "Diff", "APE", "APE+MPIR", "ProTeGi",
                   "ProTeGi+MPIR", "Gemini PW", "Gemini MPIR"],
           rows=rows, full=True)
@@ -247,7 +249,9 @@ H1("Appendix F. Protocol and Deviations")
 P("The decision rules of Section 4.1 were fixed in REVISION_PROTOCOL.md before any revised experiment "
   "ran (commit 8fd1397, 2026-10-19). The amendments below are recorded in that file; none is an entry in a "
   "registry. Amendments 1 to 7 were made before the results of the affected experiment were inspected; "
-  "amendments 8 and 9 were made after results were seen and are exploratory; V1P and V2P were stopped before all nine cells finished.")
+  "amendments 8 and 9 were made after results were seen and are exploratory; V1P and V2P were stopped before all nine cells finished. "
+  "Amendment 10 lists the additions made in response to the second round of review; they were decided after the "
+  "first-round results were known and are post hoc in that sense, although none was chosen after seeing its own result.")
 BULLETS([
     ("1. 2026-10-20, compute.", "Serving stack vLLM 0.28.0 under WSL2 with measured throughput of about 1.2k "
      "tokens/s; oracle test scoring of every validated candidate for MPIR seed 1 only; one validation score per "
@@ -269,4 +273,13 @@ BULLETS([
     ("9. 2026-10-21, exploratory.", "After an audit found that V1 and V2 candidates are scored without the "
      "answer-format line, the format-protected variants V1P and V2P were added, and the lenient parser was "
      "corrected to accept everything the strict parser accepts (Section 5.2)."),
+    ("10. 2026-11-02, second revision.", "Added in response to the second review: variant V2F on all 45 cells "
+     "(Section 5.3.1); a positive control and a content-free bare-tag control for the gate (Section 5.3.1); "
+     "rescoring of the prompts behind the exploratory claims in one serving session (Section 5.7); a labelled "
+     "validation of the lenient parser (Section 5.1.1); an audit of sampled echo and fallback rounds (Section 5.2); "
+     "an intermediate open-weight refiner, Qwen3-8B-AWQ, with V2 and V3 on the nine Tier-1 seed-42 cells "
+     "(Section 5.6.2); a local 8B judge that is not a refiner (Section 5.8); exact acceptance-rate bounds and a "
+     "per-variant cost table. The grid size of the original protocol (135 runs) was not restored; V2F has one "
+     "MPIR seed per cell. The original decision rules D1 to D3 were not changed, and D1 is restated for V2F "
+     "and on the validated lenient metric."),
 ])

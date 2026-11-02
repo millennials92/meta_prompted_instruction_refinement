@@ -12,17 +12,19 @@ P("MPIR is a three-stage cycle applied to a prompt P0 that an upstream APO metho
   "under test, not as a contribution.")
 
 FIG("figure_3.png",
-    "Figure 1. The MPIR cycle as drawn for the first submission: a prompt P0 from an APO run enters "
-    "evaluation, refinement and validation for N rounds, and the best validated prompt is returned. In the "
-    "legacy loop every round starts from P0; the repaired variants of Section 3.2 sample the refiner and, in "
-    "the chained variant, start each round from the incumbent prompt.", full=False)
+    "Figure 1. The MPIR cycle. A prompt P0 from an APO run enters evaluation, refinement and validation for "
+    "N rounds, and the best validated prompt is returned. The drawing shows the legacy loop, in which every "
+    "round starts from P0; the repaired variants of Section 3.2 sample the refiner and, in the chained "
+    "variants, start each round from the incumbent prompt.", full=False)
 
 H2("3.1. Problem Formulation")
 P("Let (Qv, Av) = {(qi, ai)}, i = 1..M, be a validation set of M question-answer pairs and A(L, P) the "
   "accuracy of the target model L on it under prompt P. Let R(P0) be the set of candidate prompts that the "
   "refinement loop produces from P0. MPIR returns")
 P("Pfinal = argmax over P′ in {P0} ∪ R(P0) of A(L, P′),")
-P("with ties resolved in favour of P0 (a candidate must be strictly better). Including P0 in the "
+P("with ties resolved in favour of P0 (a candidate must be strictly better; because validation scores are "
+  "noisy, with 6.5% of examples flipping between two scorings of the same prompt (Section 5.7), a strict "
+  "inequality on 25 questions is a coarse test). Including P0 in the "
   "candidate set is what makes it possible for the procedure to conclude that no refinement helps.")
 
 H2("3.2. Algorithm and Variants")
@@ -60,15 +62,20 @@ P("The pilot ran what we call the legacy loop: Psrc = P0 in every round, H empty
   "distinct attempt per cell. The repaired loop differs between rounds in two ways: independent mode "
   "samples at τ = 0.7 so each round is a fresh draw, and chained mode refines the current incumbent and "
   "shows the model the earlier candidates with their validation scores, as OPRO does with its "
-  "trajectory ‹22›. We study seven variants (Table 2). Two of them, V1P and V2P, are format-protected: the "
+  "trajectory ‹22›. We study eight variants (Table 2). Two of them, V1P and V2P, are format-protected: the "
   "answer-format line is appended to every candidate, as it is for the rubric-free rewrite and for the "
   "prompts of the base optimizers. They were added after an audit found that the refinement request does not "
   "ask the refiner to keep the answer-format line, which the 1.7B refiner then dropped in most candidates "
-  "(Section 5.2); they are exploratory.")
+  "(Section 5.2); they are exploratory. After the second round of review we added V2F, which tests the treatment "
+  "that the first review asked for: a chained variant whose refinement request tells the refiner to keep the "
+  "answer-format line and every worked example, whose loop starts from P0 extended with one bare-tag worked "
+  "example of the answer format (so that the gate's baseline already carries the format and a candidate "
+  "cannot win merely by restoring it), and in which any candidate that still lacks the format line or the "
+  "example has them re-attached in code. V2F is run on all 45 cells with one MPIR seed.")
 
 TABLE("Table 2. Refinement variants studied. All use the same gate (strict improvement over the "
-      "incumbent on 25 validation questions) and N = 7 rounds. V3 candidates, and those of V1P and V2P, carry "
-      "the answer-format line; V1 and V2 candidates are scored as the refiner wrote them.",
+      "incumbent on 25 validation questions) and N = 7 rounds. V3 candidates, and those of V1P, V2P and V2F, carry "
+      "the answer-format line (V2F also keeps the worked example); V1 and V2 candidates are scored as the refiner wrote them.",
       header=["Variant", "Refines", "History", "Sampling", "Rubric text"],
       rows=[
           ["V0 legacy (as in the pilot)", "P0", "none", "greedy", "original"],
@@ -78,6 +85,8 @@ TABLE("Table 2. Refinement variants studied. All use the same gate (strict impro
           ["V3 gated free rewrite", "P0", "none", "τ = 0.7", "none (no rubric)"],
           ["V1P independent, format-protected", "P0", "none", "τ = 0.7", "corrected"],
           ["V2P chained, format-protected", "incumbent", "scored candidates", "τ = 0.7", "corrected"],
+          ["V2F chained, format- and example-preserving", "incumbent (P0 + bare-tag example)",
+           "scored candidates", "τ = 0.7", "corrected"],
       ], full=True, colw=[0.27, 0.17, 0.22, 0.12, 0.22])
 
 H2("3.3. The Seven-Criteria Rubric")
@@ -151,10 +160,10 @@ P("A candidate is accepted only if its accuracy on the 25 validation questions s
 # ===========================================================================
 H1("4. Experimental Design")
 
-H2("4.1. Pre-Specification and Decision Rules")
+H2("4.1. Protocol Fixed in Advance, Amendments and Decision Rules")
 P("The pilot's go/no-go rule was written in the project's planning document (REBUILD.md, commit 7612aa0, "
   "2026-09-03) before the pilot ran. That is a time-stamped plan in a version-controlled repository, not an "
-  "entry in a public registry, so we describe the study as pre-specified, not pre-registered; several pipeline "
+  "entry in a public registry, so we say that the protocol was fixed in advance, with listed amendments, and do not call the study pre-registered or pre-specified; several pipeline "
   "fixes were also made while the pilot ran (Appendix C). The chronology is: first evaluation and audit "
   "(before September 2026); pilot, 2026-09-04 and 05; first submission to this journal, 2026-09-05; decision "
   "and reviews, 2026-10-19; revision protocol committed 2026-10-19 (commit 8fd1397), before any revised "
@@ -218,7 +227,13 @@ P("The target model is Qwen3-1.7B ‹68› with thinking disabled and greedy dec
   "limit and, for GPT-6 Luna, minimal reasoning effort. Meta-prompt calls allow 1500 (evaluation) and 3000 "
   "(refinement) new tokens. The target and the 1.7B refiner are served with vLLM ‹123› 0.28.0 under WSL2 on one "
   "16 GB RTX 5000 Ada GPU, bf16 weights, a maximum context of 8192 tokens (Appendix C). Greedy decoding is not bit-reproducible under continuous batching, so we measure the "
-  "resulting noise (Section 5.7).")
+  "resulting noise (Section 5.7). The OpenRouter model slugs are qwen/qwen3-235b-a22b-2507 and "
+  "openai/gpt-6-luna; calls were made on 2026-10-20 and 21 through the router, which chooses the serving "
+  "provider, and the provider name and system fingerprint were not logged, so the exact backend build cannot be "
+  "recovered and a re-run could differ if the router's models have changed (Section 6.3.1). The runs added in the "
+  "second revision (V2F, the controls and the rescoring of Section 5.7) were produced on 2026-11-02 in a single "
+  "serving session, vLLM 0.28.0 with --max-num-seqs 192 and --gpu-memory-utilization 0.86; the intermediate "
+  "refiner of Section 5.6.2 is Qwen3-8B-AWQ served locally.")
 
 H2("4.4. Base Optimizers and Conditions")
 P("APE and ProTeGi are clean-room implementations of the published algorithms ‹19,20›, run with few_shot_count "
@@ -257,10 +272,17 @@ P("Accuracy is the share of test examples whose delimited answer equals the gold
   "removing parentheses, whitespace and case (strict extraction, as in the pilot). Because strict "
   "extraction penalizes correct reasoning that is wrapped badly, we add a lenient accuracy computed "
   "offline from the saved raw outputs: the response counts as correct if the delimited span (or, if there "
-  "is none, the last 300 characters) names exactly one option and it is the gold one. Both are reported; "
-  "strict extraction remains primary because MPIR's gate uses it.")
+  "is none, the last 300 characters) names exactly one option and it is the gold one. Both are reported. "
+  "Strict extraction remains the metric of the gate, because MPIR's gate uses it, but it largely measures "
+  "formatting (Section 5.1) and the lenient metric had not been checked against labels. In the second revision we "
+  "therefore validated the lenient parser on a manually labelled sample (Section 5.1.1), restated the decision "
+  "rules D1 to D3 on both metrics, and report both throughout.")
 
 H2("4.6. Statistical Analysis")
+P("The exact acceptance-rate bounds are Clopper-Pearson intervals; because runs of a cell share a base prompt we "
+  "give them over runs and over cells (Section 5.3). Serving variability enters the intervals in two ways: the "
+  "paired bootstrap resamples test examples only, so we also repeat the scoring of every prompt behind an "
+  "exploratory claim in one session and report the change in each cell difference (Section 5.7).")
 P("For every cell we report the paired difference in test accuracy between the final MPIR prompt and P0 "
   "with a 95% paired-bootstrap interval over test examples. Cells with identical prompts have a "
   "difference of zero by construction, apart from serving noise. Across cells we report counts of wins, "

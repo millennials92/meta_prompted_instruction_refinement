@@ -1,0 +1,446 @@
+{
+ "echo": [
+  {
+   "id": "echo-00",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-01",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-02",
+   "verdict": "false_positive",
+   "reason": "task description, output format and reasoning steps with examples; usable though verbose"
+  },
+  {
+   "id": "echo-03",
+   "verdict": "false_positive",
+   "reason": "few-shot examples plus a short usable task instruction (APE-style base format)"
+  },
+  {
+   "id": "echo-04",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-05",
+   "verdict": "true_echo",
+   "reason": "meta text \"generate a variation\" plus pronoun examples, no solving instruction"
+  },
+  {
+   "id": "echo-06",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-07",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-08",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-09",
+   "verdict": "false_positive",
+   "reason": "task description, format and reasoning steps; usable few-shot style prompt"
+  },
+  {
+   "id": "echo-10",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-11",
+   "verdict": "true_echo",
+   "reason": "seven-criteria rubric scoring and suggestions"
+  },
+  {
+   "id": "echo-12",
+   "verdict": "true_echo",
+   "reason": "examples only, no instruction at all"
+  },
+  {
+   "id": "echo-13",
+   "verdict": "true_echo",
+   "reason": "copy of rubric header plus an answered question and meta commentary"
+  },
+  {
+   "id": "echo-14",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-15",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-16",
+   "verdict": "true_echo",
+   "reason": "induction text with muddled guidelines and a worked reasoning that is task-instance specific"
+  },
+  {
+   "id": "echo-17",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-18",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-19",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-20",
+   "verdict": "true_echo",
+   "reason": "induction text with wrong principle (adjectives follow the noun) and circular conclusion"
+  },
+  {
+   "id": "echo-21",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-22",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-23",
+   "verdict": "false_positive",
+   "reason": "few-shot examples plus instruction on answer format and reasoning; usable prompt"
+  },
+  {
+   "id": "echo-24",
+   "verdict": "true_echo",
+   "reason": "rubric-style list of improvement suggestions"
+  },
+  {
+   "id": "echo-25",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-26",
+   "verdict": "true_echo",
+   "reason": "rubric-style list of suggestions"
+  },
+  {
+   "id": "echo-27",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-28",
+   "verdict": "true_echo",
+   "reason": "repetitive rambling with an incorrect rule, degenerate"
+  },
+  {
+   "id": "echo-29",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-30",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-31",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-32",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-33",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-34",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-35",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-36",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-37",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-38",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  },
+  {
+   "id": "echo-39",
+   "verdict": "true_echo",
+   "reason": "begins with the rubric Task Overview header/Prompt Under Evaluation and continues with a question and worked answer, not a prompt"
+  }
+ ],
+ "fallback": [
+  {
+   "id": "fallback-00",
+   "cause": "other",
+   "recoverable": false,
+   "reason": "restates the instance question with options, not a prompt; closed with </START>"
+  },
+  {
+   "id": "fallback-01",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-02",
+   "cause": "refined_prompt_without_end",
+   "recoverable": false,
+   "reason": "real prompt then rubric critique appended; <END> missing; contaminated, not clean"
+  },
+  {
+   "id": "fallback-03",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-04",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-05",
+   "cause": "refined_prompt_without_end",
+   "recoverable": true,
+   "reason": "task-specific generic SVG shape prompt, usable"
+  },
+  {
+   "id": "fallback-06",
+   "cause": "refined_prompt_without_end",
+   "recoverable": true,
+   "reason": "generic step-by-step prompt, closed with </START>; usable"
+  },
+  {
+   "id": "fallback-07",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-08",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-09",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-10",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-11",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-12",
+   "cause": "refined_prompt_without_end",
+   "recoverable": false,
+   "reason": "prompt skeleton then suggestion list appended; contaminated, not clean"
+  },
+  {
+   "id": "fallback-13",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-14",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-15",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-16",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-17",
+   "cause": "refined_prompt_without_end",
+   "recoverable": true,
+   "reason": "few-shot plus instruction (weak rule) closed with </END>; usable form"
+  },
+  {
+   "id": "fallback-18",
+   "cause": "other",
+   "recoverable": false,
+   "reason": "prompt about wrong task (algebra) closed with </START>; unusable"
+  },
+  {
+   "id": "fallback-19",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-20",
+   "cause": "refined_prompt_without_end",
+   "recoverable": false,
+   "reason": "real prompt then rubric critique appended; contaminated, not clean"
+  },
+  {
+   "id": "fallback-21",
+   "cause": "other",
+   "recoverable": false,
+   "reason": "same instance-question restatement; </START>"
+  },
+  {
+   "id": "fallback-22",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-23",
+   "cause": "refined_prompt_without_end",
+   "recoverable": true,
+   "reason": "generic structured prompt, closed with </END>; usable"
+  },
+  {
+   "id": "fallback-24",
+   "cause": "refined_prompt_without_end",
+   "recoverable": true,
+   "reason": "few-shot plus principle and steps, closed with </START>; usable"
+  },
+  {
+   "id": "fallback-25",
+   "cause": "refined_prompt_without_end",
+   "recoverable": false,
+   "reason": "quoted refined prompt then rubric scoring appended; contaminated, not clean"
+  },
+  {
+   "id": "fallback-26",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-27",
+   "cause": "other",
+   "recoverable": false,
+   "reason": "same instance-question restatement; </START>"
+  },
+  {
+   "id": "fallback-28",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-29",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-30",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-31",
+   "cause": "refined_prompt_without_end",
+   "recoverable": true,
+   "reason": "few-shot plus task statement, closed with </END>; usable"
+  },
+  {
+   "id": "fallback-32",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-33",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-34",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-35",
+   "cause": "other",
+   "recoverable": false,
+   "reason": "question restatement with placeholder; </START>"
+  },
+  {
+   "id": "fallback-36",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-37",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-38",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  },
+  {
+   "id": "fallback-39",
+   "cause": "no_refined_prompt",
+   "recoverable": false,
+   "reason": "text after <START> is rubric critique/meta-suggestions rather than a task prompt"
+  }
+ ]
+}

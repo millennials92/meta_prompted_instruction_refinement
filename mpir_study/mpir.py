@@ -15,9 +15,10 @@ from pathlib import Path
 from .client import REFINERS, Endpoint, chat
 from .data import Cell, load_p0
 from .scoring import Scorer, prompt_hash
-from .templates import (ANSWER_FORMAT, CORRECTED_RUBRIC, ECHO_MARKERS, FREE_REWRITE_PROMPT, HISTORY_REQUEST,
-                        IMPROVED_PROMPT, ORIGINAL_RUBRIC, REFINEMENT_REQUEST, REPO, TEXT_DELIMITER,
-                        final_prompt_template, parse_rubric_total)
+from .exemplar import first_exemplar, with_exemplar
+from .templates import (ANSWER_FORMAT, CORRECTED_RUBRIC, ECHO_MARKERS, EXEMPLAR_HEADER, FREE_REWRITE_PROMPT,
+                        HISTORY_REQUEST, HISTORY_REQUEST_F, IMPROVED_PROMPT, ORIGINAL_RUBRIC, REFINEMENT_REQUEST,
+                        REFINEMENT_REQUEST_F, REPO, TEXT_DELIMITER, final_prompt_template, parse_rubric_total)
 
 ROUNDS_DIR = REPO / "results" / "revision" / "rounds"
 GEN_DIR = REPO / "results" / "revision" / "gen_cache"
@@ -25,7 +26,7 @@ TEMPERATURE = 0.7  # plain temperature sampling; top-p was dropped (vLLM's non-f
 EVAL_MAX_TOKENS, REFINE_MAX_TOKENS = 1500, 3000
 HISTORY_KEEP, HISTORY_CHARS = 4, 800
 VALIDATION_REPS = 3
-VARIANTS = ("v0", "v1", "v2", "v2l", "v3", "v1p", "v2p")
+VARIANTS = ("v0", "v1", "v2", "v2l", "v3", "v1p", "v2p", "v2f")
 
 
 def base_variant(variant: str) -> str:
@@ -35,6 +36,23 @@ def base_variant(variant: str) -> str:
 
 def is_protected(variant: str) -> bool:
     return variant in ("v3", "v1p", "v2p")
+
+
+def start_prompt(spec: "RunSpec") -> str:
+    """The prompt the loop starts from: P0, or for v2f P0 plus the bare-tag worked example (so that the gate's
+    baseline already carries the format and a candidate cannot win merely by restoring it)."""
+    p0 = load_p0(spec.cell)
+    return with_exemplar(p0, spec.cell.task) if spec.variant == "v2f" else p0
+
+
+def protect_candidate(raw: str, task: str) -> str:
+    """v2f candidate: the refined text with the answer-format line and the worked example re-attached if missing."""
+    text = raw.strip()
+    if ANSWER_FORMAT not in text:
+        text += "\n\n" + ANSWER_FORMAT
+    if EXEMPLAR_HEADER not in text:
+        text += "\n\n" + EXEMPLAR_HEADER + "\n\n" + first_exemplar(task) + "\n"
+    return text
 
 
 @dataclass(frozen=True)
@@ -107,11 +125,13 @@ def _generate_uncached(spec: RunSpec, refiner: Endpoint, source: str, round_no: 
         raw = chat(refiner, [{"role": "user", "content": FREE_REWRITE_PROMPT.format(prompt=source, variant_instruction="")}],
                    max_tokens=REFINE_MAX_TOKENS, seed=_seed(spec, round_no, 1), **kwargs)
         return {"judge_text": None, "refine_text": raw, "raw_candidate": raw.strip() or None}
-    rubric = CORRECTED_RUBRIC if variant in ("v1", "v2") else ORIGINAL_RUBRIC
+    rubric = CORRECTED_RUBRIC if variant in ("v1", "v2", "v2f") else ORIGINAL_RUBRIC
     messages = [{"role": "user", "content": rubric.format(prompt=source)}]
     judge_text = chat(refiner, messages, max_tokens=EVAL_MAX_TOKENS, seed=_seed(spec, round_no, 1), **kwargs)
-    request = (HISTORY_REQUEST.format(history=_history_block(history))
-               if variant in ("v2", "v2l") and history else REFINEMENT_REQUEST)
+    chained = variant in ("v2", "v2l", "v2f")
+    history_request = HISTORY_REQUEST_F if variant == "v2f" else HISTORY_REQUEST
+    request = (history_request.format(history=_history_block(history)) if chained and history
+               else REFINEMENT_REQUEST_F if variant == "v2f" else REFINEMENT_REQUEST)
     messages = messages + [{"role": "assistant", "content": judge_text}, {"role": "user", "content": request}]
     refine_text = chat(refiner, messages, max_tokens=REFINE_MAX_TOKENS, seed=_seed(spec, round_no, 2), **kwargs)
     return {"judge_text": judge_text, "refine_text": refine_text, "raw_candidate": _extract_candidate(refine_text)}
@@ -123,7 +143,9 @@ def _classify(spec: RunSpec, raw_candidate: str | None, source: str, p0: str, se
         return "fallback", None
     if spec.variant != "v3" and any(marker in raw_candidate for marker in ECHO_MARKERS):
         return "echo", None
-    if is_protected(spec.variant):
+    if spec.variant == "v2f":
+        prompt = protect_candidate(raw_candidate, spec.cell.task)
+    elif is_protected(spec.variant):
         prompt = final_prompt_template().format(instruction=raw_candidate.strip(), few_shot_examples="",
                                                 answer_format=ANSWER_FORMAT)
     else:
@@ -138,12 +160,13 @@ def run_refinement(spec: RunSpec, scorer: Scorer, oracle: bool = False) -> dict:
     if spec.path.exists():
         return json.loads(spec.path.read_text(encoding="utf-8"))
     refiner = REFINERS[spec.refiner]
-    p0 = load_p0(spec.cell)
+    true_p0 = load_p0(spec.cell)
+    p0 = start_prompt(spec)
     baseline = scorer.score(p0, "val", 0).accuracy
     best_prompt, best_val, seen, history, records = p0, baseline, {prompt_hash(p0)}, [], []
 
     for round_no in range(1, spec.rounds + 1):
-        source = best_prompt if base_variant(spec.variant) in ("v2", "v2l") else p0
+        source = best_prompt if base_variant(spec.variant) in ("v2", "v2l", "v2f") else p0
         generated = _generate(spec, refiner, source, round_no, history)
         outcome, candidate = _classify(spec, generated["raw_candidate"], source, p0, seen)
         judge_total, judge_max = parse_rubric_total(generated["judge_text"] or "")
@@ -165,6 +188,7 @@ def run_refinement(spec: RunSpec, scorer: Scorer, oracle: bool = False) -> dict:
 
     final_test = scorer.score(best_prompt, "test", 0)
     p0_test = scorer.score(p0, "test", 0)
+    true_p0_test = scorer.score(true_p0, "test", 0)
     if oracle:
         for record in records:
             if record["outcome"] == "validated":
@@ -172,7 +196,8 @@ def run_refinement(spec: RunSpec, scorer: Scorer, oracle: bool = False) -> dict:
     result = {"spec": {**asdict(spec), "cell": asdict(spec.cell)}, "p0_hash": prompt_hash(p0),
               "baseline_val": baseline, "final_hash": prompt_hash(best_prompt),
               "final_is_p0": best_prompt == p0, "p0_test": p0_test.accuracy, "final_test": final_test.accuracy,
-              "n_test": len(final_test.correct),
+              "n_test": len(final_test.correct), "true_p0_test": true_p0_test.accuracy,
+              "paired_true_p0": list(true_p0_test.correct),
               "paired": {"p0": list(p0_test.correct), "final": list(final_test.correct)},
               "rounds": records}
     ROUNDS_DIR.mkdir(parents=True, exist_ok=True)
