@@ -1,0 +1,49 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{times}
+\usepackage{url}
+\usepackage{parskip}
+\setlength{\parindent}{0pt}
+\begin{document}
+\begin{flushright}
+November 2, 2026
+\end{flushright}
+
+\textbf{Manuscript ID:} Access-2026-54235 (initial submission: Access-2026-44920)\\
+\textbf{Revised title:} Does Rubric-Guided Self-Refinement Improve Prompts from Small-Model Optimizers? A Scoped
+Negative-Result Study with Qwen3-1.7B\\
+\textbf{Manuscript type:} Negative Result\\
+\textbf{Corresponding author:} Quang-Vinh Dang (British University Vietnam), \url{vinh.dq4@buv.edu.vn}
+
+\bigskip
+Dear Editor,
+
+Thank you for the opportunity to resubmit. The reviews of Access-2026-54235 identified one central problem: the primary
+treatment dropped the answer format in almost all candidates, so the null result could not show that rubric-guided
+refinement fails. The revised manuscript addresses it with new experiments and a narrower scope.
+
+\medskip
+What changed. (i) A positive control: the validation gate accepted a known-good candidate in 24 of 26 cells in which it helps.
+(ii) A re-run of the main grid with a format- and example-preserving treatment on 44 cells: candidates were accepted in
+15 runs, but under a lenient metric the final prompts won in 1 cell(s) and lost significantly in 3.
+(iii) A validation of the lenient parser on 400 labelled responses (precision 98.4\%, recall 96.8\%); the labels
+and the audit of 80 sampled echo and fallback rounds were produced by a language-model assistant, not by human raters, and
+the manuscript says so. (iv) Exact acceptance bounds (5.8\% one-sided for 1 acceptance in 80 runs; the earlier 7\% was
+the two-sided value), a paired comparison of the rubric-guided and rubric-free variants, a single-session rescoring of the
+exploratory prompts, an intermediate open-weight refiner (Qwen3-8B, 1 of 9 runs changed the prompt), cost per
+variant, and a list of all base prompts. (v) The title and claims now state the scope (Qwen3-1.7B, nine tasks, weak base
+prompts), and ``pre-specified'' is replaced by ``protocol fixed in advance, with listed amendments''.
+
+\medskip
+What we could not do. We have no second target family, we could not rerun the strong closed and large refiners (no router
+access at this time), and we collected no human ratings. The paper lists these limits.
+
+\medskip
+This manuscript is not under review elsewhere, and all authors have approved this submission. The author list is unchanged,
+so no byline-change form is enclosed. All code, per-round logs, samples and labels are at
+\url{https://github.com/millennials92/meta_prompted_instruction_refinement}.
+
+\bigskip
+On behalf of all authors,\\
+Quang-Vinh Dang
+\end{document}

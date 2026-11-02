@@ -6,17 +6,6 @@
    "disambiguation_qa__ape__s42": {
     "lenient": {
      "vs_start": {
-      "diff": 0.085,
-      "lo": 0.0,
-      "hi": 0.175,
-      "n": 200,
-      "discordant": 77,
-      "gained": 47,
-      "lost": 30
-     },
-     "win_vs_start": false,
-     "loss_vs_start": false,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -24,6 +13,17 @@
       "discordant": 0,
       "gained": 0,
       "lost": 0
+     },
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": -0.085,
+      "lo": -0.175,
+      "hi": 0.0,
+      "n": 200,
+      "discordant": 77,
+      "gained": 30,
+      "lost": 47
      },
      "win_vs_p0": false
     },
@@ -58,17 +58,6 @@
    "disambiguation_qa__promptwizard__s42": {
     "lenient": {
      "vs_start": {
-      "diff": -0.14,
-      "lo": -0.235,
-      "hi": -0.045,
-      "n": 200,
-      "discordant": 96,
-      "gained": 34,
-      "lost": 62
-     },
-     "win_vs_start": false,
-     "loss_vs_start": true,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -77,7 +66,18 @@
       "gained": 0,
       "lost": 0
      },
-     "win_vs_p0": false
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": 0.14,
+      "lo": 0.045,
+      "hi": 0.235,
+      "n": 200,
+      "discordant": 96,
+      "gained": 62,
+      "lost": 34
+     },
+     "win_vs_p0": true
     },
     "task": "disambiguation_qa",
     "optimizer": "promptwizard",
@@ -110,17 +110,6 @@
    "disambiguation_qa__protegi__s42": {
     "lenient": {
      "vs_start": {
-      "diff": 0.065,
-      "lo": -0.025,
-      "hi": 0.155,
-      "n": 200,
-      "discordant": 87,
-      "gained": 50,
-      "lost": 37
-     },
-     "win_vs_start": false,
-     "loss_vs_start": false,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -128,6 +117,17 @@
       "discordant": 0,
       "gained": 0,
       "lost": 0
+     },
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": -0.065,
+      "lo": -0.155,
+      "hi": 0.025,
+      "n": 200,
+      "discordant": 87,
+      "gained": 37,
+      "lost": 50
      },
      "win_vs_p0": false
     },
@@ -214,17 +214,6 @@
    "geometric_shapes__protegi__s42": {
     "lenient": {
      "vs_start": {
-      "diff": 0.07,
-      "lo": -0.01,
-      "hi": 0.15,
-      "n": 200,
-      "discordant": 66,
-      "gained": 40,
-      "lost": 26
-     },
-     "win_vs_start": false,
-     "loss_vs_start": false,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -232,6 +221,17 @@
       "discordant": 0,
       "gained": 0,
       "lost": 0
+     },
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": -0.07,
+      "lo": -0.15,
+      "hi": 0.01,
+      "n": 200,
+      "discordant": 66,
+      "gained": 26,
+      "lost": 40
      },
      "win_vs_p0": false
     },
@@ -266,17 +266,6 @@
    "hyperbaton__ape__s42": {
     "lenient": {
      "vs_start": {
-      "diff": -0.065,
-      "lo": -0.125,
-      "hi": -0.005,
-      "n": 200,
-      "discordant": 39,
-      "gained": 13,
-      "lost": 26
-     },
-     "win_vs_start": false,
-     "loss_vs_start": true,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -285,7 +274,18 @@
       "gained": 0,
       "lost": 0
      },
-     "win_vs_p0": false
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": 0.065,
+      "lo": 0.005,
+      "hi": 0.125,
+      "n": 200,
+      "discordant": 39,
+      "gained": 26,
+      "lost": 13
+     },
+     "win_vs_p0": true
     },
     "task": "hyperbaton",
     "optimizer": "ape",
@@ -318,17 +318,6 @@
    "hyperbaton__ape__s43": {
     "lenient": {
      "vs_start": {
-      "diff": -0.06,
-      "lo": -0.13,
-      "hi": 0.01,
-      "n": 200,
-      "discordant": 52,
-      "gained": 20,
-      "lost": 32
-     },
-     "win_vs_start": false,
-     "loss_vs_start": false,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -336,6 +325,17 @@
       "discordant": 0,
       "gained": 0,
       "lost": 0
+     },
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": 0.06,
+      "lo": -0.01,
+      "hi": 0.13,
+      "n": 200,
+      "discordant": 52,
+      "gained": 32,
+      "lost": 20
      },
      "win_vs_p0": false
     },
@@ -370,17 +370,6 @@
    "hyperbaton__ape__s44": {
     "lenient": {
      "vs_start": {
-      "diff": 0.015,
-      "lo": -0.01,
-      "hi": 0.04,
-      "n": 200,
-      "discordant": 7,
-      "gained": 5,
-      "lost": 2
-     },
-     "win_vs_start": false,
-     "loss_vs_start": false,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -388,6 +377,17 @@
       "discordant": 0,
       "gained": 0,
       "lost": 0
+     },
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": -0.015,
+      "lo": -0.04,
+      "hi": 0.01,
+      "n": 200,
+      "discordant": 7,
+      "gained": 2,
+      "lost": 5
      },
      "win_vs_p0": false
     },
@@ -526,17 +526,6 @@
    "hyperbaton__promptwizard__s44": {
     "lenient": {
      "vs_start": {
-      "diff": 0.075,
-      "lo": -0.005,
-      "hi": 0.155,
-      "n": 200,
-      "discordant": 67,
-      "gained": 41,
-      "lost": 26
-     },
-     "win_vs_start": false,
-     "loss_vs_start": false,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -544,6 +533,17 @@
       "discordant": 0,
       "gained": 0,
       "lost": 0
+     },
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": -0.075,
+      "lo": -0.155,
+      "hi": 0.005,
+      "n": 200,
+      "discordant": 67,
+      "gained": 26,
+      "lost": 41
      },
      "win_vs_p0": false
     },
@@ -630,17 +630,6 @@
    "hyperbaton__protegi__s43": {
     "lenient": {
      "vs_start": {
-      "diff": -0.12,
-      "lo": -0.205,
-      "hi": -0.03,
-      "n": 200,
-      "discordant": 82,
-      "gained": 29,
-      "lost": 53
-     },
-     "win_vs_start": false,
-     "loss_vs_start": true,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -649,7 +638,18 @@
       "gained": 0,
       "lost": 0
      },
-     "win_vs_p0": false
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": 0.12,
+      "lo": 0.03,
+      "hi": 0.205,
+      "n": 200,
+      "discordant": 82,
+      "gained": 53,
+      "lost": 29
+     },
+     "win_vs_p0": true
     },
     "task": "hyperbaton",
     "optimizer": "protegi",
@@ -734,17 +734,6 @@
    "movie_recommendation__ape__s42": {
     "lenient": {
      "vs_start": {
-      "diff": -0.1,
-      "lo": -0.165,
-      "hi": -0.035,
-      "n": 200,
-      "discordant": 46,
-      "gained": 13,
-      "lost": 33
-     },
-     "win_vs_start": false,
-     "loss_vs_start": true,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -753,7 +742,18 @@
       "gained": 0,
       "lost": 0
      },
-     "win_vs_p0": false
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": 0.1,
+      "lo": 0.035,
+      "hi": 0.165,
+      "n": 200,
+      "discordant": 46,
+      "gained": 33,
+      "lost": 13
+     },
+     "win_vs_p0": true
     },
     "task": "movie_recommendation",
     "optimizer": "ape",
@@ -786,17 +786,6 @@
    "movie_recommendation__promptwizard__s42": {
     "lenient": {
      "vs_start": {
-      "diff": -0.02,
-      "lo": -0.09,
-      "hi": 0.05,
-      "n": 200,
-      "discordant": 50,
-      "gained": 23,
-      "lost": 27
-     },
-     "win_vs_start": false,
-     "loss_vs_start": false,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -804,6 +793,17 @@
       "discordant": 0,
       "gained": 0,
       "lost": 0
+     },
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": 0.02,
+      "lo": -0.05,
+      "hi": 0.09,
+      "n": 200,
+      "discordant": 50,
+      "gained": 27,
+      "lost": 23
      },
      "win_vs_p0": false
     },
@@ -838,17 +838,6 @@
    "movie_recommendation__protegi__s42": {
     "lenient": {
      "vs_start": {
-      "diff": -0.175,
-      "lo": -0.255,
-      "hi": -0.095,
-      "n": 200,
-      "discordant": 73,
-      "gained": 19,
-      "lost": 54
-     },
-     "win_vs_start": false,
-     "loss_vs_start": true,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -857,7 +846,18 @@
       "gained": 0,
       "lost": 0
      },
-     "win_vs_p0": false
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": 0.175,
+      "lo": 0.095,
+      "hi": 0.255,
+      "n": 200,
+      "discordant": 73,
+      "gained": 54,
+      "lost": 19
+     },
+     "win_vs_p0": true
     },
     "task": "movie_recommendation",
     "optimizer": "protegi",
@@ -942,17 +942,6 @@
    "penguins_in_a_table__ape__s43": {
     "lenient": {
      "vs_start": {
-      "diff": -0.020833333333333332,
-      "lo": -0.13541666666666666,
-      "hi": 0.09375,
-      "n": 96,
-      "discordant": 30,
-      "gained": 14,
-      "lost": 16
-     },
-     "win_vs_start": false,
-     "loss_vs_start": false,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -960,6 +949,17 @@
       "discordant": 0,
       "gained": 0,
       "lost": 0
+     },
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": 0.020833333333333332,
+      "lo": -0.09375,
+      "hi": 0.13541666666666666,
+      "n": 96,
+      "discordant": 30,
+      "gained": 16,
+      "lost": 14
      },
      "win_vs_p0": false
     },
@@ -1046,17 +1046,6 @@
    "penguins_in_a_table__promptwizard__s42": {
     "lenient": {
      "vs_start": {
-      "diff": -0.052083333333333336,
-      "lo": -0.125,
-      "hi": 0.020833333333333332,
-      "n": 96,
-      "discordant": 13,
-      "gained": 4,
-      "lost": 9
-     },
-     "win_vs_start": false,
-     "loss_vs_start": false,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -1064,6 +1053,17 @@
       "discordant": 0,
       "gained": 0,
       "lost": 0
+     },
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": 0.052083333333333336,
+      "lo": -0.020833333333333332,
+      "hi": 0.125,
+      "n": 96,
+      "discordant": 13,
+      "gained": 9,
+      "lost": 4
      },
      "win_vs_p0": false
     },
@@ -1150,17 +1150,6 @@
    "penguins_in_a_table__promptwizard__s44": {
     "lenient": {
      "vs_start": {
-      "diff": 0.010416666666666666,
-      "lo": -0.07291666666666667,
-      "hi": 0.09375,
-      "n": 96,
-      "discordant": 19,
-      "gained": 10,
-      "lost": 9
-     },
-     "win_vs_start": false,
-     "loss_vs_start": false,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -1168,6 +1157,17 @@
       "discordant": 0,
       "gained": 0,
       "lost": 0
+     },
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": -0.010416666666666666,
+      "lo": -0.09375,
+      "hi": 0.07291666666666667,
+      "n": 96,
+      "discordant": 19,
+      "gained": 9,
+      "lost": 10
      },
      "win_vs_p0": false
     },
@@ -1202,17 +1202,6 @@
    "penguins_in_a_table__protegi__s42": {
     "lenient": {
      "vs_start": {
-      "diff": -0.19791666666666666,
-      "lo": -0.3125,
-      "hi": -0.07291666666666667,
-      "n": 96,
-      "discordant": 39,
-      "gained": 10,
-      "lost": 29
-     },
-     "win_vs_start": false,
-     "loss_vs_start": true,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -1221,7 +1210,18 @@
       "gained": 0,
       "lost": 0
      },
-     "win_vs_p0": false
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": 0.19791666666666666,
+      "lo": 0.07291666666666667,
+      "hi": 0.3125,
+      "n": 96,
+      "discordant": 39,
+      "gained": 29,
+      "lost": 10
+     },
+     "win_vs_p0": true
     },
     "task": "penguins_in_a_table",
     "optimizer": "protegi",
@@ -1254,17 +1254,6 @@
    "penguins_in_a_table__protegi__s43": {
     "lenient": {
      "vs_start": {
-      "diff": -0.2604166666666667,
-      "lo": -0.3854166666666667,
-      "hi": -0.13541666666666666,
-      "n": 96,
-      "discordant": 43,
-      "gained": 9,
-      "lost": 34
-     },
-     "win_vs_start": false,
-     "loss_vs_start": true,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -1273,7 +1262,18 @@
       "gained": 0,
       "lost": 0
      },
-     "win_vs_p0": false
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": 0.2604166666666667,
+      "lo": 0.13541666666666666,
+      "hi": 0.3854166666666667,
+      "n": 96,
+      "discordant": 43,
+      "gained": 34,
+      "lost": 9
+     },
+     "win_vs_p0": true
     },
     "task": "penguins_in_a_table",
     "optimizer": "protegi",
@@ -1306,17 +1306,6 @@
    "penguins_in_a_table__protegi__s44": {
     "lenient": {
      "vs_start": {
-      "diff": -0.23958333333333334,
-      "lo": -0.3541666666666667,
-      "hi": -0.11458333333333333,
-      "n": 96,
-      "discordant": 39,
-      "gained": 8,
-      "lost": 31
-     },
-     "win_vs_start": false,
-     "loss_vs_start": true,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -1325,7 +1314,18 @@
       "gained": 0,
       "lost": 0
      },
-     "win_vs_p0": false
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": 0.23958333333333334,
+      "lo": 0.11458333333333333,
+      "hi": 0.3541666666666667,
+      "n": 96,
+      "discordant": 39,
+      "gained": 31,
+      "lost": 8
+     },
+     "win_vs_p0": true
     },
     "task": "penguins_in_a_table",
     "optimizer": "protegi",
@@ -1410,17 +1410,6 @@
    "ruin_names__ape__s43": {
     "lenient": {
      "vs_start": {
-      "diff": 0.455,
-      "lo": 0.385,
-      "hi": 0.525,
-      "n": 200,
-      "discordant": 91,
-      "gained": 91,
-      "lost": 0
-     },
-     "win_vs_start": true,
-     "loss_vs_start": false,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -1428,6 +1417,17 @@
       "discordant": 0,
       "gained": 0,
       "lost": 0
+     },
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": -0.455,
+      "lo": -0.525,
+      "hi": -0.385,
+      "n": 200,
+      "discordant": 91,
+      "gained": 0,
+      "lost": 91
      },
      "win_vs_p0": false
     },
@@ -1462,17 +1462,6 @@
    "ruin_names__ape__s44": {
     "lenient": {
      "vs_start": {
-      "diff": 0.06,
-      "lo": -0.025,
-      "hi": 0.145,
-      "n": 200,
-      "discordant": 78,
-      "gained": 45,
-      "lost": 33
-     },
-     "win_vs_start": false,
-     "loss_vs_start": false,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -1480,6 +1469,17 @@
       "discordant": 0,
       "gained": 0,
       "lost": 0
+     },
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": -0.06,
+      "lo": -0.145,
+      "hi": 0.025,
+      "n": 200,
+      "discordant": 78,
+      "gained": 33,
+      "lost": 45
      },
      "win_vs_p0": false
     },
@@ -1514,17 +1514,6 @@
    "ruin_names__promptwizard__s42": {
     "lenient": {
      "vs_start": {
-      "diff": 0.01,
-      "lo": -0.06,
-      "hi": 0.08,
-      "n": 200,
-      "discordant": 52,
-      "gained": 27,
-      "lost": 25
-     },
-     "win_vs_start": false,
-     "loss_vs_start": false,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -1532,6 +1521,17 @@
       "discordant": 0,
       "gained": 0,
       "lost": 0
+     },
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": -0.01,
+      "lo": -0.08,
+      "hi": 0.06,
+      "n": 200,
+      "discordant": 52,
+      "gained": 25,
+      "lost": 27
      },
      "win_vs_p0": false
     },
@@ -1566,17 +1566,6 @@
    "ruin_names__promptwizard__s43": {
     "lenient": {
      "vs_start": {
-      "diff": 0.025,
-      "lo": -0.035,
-      "hi": 0.085,
-      "n": 200,
-      "discordant": 37,
-      "gained": 21,
-      "lost": 16
-     },
-     "win_vs_start": false,
-     "loss_vs_start": false,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -1584,6 +1573,17 @@
       "discordant": 0,
       "gained": 0,
       "lost": 0
+     },
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": -0.025,
+      "lo": -0.085,
+      "hi": 0.035,
+      "n": 200,
+      "discordant": 37,
+      "gained": 16,
+      "lost": 21
      },
      "win_vs_p0": false
     },
@@ -1670,17 +1670,6 @@
    "ruin_names__protegi__s42": {
     "lenient": {
      "vs_start": {
-      "diff": -0.04,
-      "lo": -0.12,
-      "hi": 0.04,
-      "n": 200,
-      "discordant": 68,
-      "gained": 30,
-      "lost": 38
-     },
-     "win_vs_start": false,
-     "loss_vs_start": false,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -1688,6 +1677,17 @@
       "discordant": 0,
       "gained": 0,
       "lost": 0
+     },
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": 0.04,
+      "lo": -0.04,
+      "hi": 0.12,
+      "n": 200,
+      "discordant": 68,
+      "gained": 38,
+      "lost": 30
      },
      "win_vs_p0": false
     },
@@ -1826,17 +1826,6 @@
    "salient_translation_error_detection__ape__s42": {
     "lenient": {
      "vs_start": {
-      "diff": -0.065,
-      "lo": -0.14,
-      "hi": 0.005,
-      "n": 200,
-      "discordant": 55,
-      "gained": 21,
-      "lost": 34
-     },
-     "win_vs_start": false,
-     "loss_vs_start": false,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -1844,6 +1833,17 @@
       "discordant": 0,
       "gained": 0,
       "lost": 0
+     },
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": 0.065,
+      "lo": -0.005,
+      "hi": 0.14,
+      "n": 200,
+      "discordant": 55,
+      "gained": 34,
+      "lost": 21
      },
      "win_vs_p0": false
     },
@@ -1878,17 +1878,6 @@
    "salient_translation_error_detection__promptwizard__s42": {
     "lenient": {
      "vs_start": {
-      "diff": -0.035,
-      "lo": -0.085,
-      "hi": 0.015,
-      "n": 200,
-      "discordant": 25,
-      "gained": 9,
-      "lost": 16
-     },
-     "win_vs_start": false,
-     "loss_vs_start": false,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -1896,6 +1885,17 @@
       "discordant": 0,
       "gained": 0,
       "lost": 0
+     },
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": 0.035,
+      "lo": -0.015,
+      "hi": 0.085,
+      "n": 200,
+      "discordant": 25,
+      "gained": 16,
+      "lost": 9
      },
      "win_vs_p0": false
     },
@@ -1982,17 +1982,6 @@
    "sports_understanding__ape__s42": {
     "lenient": {
      "vs_start": {
-      "diff": -0.09,
-      "lo": -0.17,
-      "hi": -0.01,
-      "n": 200,
-      "discordant": 68,
-      "gained": 25,
-      "lost": 43
-     },
-     "win_vs_start": false,
-     "loss_vs_start": true,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -2001,7 +1990,18 @@
       "gained": 0,
       "lost": 0
      },
-     "win_vs_p0": false
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": 0.09,
+      "lo": 0.01,
+      "hi": 0.17,
+      "n": 200,
+      "discordant": 68,
+      "gained": 43,
+      "lost": 25
+     },
+     "win_vs_p0": true
     },
     "task": "sports_understanding",
     "optimizer": "ape",
@@ -2034,17 +2034,6 @@
    "sports_understanding__promptwizard__s42": {
     "lenient": {
      "vs_start": {
-      "diff": -0.04,
-      "lo": -0.1,
-      "hi": 0.02,
-      "n": 200,
-      "discordant": 36,
-      "gained": 14,
-      "lost": 22
-     },
-     "win_vs_start": false,
-     "loss_vs_start": false,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -2052,6 +2041,17 @@
       "discordant": 0,
       "gained": 0,
       "lost": 0
+     },
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": 0.04,
+      "lo": -0.02,
+      "hi": 0.1,
+      "n": 200,
+      "discordant": 36,
+      "gained": 22,
+      "lost": 14
      },
      "win_vs_p0": false
     },
@@ -2138,17 +2138,6 @@
    "temporal_sequences__ape__s42": {
     "lenient": {
      "vs_start": {
-      "diff": -0.085,
-      "lo": -0.16,
-      "hi": -0.005,
-      "n": 200,
-      "discordant": 63,
-      "gained": 23,
-      "lost": 40
-     },
-     "win_vs_start": false,
-     "loss_vs_start": true,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -2157,7 +2146,18 @@
       "gained": 0,
       "lost": 0
      },
-     "win_vs_p0": false
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": 0.085,
+      "lo": 0.005,
+      "hi": 0.16,
+      "n": 200,
+      "discordant": 63,
+      "gained": 40,
+      "lost": 23
+     },
+     "win_vs_p0": true
     },
     "task": "temporal_sequences",
     "optimizer": "ape",
@@ -2242,17 +2242,6 @@
    "temporal_sequences__protegi__s42": {
     "lenient": {
      "vs_start": {
-      "diff": -0.05,
-      "lo": -0.135,
-      "hi": 0.04,
-      "n": 200,
-      "discordant": 78,
-      "gained": 34,
-      "lost": 44
-     },
-     "win_vs_start": false,
-     "loss_vs_start": false,
-     "vs_p0": {
       "diff": 0.0,
       "lo": 0.0,
       "hi": 0.0,
@@ -2260,6 +2249,17 @@
       "discordant": 0,
       "gained": 0,
       "lost": 0
+     },
+     "win_vs_start": false,
+     "loss_vs_start": false,
+     "vs_p0": {
+      "diff": 0.05,
+      "lo": -0.04,
+      "hi": 0.135,
+      "n": 200,
+      "discordant": 78,
+      "gained": 44,
+      "lost": 34
      },
      "win_vs_p0": false
     },
@@ -2305,10 +2305,10 @@
   "val_equal": 12,
   "val_worse": 60,
   "lenient_cells": 44,
-  "lenient_wins_vs_start": 2,
-  "lenient_losses_vs_start": 13,
-  "lenient_wins_vs_p0": 3,
-  "lenient_mean_diff_vs_start": -0.026742424242424245,
+  "lenient_wins_vs_start": 1,
+  "lenient_losses_vs_start": 3,
+  "lenient_wins_vs_p0": 13,
+  "lenient_mean_diff_vs_start": -0.0043465909090909085,
   "wins_vs_start": 4,
   "wins_vs_p0": 27,
   "mean_diff_vs_start": 0.007149621212121213,
@@ -3367,7 +3367,9 @@
    }
   },
   "n": 45,
-  "gate_accepts_exemplar": 29
+  "gate_accepts_exemplar": 29,
+  "known_good_cells": 26,
+  "known_good_accepted": 24
  },
  "rescore": {
   "groups": {

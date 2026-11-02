@@ -32,7 +32,7 @@ P(f"With Qwen3-1.7B as target and refiner, the rubric-guided layer as originally
   "93-95% of the candidates lost it and scored zero under strict extraction, and about 60% of rounds never produced a "
   "usable candidate. We therefore re-ran the grid with a format- and example-preserving treatment (V2F, "
   f"{_G['runs']} cells) after a positive control showed that the gate and the harness accept a known-good candidate in "
-  f"{_CT['gate_accepts_exemplar']} of {_CT['n']} cells. Acceptance rose to {_G['accepted_runs']} of {_G['runs']} runs, "
+  f"{_CT['known_good_accepted']} of {_CT['known_good_cells']} cells in which it helps. Acceptance rose to {_G['accepted_runs']} of {_G['runs']} runs, "
   f"but against its own baseline the final prompts win in {_G['wins_vs_start']} cells under strict scoring and in "
   f"{_G['lenient_wins_vs_start']} under lenient scoring, with {_G['lenient_losses_vs_start']} significant lenient losses, "
   "so the treatment can now succeed and still does not help. This is a result about a 1.7B model refining its own "
@@ -68,7 +68,8 @@ P("The following points follow from these experiments, with Qwen3 models, nine B
   f"prompts scored twice differ on {pct(NOISE['mean_discordance'], 1)}% of examples, so differences of a few "
   "points on a few hundred questions are noise. (iv) When the refining model is as small as the target, expect "
   "most rewrites to be unusable (echoes, missing delimiters, a dropped answer format) and monitor that rate; "
-  "protect the answer-format line explicitly.")
+  "protect the answer-format line and show one worked example of the bare tag, since the line alone did not restore "
+  "accuracy (Section 5.2).")
 
 H2("6.3. Threats to Validity")
 H3("6.3.1. Internal Validity")
@@ -81,7 +82,8 @@ P(f"The serving stack is not deterministic: repeated scoring of one prompt spans
   "planned 135, oracle scoring covers MPIR seed 1 only, the strong-refiner runs use one MPIR seed (a second "
   "for one refiner), and the format-protected variants cover only part of the nine Tier-1 seed-42 cells (Section 5.2). Two "
   "audit findings, the format asymmetry of V1 and V2 and a lenient parser that rejected bare letters, were "
-  "found late and corrected after the main grid had run; the second revision re-ran the grid with a "
+  "found late: the lenient parser was corrected, and the format asymmetry was addressed by new variants (V1P, V2P, "
+  "V2F) while the original V1 and V2 results were kept as run; the second revision re-ran the grid with a "
   "format-preserving treatment (V2F), with one MPIR seed per cell and on 44 of 45 cells (one request exceeded the "
   "context window). The follow-up runs and the protected variants were added after results were seen. The "
   "refiner's rewrite is gated on 25 questions, so even V2F's accepted candidates may be noise; the strong-refiner "
@@ -117,12 +119,12 @@ P(f"We re-tested a rubric-guided refinement layer on prompts from small-model op
   f"own prompts the original treatment changed the prompt in one of {MG['runs']} runs and won in none of "
   f"{MG['n_cells']} cells, because that refiner often dropped the answer format and rarely produced a usable candidate. "
   f"A format- and example-preserving treatment, run after a positive control showed that the gate accepts a "
-  f"known-good candidate in {NEW['controls']['gate_accepts_exemplar']} of {NEW['controls']['n']} cells, was accepted "
+  f"known-good candidate in {NEW['controls']['known_good_accepted']} of {NEW['controls']['known_good_cells']} cells in which it helps, was accepted "
   f"in {NEW['grid_v2f']['accepted_runs']} of {NEW['grid_v2f']['runs']} runs but won in "
-  f"{NEW['grid_v2f']['lenient_wins_vs_start']} cells and lost significantly in "
+  f"{NEW['grid_v2f']['lenient_wins_vs_start']} cell(s) and lost significantly in "
   f"{NEW['grid_v2f']['lenient_losses_vs_start']} under a lenient metric that we validated on labelled responses. A much "
-  "larger refiner obtained strict-metric gains in several cells, but they do not hold under lenient scoring, and a "
-  "rubric-free rewrite reaches gains of the same kind, so the rubric is not shown to be what helps; the "
+  "larger refiner obtained strict-metric gains in several cells, but most do not hold under lenient scoring, and a "
+  "rubric-free rewrite reaches gains of the same kind in some cells, so the rubric is not shown to be what helps; the "
   "comparison is exploratory and cannot exclude a modest benefit. In a simulation that applies the original "
   f"accept-first rule to the candidates of the independent variant, accuracy would have fallen by about "
   f"{abs(100 * LEG['mean_legacy_delta']):.0f} points (the actual legacy loop produced identical prompts), strict answer "
@@ -133,7 +135,7 @@ P(f"We re-tested a rubric-guided refinement layer on prompts from small-model op
 
 # ===========================================================================
 H1("Acknowledgement")
-P("The authors thank the reviewers for their constructive comments on the first submission.")
+P("The authors thank the reviewers for their constructive comments on earlier versions of this manuscript.")
 
 H1("Funding")
 P("This research received no specific grant from any funding agency in the public, commercial, or "

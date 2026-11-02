@@ -46,3 +46,21 @@ R.1-R.5 so the auto-numbered Tables 1-17 stay aligned).
 Reviews (fact-check, simulated reviewer, consistency) are in `manuscript/review_round2_*.md`; their findings are being fixed.
 Still pending: 8B judge pass (`judge_eval --judge 8b --sample 150`), fixes from the reviews, final rebuild, highlighted PDF,
 upload package, cover letter. Do not upload anything before the review reports are resolved.
+
+## Final state (2026-11-02)
+
+The second-resubmission package is built in `submission_revision2/upload_ready/` (see `README_UPLOAD.txt` there):
+clean LaTeX source and PDF, response letter (`manuscript/build_response_round2.py`), highlighted PDF against the PDF the
+reviewers saw, cover letter, supplementary archive. Rebuild with `logs`-independent steps: `mpir_study.revision2`,
+`revision2_new`, `mid_refiner`, then `manuscript/build_latex_ieee.py`, `build_response_round2.py`, `make_round2_package.py`.
+
+Review reports are in `manuscript/review_round2_*.md`. The fact-check found a bug in the V2F lenient comparison (non-accepted runs used
+the plain P0 instead of P0 plus exemplar); it is fixed (`mpir_study/rescore.py::final_prompt`) and the corrected result is in the
+manuscript: lenient 1 win, 3 losses, mean -0.4 points (null), strict 4 wins (mixed). Most blocking and numerical findings of the three reviews
+were fixed; the longer list of style suggestions (items 44-67 of the consistency report: roadmap paragraph, repeated numbers across
+Sections 5, 6.1 and 7, splitting the conclusion) was not applied.
+
+Known limits stated in the manuscript: AI-assistant labels (lenient validation, audit), no second target family, no V3F or capable-refiner
+run of V2F, 8B refiner changed one run per variant, no router access for 235B/Luna reruns, 44 of 45 V2F cells (context limit), 8B judge on a
+150-prompt subset, no criterion ablation. Open decision for the authors: the portal history (Access-2026-44920 initial; Access-2026-54235 reviewed;
+this document as second resubmission) should be checked against what the portal shows.

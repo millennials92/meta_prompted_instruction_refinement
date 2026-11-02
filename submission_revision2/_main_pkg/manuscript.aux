@@ -1,0 +1,256 @@
+\relax 
+\citation{vilar2023}
+\citation{goyal2023}
+\citation{kamalloo2023}
+\citation{qin2025}
+\citation{colombo2024,zhang2025}
+\citation{errica2025,sclar2024}
+\citation{wei2022}
+\citation{kong2024}
+\citation{brown2020}
+\citation{zamfirescupereira2023,reynolds2021}
+\citation{zhou2023,pryzant2023,guo2024,yang2024,agarwal2025}
+\citation{ramnath2025}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{}\protected@file@percent }
+\citation{suzgun2023}
+\citation{agarwal2025}
+\citation{liu2023,brown2020}
+\citation{reynolds2021}
+\citation{zamfirescupereira2023}
+\citation{brown2020,dong2024}
+\citation{min2022}
+\citation{wei2022,kojima2022}
+\citation{wang2023}
+\citation{kong2024}
+\citation{kim2024}
+\citation{zheng2024b}
+\citation{zheng2024}
+\citation{liu2024,yu2025}
+\citation{microsoft2025}
+\citation{wang2023b}
+\citation{ramnath2025}
+\citation{zhou2023}
+\citation{pryzant2023}
+\citation{guo2024}
+\citation{yang2024}
+\citation{agarwal2025}
+\citation{khattab2024,yuksekgonul2025,madaan2023,shinn2023}
+\citation{cui2025}
+\citation{ye2024}
+\citation{yang2024b}
+\citation{mayilvaghanan2025}
+\citation{chakma2026}
+\citation{agrawal2026}
+\citation{singh2026}
+\citation{liu2025}
+\citation{nair2025}
+\citation{lin2025}
+\citation{das2025}
+\citation{shim2026}
+\citation{pandy2026}
+\citation{badhe2026}
+\citation{shah2026}
+\citation{zhu2025}
+\citation{bsharat2023}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Related Work}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Manual Prompting Heuristics}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Automatic Prompt Optimization and Meta-Prompting}{2}{}\protected@file@percent }
+\citation{madaan2023,shinn2023}
+\citation{huang2024}
+\citation{zhang2024}
+\citation{zheng2023,wang2024c,panickssery2024}
+\citation{sclar2024,wang2024d,zheng2024c}
+\citation{pineau2021}
+\citation{dodge2019}
+\citation{bouthillier2021}
+\citation{dror2018}
+\citation{card2020}
+\citation{zhou2023}
+\citation{pryzant2023}
+\citation{guo2024}
+\citation{yang2024}
+\citation{agarwal2025}
+\citation{ye2024}
+\citation{mayilvaghanan2025}
+\citation{agrawal2026}
+\citation{pryzant2023,ye2024,madaan2023}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Limits of Self-Refinement and of LLM Judges}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Reporting Negative Results}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Positioning}{3}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Design comparison of MPIR with representative methods. The table describes design differences only; it reports no empirical comparison.}}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}The MPIR Layer Under Test}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Problem Formulation}{3}{}\protected@file@percent }
+\citation{yang2024}
+\citation{schulhoff2024,sahoo2024}
+\citation{boonstra2025,anthropic2025,openai2025,microsoft2025}
+\citation{wei2022,wang2023,min2022}
+\citation{kim2024,zheng2024b}
+\citation{liu2024,yu2025}
+\citation{microsoft2025}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces The MPIR cycle. A prompt P0 from an APO run enters evaluation, refinement and validation for N rounds, and the best validated prompt is returned. The drawing shows the legacy loop, in which every round starts from P0; the repaired variants of Section 3.2 sample the refiner and, in the chained variants, start each round from the incumbent prompt.}}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Algorithm and Variants}{4}{}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces MPIR with a validation gate (repaired)}}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}The Seven-Criteria Rubric}{4}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Refinement variants studied. All use the same gate (strict improvement over the incumbent on 25 validation questions) and N = 7 rounds. V3 candidates, and those of V1P, V2P and V2F, carry the answer-format line (V2F also keeps the worked example); V1 and V2 candidates are scored as the refiner wrote them.}}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Evaluation, Refinement and Output Guards}{5}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Evaluation meta-prompt (corrected text; abridged from the repository file).}}{5}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Refinement request used by the independent (top) and chained (bottom) variants.}}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}The Validation Gate}{5}{}\protected@file@percent }
+\citation{suzgun2023}
+\citation{qwenteam2025}
+\citation{luna2026}
+\citation{kwon2023}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Experimental Design}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Protocol Fixed in Advance, Amendments and Decision Rules}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Data, Splits and Task Selection}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Models and Serving}{6}{}\protected@file@percent }
+\citation{zhou2023,pryzant2023}
+\citation{agarwal2025}
+\citation{suzgun2023}
+\citation{kojima2022}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Base Optimizers and Conditions}{7}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Metrics}{7}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Hyperparameters of the base optimizers and of MPIR as actually used.}}{7}{}\protected@file@percent }
+\citation{dror2018,card2020}
+\citation{efron1979}
+\citation{wilson1927}
+\citation{wilson1927}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.6}Statistical Analysis}{8}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.7}Harness Defects and Deviations}{8}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Results}{8}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Base Prompts and the Scoring Harness}{8}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.1.1}Validating the Lenient Parser}{8}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Test accuracy (\%) of the nine pilot base prompts (seed 42, Qwen3-1.7B, greedy, one scoring pass). Strict is the primary metric with a 95\% Wilson interval; lenient is the secondary metric. Chance is 1 over the number of distinct gold labels. Delims is the share of responses containing both tags.}}{9}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Reference conditions, strict (lenient) test accuracy \%, seed 42. Free rewrite is the ungated rubric-free rewrite of the PromptWizard prompt from the pilot.}}{9}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}What the Rounds Were}{9}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Outcome of every refinement round (all runs of a variant pooled; refiner Qwen3-1.7B unless stated). Fallback: no delimiters. Echo: template phrase. Duplicate: same text as an earlier prompt. Validated rounds are split by validation score against the baseline (better/equal/worse). The last column pair gives the runs whose final prompt differs from P0 and the mean number of distinct candidate prompts per run.}}{10}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}The Repaired Layer on 45 Cells (RQ1, D1)}{10}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Per task and optimizer, chained variant, 1.7B refiner: the only task-optimizer combinations in which any run's final prompt differs from P0 (runs changed out of all MPIR runs, and the mean paired test-accuracy difference in points). All other 26 of the 27 combinations are identical to P0 in every run, with a difference of exactly zero.}}{11}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.1}A Format- and Example-Preserving Re-Run (V2F) and a Positive Control}{11}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Is the Gate the Bottleneck? (RQ2, D3)}{12}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Free Rewriting Versus the Rubric}{12}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Acceptance-rule sensitivity on the oracle-scored candidates (MPIR seed 1, Tier-1 seed-42 cells). Cells accepting: cells in which the rule accepts some candidate, out of the cells with at least one validated candidate. Mean delta is the mean change in strict test accuracy of the selected prompt versus P0, in points, over those cells (for the larger gate, measured on the held-out half of the test split). Better/worse is the number of cells with a positive or negative delta.}}{12}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6}A More Capable Refiner (RQ3, D2)}{13}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.6.1}Follow-Up Runs (Exploratory)}{13}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.6.2}An Intermediate Open-Weight Refiner (Exploratory)}{13}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces Refiner capability on the nine Tier-1 seed-42 cells; the target stays Qwen3-1.7B. Validated is the share of rounds reaching validation. Runs changed, strict wins and the strict mean refer to the final prompt versus P0 under strict extraction; the last two columns give wins/losses and the mean difference under lenient extraction. Rows marked † pool up to three MPIR seeds, the others use MPIR seed 1 only; read the † rows as pooled and not as seed-1 results.}}{14}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.7}Serving Noise and Minimum Detectable Effect}{14}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.8}Does the Rubric Judge Measure Anything? (RQ4)}{15}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.9}Effect of the Original Defect}{15}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.10}Decision Rules}{15}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.11}Cost}{15}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Discussion}{15}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}What the Evidence Supports}{15}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {10}{\ignorespaces Rubric totals (out of 35) assigned at temperature 0 to the base prompts and oracle-scored candidates (223 distinct prompts). Spearman correlations of the total with validation and with test accuracy are computed within each of the nine cells over the 275 oracle-scored candidates (median shown); the two judges' totals correlate at 0.38.}}{16}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {11}{\ignorespaces Outcome of the decision rules (Section 4.1).}}{16}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Practical Guidance, Scoped to What Was Tested}{17}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Threats to Validity}{17}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.1}Internal Validity}{17}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.2}External Validity}{18}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.3}Construct and Conclusion Validity}{18}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Conclusion}{18}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {8}Funding}{18}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9}Ethical Statement}{18}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {10}Declaration of Competing Interest}{18}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {11}Data Availability Statement}{18}{}\protected@file@percent }
+\citation{suzgun2023}
+\@writefile{toc}{\contentsline {section}{\numberline {12}Author Contribution Statement}{19}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {A}Prompt Examples}{19}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.1}Base Prompts Produced by a 1.7B-Driven Optimizer}{19}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.2}Reference Prompts}{19}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.3}Free-Rewrite Control Prompt}{19}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {B}Echo Failure Transcripts}{19}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {C}Pipeline Defects and Serving Configuration}{20}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {D}The Original Evaluation (Exploratory; Validation Leak)}{20}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {12}{\ignorespaces Defects found in the pipeline, their observed symptom and the fix.}}{20}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {13}{\ignorespaces Serving configuration.}}{21}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {E}Round-Level Record of the Primary Variant}{21}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {F}Protocol and Deviations}{21}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {14}{\ignorespaces Original GPT-3.5-turbo evaluation (accuracy \%, single run, leaked validation split) and Gemini 3.5 Flash-Lite check. PW = PromptWizard; Diff = PW+MPIR minus PW (points). Exploratory only; it reproduces results that we declare invalid. One run per cell; the Gemini columns are blank for tasks that were not run.}}{22}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {15}{\ignorespaces Round-level outcomes, variant V2, MPIR seed 1 (an asterisk marks an accepted candidate).}}{22}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {16}{\ignorespaces Round-level outcomes, variant V1, MPIR seed 1 (an asterisk marks an accepted candidate).}}{22}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {G}The 45 Base Prompts}{22}{}\protected@file@percent }
+\bibstyle{IEEEtran}
+\bibdata{cas-refs}
+\bibcite{vilar2023}{1}
+\bibcite{goyal2023}{2}
+\bibcite{kamalloo2023}{3}
+\bibcite{qin2025}{4}
+\bibcite{colombo2024}{5}
+\bibcite{zhang2025}{6}
+\bibcite{errica2025}{7}
+\bibcite{sclar2024}{8}
+\bibcite{wei2022}{9}
+\bibcite{kong2024}{10}
+\bibcite{brown2020}{11}
+\bibcite{zamfirescupereira2023}{12}
+\bibcite{reynolds2021}{13}
+\bibcite{zhou2023}{14}
+\bibcite{pryzant2023}{15}
+\bibcite{guo2024}{16}
+\bibcite{yang2024}{17}
+\bibcite{agarwal2025}{18}
+\bibcite{ramnath2025}{19}
+\bibcite{suzgun2023}{20}
+\bibcite{liu2023}{21}
+\bibcite{dong2024}{22}
+\bibcite{min2022}{23}
+\bibcite{kojima2022}{24}
+\bibcite{wang2023}{25}
+\bibcite{kim2024}{26}
+\@writefile{toc}{\contentsline {section}{REFERENCES}{23}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {17}{\ignorespaces Kind of each base prompt P0 (Qwen3-1.7B-driven optimizers). Chars is the prompt length; bare-tag example means that the prompt contains a worked example whose answer is a bare option inside the answer tags.}}{24}{}\protected@file@percent }
+\bibcite{zheng2024b}{27}
+\bibcite{zheng2024}{28}
+\bibcite{liu2024}{29}
+\bibcite{yu2025}{30}
+\bibcite{microsoft2025}{31}
+\bibcite{wang2023b}{32}
+\bibcite{khattab2024}{33}
+\bibcite{yuksekgonul2025}{34}
+\bibcite{madaan2023}{35}
+\bibcite{shinn2023}{36}
+\bibcite{cui2025}{37}
+\bibcite{ye2024}{38}
+\bibcite{yang2024b}{39}
+\bibcite{mayilvaghanan2025}{40}
+\bibcite{chakma2026}{41}
+\bibcite{agrawal2026}{42}
+\bibcite{singh2026}{43}
+\bibcite{liu2025}{44}
+\bibcite{nair2025}{45}
+\bibcite{lin2025}{46}
+\bibcite{das2025}{47}
+\bibcite{shim2026}{48}
+\bibcite{pandy2026}{49}
+\bibcite{badhe2026}{50}
+\bibcite{shah2026}{51}
+\bibcite{zhu2025}{52}
+\bibcite{bsharat2023}{53}
+\bibcite{huang2024}{54}
+\bibcite{zhang2024}{55}
+\bibcite{zheng2023}{56}
+\bibcite{wang2024c}{57}
+\bibcite{panickssery2024}{58}
+\bibcite{wang2024d}{59}
+\bibcite{zheng2024c}{60}
+\bibcite{pineau2021}{61}
+\bibcite{dodge2019}{62}
+\bibcite{bouthillier2021}{63}
+\bibcite{dror2018}{64}
+\bibcite{card2020}{65}
+\bibcite{schulhoff2024}{66}
+\bibcite{sahoo2024}{67}
+\bibcite{boonstra2025}{68}
+\bibcite{anthropic2025}{69}
+\bibcite{openai2025}{70}
+\bibcite{qwenteam2025}{71}
+\bibcite{luna2026}{72}
+\bibcite{kwon2023}{73}
+\bibcite{efron1979}{74}
+\bibcite{wilson1927}{75}
+\@writefile{toc}{\contentsline {subsection}{Linh Nguyen}{26}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{Quang-Vinh Dang}{26}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{Minh Ngoc Dinh}{26}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{Thuy Nguyen}{26}{}\protected@file@percent }
+\gdef \@abspage@last{26}

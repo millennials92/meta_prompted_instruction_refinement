@@ -128,8 +128,10 @@ def controls_summary() -> dict:
                                                             for r in sel)
         by_opt[opt] = entry
     allr = list(rows.values())
+    known = [r for r in allr if "ex_test" in r and r["ex_test"] > r["p0_test"]]
     return {"cells": rows, "by_optimizer": by_opt, "n": len(allr),
-            "gate_accepts_exemplar": sum(r["gate_accepts_exemplar"] for r in allr)}
+            "gate_accepts_exemplar": sum(r["gate_accepts_exemplar"] for r in allr),
+            "known_good_cells": len(known), "known_good_accepted": sum(r["gate_accepts_exemplar"] for r in known)}
 
 
 def rescore_summary(runs: list[dict]) -> dict:

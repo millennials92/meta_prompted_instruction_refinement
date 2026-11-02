@@ -24,7 +24,9 @@ OUT = REV / "rescore.json"
 def final_prompt(run: dict) -> str:
     cell = cell_of(run)
     if run["final_is_p0"]:
-        return load_p0(cell)
+        # the loop's start prompt: P0, or for v2f P0 plus the bare-tag worked example
+        from .mpir import RunSpec, start_prompt
+        return start_prompt(RunSpec(cell, run["spec"]["variant"]))
     for x in run["rounds"]:
         if x.get("cand_hash") == run["final_hash"] and x.get("candidate"):
             return x["candidate"]

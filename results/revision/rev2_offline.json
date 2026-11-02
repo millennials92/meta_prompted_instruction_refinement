@@ -875,6 +875,18 @@
    "cells_used": 8,
    "median_spearman_test": 0.13124645266837076,
    "zero_share": 0.6113744075829384
+  },
+  "8b|all": {
+   "candidates": 136,
+   "cells_used": 9,
+   "median_spearman_test": 0.175919798853417,
+   "zero_share": 0.6323529411764706
+  },
+  "8b|test_above_zero": {
+   "candidates": 50,
+   "cells_used": 5,
+   "median_spearman_test": 0.30779350562554625,
+   "zero_share": 0.6323529411764706
   }
  },
  "audit_samples": {

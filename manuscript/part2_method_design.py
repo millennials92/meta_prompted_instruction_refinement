@@ -58,20 +58,20 @@ ALGO(
 
 P("The pilot ran what we call the legacy loop: Psrc = P0 in every round, H empty and τ = 0. Because "
   "Evaluate and Refine then receive identical input in every round, the seven rounds were one request "
-  "repeated, up to serving non-determinism, and 'seven rounds without acceptance' meant roughly one "
-  "distinct attempt per cell. The repaired loop differs between rounds in two ways: independent mode "
+  "repeated, up to serving non-determinism, and 'seven rounds without acceptance' overstated the evidence: they "
+  "differed only through serving non-determinism, not by design (Section 5.2 gives the number of distinct candidates). The repaired loop differs between rounds in two ways: independent mode "
   "samples at τ = 0.7 so each round is a fresh draw, and chained mode refines the current incumbent and "
   "shows the model the earlier candidates with their validation scores, as OPRO does with its "
   "trajectory ‹22›. We study eight variants (Table 2). Two of them, V1P and V2P, are format-protected: the "
   "answer-format line is appended to every candidate, as it is for the rubric-free rewrite and for the "
   "prompts of the base optimizers. They were added after an audit found that the refinement request does not "
   "ask the refiner to keep the answer-format line, which the 1.7B refiner then dropped in most candidates "
-  "(Section 5.2); they are exploratory. After the second round of review we added V2F, which tests the treatment "
-  "that the first review asked for: a chained variant whose refinement request tells the refiner to keep the "
+  "(Section 5.2); they are exploratory. We added V2F, which tests a treatment "
+  "that can succeed: a chained variant whose refinement request tells the refiner to keep the "
   "answer-format line and every worked example, whose loop starts from P0 extended with one bare-tag worked "
   "example of the answer format (so that the gate's baseline already carries the format and a candidate "
   "cannot win merely by restoring it), and in which any candidate that still lacks the format line or the "
-  "example has them re-attached in code. V2F is run on all 45 cells with one MPIR seed.")
+  "example has them re-attached in code. V2F is run on 44 of the 45 cells with one MPIR seed (one request exceeds the context window).")
 
 TABLE("Table 2. Refinement variants studied. All use the same gate (strict improvement over the "
       "incumbent on 25 validation questions) and N = 7 rounds. V3 candidates, and those of V1P, V2P and V2F, carry "
@@ -80,7 +80,7 @@ TABLE("Table 2. Refinement variants studied. All use the same gate (strict impro
       rows=[
           ["V0 legacy (as in the pilot)", "P0", "none", "greedy", "original"],
           ["V1 independent", "P0", "none", "τ = 0.7", "corrected"],
-          ["V2 chained (primary)", "incumbent", "scored candidates", "τ = 0.7", "corrected"],
+          ["V2 chained (unprotected; original primary)", "incumbent", "scored candidates", "τ = 0.7", "corrected"],
           ["V2L chained", "incumbent", "scored candidates", "τ = 0.7", "original"],
           ["V3 gated free rewrite", "P0", "none", "τ = 0.7", "none (no rubric)"],
           ["V1P independent, format-protected", "P0", "none", "τ = 0.7", "corrected"],
@@ -167,7 +167,7 @@ P("The pilot's go/no-go rule was written in the project's planning document (REB
   "fixes were also made while the pilot ran (Appendix C). The chronology is: first evaluation and audit "
   "(before September 2026); pilot, 2026-09-04 and 05; first submission to this journal, 2026-09-05; decision "
   "and reviews, 2026-10-19; revision protocol committed 2026-10-19 (commit 8fd1397), before any revised "
-  "experiment; revised experiments, 2026-10-20 and 21. The decision rules below are reproduced from that "
+  "experiment; revised experiments, 2026-10-20 and 21; second review and the second-revision experiments, 2026-11-02 (Appendix F, amendment 10). The decision rules below are reproduced from that "
   "protocol. Its dated amendments, which include one change of the refiners used for D2 and later "
   "exploratory additions, are listed with their dates in Appendix F.")
 BULLETS([
@@ -185,8 +185,8 @@ BULLETS([
      "with the 1.7B refiner by at least 2.0 points and at least 3 of 9 cells are wins with that refiner. The "
      "protocol named a local 8B refiner; because the shared GPU was too slow for the extra servers, the "
      "strongest-refiner role was reassigned on 2026-10-20 (before any result with these refiners was "
-     "inspected) to GPT-6 Luna, with Qwen3-235B-A22B as an intermediate rung. Any statement about "
-     "Qwen3-235B against D2 is therefore post hoc."),
+     "inspected) to GPT-6 Luna, with Qwen3-235B-A22B as an intermediate rung (a local 8B refiner was added "
+     "exploratorily in the second revision, Section 5.6.2). Any statement about Qwen3-235B against D2 is therefore post hoc."),
     ("D3 (RQ2).",
      "The gate is limiting if the best oracle candidate beats P0 on test by at least 3.0 points in at "
      "least 3 of 9 cells although the gated final prompt did not."),
@@ -213,7 +213,7 @@ BULLETS([
     ("Cell.", "A (task, optimizer, split seed) combination with its own split and its own base prompt P0."),
     ("Run.", "One execution of a refinement variant on a cell with one MPIR seed (the seed of the refiner's "
               "sampling); a cell has one to three runs."),
-    ("Variant, round.", "A refinement procedure (V0 to V3, V1P, V2P, V2L; Table 2); one round is one "
+    ("Variant, round.", "A refinement procedure (V0 to V3, V1P, V2P, V2L and V2F; Table 2); one round is one "
                         "evaluate-refine-validate step, with N = 7 rounds per run."),
     ("Split seed, MPIR seed.", "The seed that draws the train, validation and test split and the optimizer's "
                                "own randomness (42, 43, 44), and the seed of the refiner's sampling (1 to 3)."),
@@ -245,7 +245,7 @@ P("APE and ProTeGi are clean-room implementations of the published algorithms �
   "answer-format line, and the APE prompt for hyperbaton is its own induction template (Appendix A). "
   "PromptWizard is a reduced configuration, because synthetic-example generation was disabled. The base "
   "prompts are therefore a mix of weak and degenerate starting points, which limits what refining them can show. Only the "
-  "expert few-shot condition uses the three BBH-author exemplars ‹27›; the first manuscript's statement "
+  "expert few-shot condition uses the three BBH-author exemplars ‹27›; the first submission's statement "
   "that APE and ProTeGi also used them was wrong. Reference conditions are zero-shot CoT ‹8› and expert "
   "few-shot CoT. The free-rewrite control (Appendix A.3) rewrites P0 with no rubric; V3 adds the gate.")
 
@@ -275,7 +275,7 @@ P("Accuracy is the share of test examples whose delimited answer equals the gold
   "is none, the last 300 characters) names exactly one option and it is the gold one. Both are reported. "
   "Strict extraction remains the metric of the gate, because MPIR's gate uses it, but it largely measures "
   "formatting (Section 5.1) and the lenient metric had not been checked against labels. In the second revision we "
-  "therefore validated the lenient parser on a manually labelled sample (Section 5.1.1), restated the decision "
+  "therefore validated the lenient parser on a labelled sample, labelled by an AI assistant (Section 5.1.1), restated the decision "
   "rules D1 to D3 on both metrics, and report both throughout.")
 
 H2("4.6. Statistical Analysis")
@@ -296,5 +296,6 @@ H2("4.7. Harness Defects and Deviations")
 P("Running against a live model exposed defects that mocked tests could not (truncation of long "
   "responses, answer normalization, delimiter mismatches in expert exemplars, template mismatches between "
   "an optimizer's own and MPIR's evaluation harness, two echo patterns and the unscored baseline). All "
-  "are described with their magnitude in Appendix C and were fixed before the numbers reported here "
-  "were produced.")
+  "are described with their magnitude in Appendix C. Defects 1 to 8 were fixed before any number reported here "
+  "was produced; defects 9 to 13 were found later and are handled as Appendix C describes (in particular, the format "
+  "asymmetry of V1 and V2 was not fixed in those variants but addressed by the new variants V1P, V2P and V2F).")

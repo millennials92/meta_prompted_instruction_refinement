@@ -81,7 +81,7 @@ P("Prompting steers an LLM through in-context learning without changing its weig
   "reliably improve performance ‹104›. Step-back prompting abstracts key principles before solving ‹13›. Models attend unevenly to information in long contexts ‹15,14›, and vendor guidance reports "
   "recency effects for some models while reporting no difference for GPT-4-class models ‹43›; whether either matters for the short prompts studied here is an empirical "
   "question rather than a premise. Self-consistency, a decoding-time heuristic, samples several reasoning "
-  "paths and votes ‹66›;")
+  "paths and votes ‹66›; it is not used here, because decoding is greedy.")
 
 H2("2.2. Automatic Prompt Optimization and Meta-Prompting")
 P("APO methods generate, evaluate and select prompts iteratively ‹47›. APE induces instructions from "

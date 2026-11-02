@@ -105,8 +105,8 @@ CODE([
 # ===========================================================================
 H1("Appendix C. Pipeline Defects and Serving Configuration")
 P("Defects found while running the pipeline against a live model. Magnitudes are the symptoms recorded "
-  "at the time. Items 1-8 were fixed before any number reported in Section 5; items 9-13 were found "
-  "during this revision, items 12 and 13 late, after the main grid had run.")
+  "at the time. Items 1-8 were fixed before any number reported in Section 5; items 9-11 were found "
+  "in the audit that preceded the first revision, and items 12 and 13 during it, after the main grid had run.")
 TABLE("Table 12. Defects found in the pipeline, their observed symptom and the fix.",
       header=["#", "Defect", "Observed symptom", "Fix"],
       rows=[
@@ -135,7 +135,7 @@ TABLE("Table 12. Defects found in the pipeline, their observed symptom and the f
           ["11", "APE search selected a degenerate prompt", "hyperbaton P0 is APE's own induction template",
            "Left in place and disclosed; same code as the pilot"],
           ["12", "Candidates of V1 and V2 scored without the answer-format line", "The refinement request does not ask "
-           "to keep it; 92-95% of validated 1.7B candidates lack it and score exactly zero under strict extraction",
+           "to keep it; 93-95% of oracle-scored 1.7B candidates lack it and score exactly zero under strict extraction",
            "Format-protected variants V1P and V2P (Section 3.2); asymmetry reported"],
           ["13", "Lenient parser rejected a bare letter inside the tags", "Strict accepted what lenient rejected",
            "Lenient now accepts everything strict accepts"],
@@ -150,9 +150,11 @@ TABLE("Table 13. Serving configuration.",
           ["Target and default refiner", "Qwen/Qwen3-1.7B, revision 70d244c, bf16, no quantization"],
           ["Capability-experiment refiners", "qwen/qwen3-235b-a22b-2507 and openai/gpt-6-luna (reasoning effort minimal) "
            "through the OpenRouter API, 2026-10-20 and 21, temperature 0.7, 3000 new tokens; no local server"],
+          ["Intermediate refiner (second revision)", "Qwen/Qwen3-8B-AWQ served locally with vLLM next to the 1.7B target, "
+           "--gpu-memory-utilization 0.88 (8B) and 0.36 (1.7B), 2026-11-02"],
           ["Context and limits", "max model length 8192; max new tokens 1024 (target), 1500 / 3000 (meta calls); thinking disabled"],
           ["Decoding", "target: temperature 0; refiner: temperature 0.7 (0 for V0); seeds recorded per call"],
-          ["Server flags", "--gpu-memory-utilization 0.80-0.86 --max-num-seqs 64-128 --seed 0; the server was restarted "
+          ["Server flags", "--gpu-memory-utilization 0.80-0.86 --max-num-seqs 64-192 --seed 0; the server was restarted "
            "several times and its memory settings changed (fp8 KV cache was tried and not usable without nvcc; "
            "prefix caching was off for one period); cached scores and generations were kept across restarts"],
           ["Hardware", "NVIDIA RTX 5000 Ada Generation Laptop GPU, 16 GB, driver 596.58; WSL2 (Ubuntu 24.04, kernel 5.15.167.4) on Windows 11"],
@@ -260,7 +262,7 @@ BULLETS([
      "top-p 0.95), because top-p was about three times slower on this stack."),
     ("3. 2026-10-20, grouping.", "Tier-1 seed-42 cells are run only in the mechanism group G2, which contains the "
      "V2 runs with oracle scoring; G1 covers the other 36 cells."),
-    ("4. 2026-10-20, refiners for D2.", "Local 4B and 8B refiners were not run; the strongest-refiner role of D2 "
+    ("4. 2026-10-20, refiners for D2.", "Local 4B and 8B refiners were not run in the first revision (an 8B refiner was added in the second, amendment 10); the strongest-refiner role of D2 "
      "went to GPT-6 Luna and Qwen3-235B-A22B through OpenRouter (Section 4.1)."),
     ("5. 2026-10-20 and 21, scale.", "The main grid has 80 runs instead of the planned 135; MPIR seeds beyond 1 "
      "were cut after seed 1 was complete."),
@@ -273,12 +275,12 @@ BULLETS([
     ("9. 2026-10-21, exploratory.", "After an audit found that V1 and V2 candidates are scored without the "
      "answer-format line, the format-protected variants V1P and V2P were added, and the lenient parser was "
      "corrected to accept everything the strict parser accepts (Section 5.2)."),
-    ("10. 2026-11-02, second revision.", "Added in response to the second review: variant V2F on all 45 cells "
+    ("10. 2026-11-02, second revision.", "Added in response to the reviews: variant V2F on 44 of the 45 cells "
      "(Section 5.3.1); a positive control and a content-free bare-tag control for the gate (Section 5.3.1); "
      "rescoring of the prompts behind the exploratory claims in one serving session (Section 5.7); a labelled "
      "validation of the lenient parser (Section 5.1.1); an audit of sampled echo and fallback rounds (Section 5.2); "
      "an intermediate open-weight refiner, Qwen3-8B-AWQ, with V2 and V3 on the nine Tier-1 seed-42 cells "
-     "(Section 5.6.2); a local 8B judge that is not a refiner (Section 5.8); exact acceptance-rate bounds and a "
+     "(Section 5.6.2); a local 8B judge, which is also the intermediate refiner of Section 5.6.2 but not the refiner of the judged strong-refiner candidates (Section 5.8); exact acceptance-rate bounds and a "
      "per-variant cost table. The grid size of the original protocol (135 runs) was not restored; V2F has one "
      "MPIR seed per cell. The original decision rules D1 to D3 were not changed, and D1 is restated for V2F "
      "and on the validated lenient metric."),
