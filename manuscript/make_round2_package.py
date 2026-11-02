@@ -69,8 +69,7 @@ def conflict_of_interest():
 \setlength{\parindent}{0pt}
 \begin{document}
 \section*{Conflict of Interest Statement}
-\textbf{Manuscript:} Does Rubric-Guided Self-Refinement Improve Prompts from Small-Model Optimizers? A Scoped
-Negative-Result Study with Qwen3-1.7B (revised submission; Access-2026-54235, initial submission Access-2026-44920)
+\textbf{Manuscript:} Does Rubric-Guided Refinement Improve Prompts from Small-Model Optimizers? (revised submission; Access-2026-54235, initial submission Access-2026-44920)
 
 None of the authors (Linh Nguyen, Quang-Vinh Dang, Minh Ngoc Dinh and Thuy Nguyen) has a conflict of interest to
 disclose. The same statement appears in the manuscript under ``Declaration of Competing Interest''.
@@ -99,8 +98,7 @@ November 3, 2026
 \end{flushright}
 
 \textbf{Manuscript ID:} Access-2026-54235 (initial submission: Access-2026-44920)\\
-\textbf{Revised title:} Does Rubric-Guided Self-Refinement Improve Prompts from Small-Model Optimizers? A Scoped
-Negative-Result Study with Qwen3-1.7B\\
+\textbf{Revised title:} Does Rubric-Guided Refinement Improve Prompts from Small-Model Optimizers?\\
 \textbf{Manuscript type:} Negative Result\\
 \textbf{Corresponding author:} Quang-Vinh Dang (British University Vietnam), \url{vinh.dq4@buv.edu.vn}
 
@@ -120,7 +118,7 @@ and the audit of 80 sampled echo and fallback rounds were produced by a language
 the manuscript says so. (iv) A rubric-free control under the same protection: a plain rewrite request gained %(v3m).1f points on average under lenient scoring (%(v3w)d winning cells of %(v3n)d), while the rubric-guided variant did not, and strong refiners (Qwen3-235B, GPT-6 Luna) improved the prompts under the protected treatment (%(q).1f and %(l).1f points, nine cells, one run each), but a rubric-free rewrite reached similar gains; so the rubric is not shown to help. (v) Exact acceptance bounds (%(ub).1f\%% one-sided for 1 acceptance in 80 runs; the earlier 7\%% was
 the two-sided value), a paired comparison of the rubric-guided and rubric-free variants, a single-session rescoring of the
 exploratory prompts, an intermediate open-weight refiner (Qwen3-8B, %(midacc)s of 9 runs changed the prompt), cost per
-variant, and a list of all base prompts. (vi) The title and claims now state the scope (Qwen3-1.7B, nine tasks, weak base
+variant, and a list of all base prompts. (vi) The abstract and claims state the scope (Qwen3-1.7B, nine tasks, weak base
 prompts), and ``pre-specified'' is replaced by ``protocol fixed in advance, with listed amendments''.
 
 \medskip

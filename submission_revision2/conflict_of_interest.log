@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.13)  3 NOV 2026 05:45
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.13)  3 NOV 2026 06:08
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -82,8 +82,7 @@ File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
 pdftex.def
 File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count287
-)
-No file conflict_of_interest.aux.
+) (conflict_of_interest.aux)
 \openout1 = `conflict_of_interest.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 6.
@@ -100,6 +99,7 @@ LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 6.
 LaTeX Font Info:    ... okay on input line 6.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 6.
 LaTeX Font Info:    ... okay on input line 6.
+
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
 *geometry* verbose mode - [ preamble ] result:
@@ -145,17 +145,17 @@ L3 programming layer <2025-12-24>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 1786 strings out of 467871
- 30014 string characters out of 5416923
- 438816 words of memory out of 5000000
- 30700 multiletter control sequences out of 15000+600000
+ 1789 strings out of 467871
+ 30187 string characters out of 5416923
+ 438807 words of memory out of 5000000
+ 30701 multiletter control sequences out of 15000+600000
  633365 words of font info for 48 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  57i,5n,65p,542b,124s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/vinh.dq4/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a
 .pfb><C:/Users/vinh.dq4/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utm
 r8a.pfb>
-Output written on conflict_of_interest.pdf (1 page, 30517 bytes).
+Output written on conflict_of_interest.pdf (1 page, 29899 bytes).
 PDF statistics:
  17 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)

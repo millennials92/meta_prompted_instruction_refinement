@@ -7,8 +7,7 @@
 
 from blocks_api import BLOCKS  # noqa: F401  (re-exported for the build scripts)
 
-TITLE = ("Does Rubric-Guided Self-Refinement Improve Prompts from Small-Model Optimizers? "
-         "A Scoped Negative-Result Study with Qwen3-1.7B")
+TITLE = ("Does Rubric-Guided Refinement Improve Prompts from Small-Model Optimizers?")
 
 AUTHORS = [
     {"name": "Linh Nguyen", "affil_idx": [1], "corresponding": False, "email": "s4021009@rmit.edu.vn"},
