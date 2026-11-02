@@ -106,7 +106,7 @@ CODE([
 H1("Appendix C. Pipeline Defects and Serving Configuration")
 P("Defects found while running the pipeline against a live model. Magnitudes are the symptoms recorded "
   "at the time. Items 1-8 were fixed before any number reported in Section 5; items 9-11 were found "
-  "in the audit that preceded the first revision, and items 12 and 13 during it, after the main grid had run.")
+  "in an audit after the pilot, and items 12 and 13 during the main grid, after it had run.")
 TABLE("Table 12. Defects found in the pipeline, their observed symptom and the fix.",
       header=["#", "Defect", "Observed symptom", "Fix"],
       rows=[
@@ -150,7 +150,7 @@ TABLE("Table 13. Serving configuration.",
           ["Target and default refiner", "Qwen/Qwen3-1.7B, revision 70d244c, bf16, no quantization"],
           ["Capability-experiment refiners", "qwen/qwen3-235b-a22b-2507 and openai/gpt-6-luna (reasoning effort minimal) "
            "through the OpenRouter API, 2026-10-20 and 21, temperature 0.7, 3000 new tokens; no local server"],
-          ["Intermediate refiner (second revision)", "Qwen/Qwen3-8B-AWQ served locally with vLLM next to the 1.7B target, "
+          ["Intermediate refiner", "Qwen/Qwen3-8B-AWQ served locally with vLLM next to the 1.7B target, "
            "--gpu-memory-utilization 0.88 (8B) and 0.36 (1.7B), 2026-11-02"],
           ["Context and limits", "max model length 8192; max new tokens 1024 (target), 1500 / 3000 (meta calls); thinking disabled"],
           ["Decoding", "target: temperature 0; refiner: temperature 0.7 (0 for V0); seeds recorded per call"],
@@ -252,8 +252,8 @@ P("The decision rules of Section 4.1 were fixed in REVISION_PROTOCOL.md before a
   "ran (commit 8fd1397, 2026-10-19). The amendments below are recorded in that file; none is an entry in a "
   "registry. Amendments 1 to 7 were made before the results of the affected experiment were inspected; "
   "amendments 8 and 9 were made after results were seen and are exploratory; V1P and V2P were stopped before all nine cells finished. "
-  "Amendment 10 lists the additions made in response to the second round of review; they were decided after the "
-  "first-round results were known and are post hoc in that sense, although none was chosen after seeing its own result.")
+  "Amendment 10 lists the later additions; they were decided after the main-grid results were known and are post hoc "
+  "in that sense, although none was chosen after seeing its own result.")
 BULLETS([
     ("1. 2026-10-20, compute.", "Serving stack vLLM 0.28.0 under WSL2 with measured throughput of about 1.2k "
      "tokens/s; oracle test scoring of every validated candidate for MPIR seed 1 only; one validation score per "
@@ -262,7 +262,7 @@ BULLETS([
      "top-p 0.95), because top-p was about three times slower on this stack."),
     ("3. 2026-10-20, grouping.", "Tier-1 seed-42 cells are run only in the mechanism group G2, which contains the "
      "V2 runs with oracle scoring; G1 covers the other 36 cells."),
-    ("4. 2026-10-20, refiners for D2.", "Local 4B and 8B refiners were not run in the first revision (an 8B refiner was added in the second, amendment 10); the strongest-refiner role of D2 "
+    ("4. 2026-10-20, refiners for D2.", "Local 4B and 8B refiners were not run in the main study (an 8B refiner was added later, amendment 10); the strongest-refiner role of D2 "
      "went to GPT-6 Luna and Qwen3-235B-A22B through OpenRouter (Section 4.1)."),
     ("5. 2026-10-20 and 21, scale.", "The main grid has 80 runs instead of the planned 135; MPIR seeds beyond 1 "
      "were cut after seed 1 was complete."),
@@ -275,7 +275,7 @@ BULLETS([
     ("9. 2026-10-21, exploratory.", "After an audit found that V1 and V2 candidates are scored without the "
      "answer-format line, the format-protected variants V1P and V2P were added, and the lenient parser was "
      "corrected to accept everything the strict parser accepts (Section 5.2)."),
-    ("10. 2026-11-02, second revision.", "Added in response to the reviews: variant V2F on 44 of the 45 cells "
+    ("10. 2026-11-02, additions.", "Added after the main-grid results: variant V2F on 44 of the 45 cells "
      "(Section 5.3.1); a positive control and a content-free bare-tag control for the gate (Section 5.3.1); "
      "rescoring of the prompts behind the exploratory claims in one serving session (Section 5.7); a labelled "
      "validation of the lenient parser (Section 5.1.1); an audit of sampled echo and fallback rounds (Section 5.2); "

@@ -85,14 +85,13 @@ def ieee_acknowledgment():
     return (
         r"\section*{Acknowledgment}" + "\n"
         + BL.resolve_citations(
-            "The authors thank the reviewers for their constructive comments on earlier versions of "
-            "this manuscript. Generative AI tools were used to assist with improving the grammar "
-            "and readability of the manuscript text to generate initial code snippets during "
-            "development, and, in the second revision, to label sampled echo and fallback rounds and responses for the "
-            "lenient-parser validation and to help verify bibliographic entries (these labels are screening aids released "
-            "for re-checking, not human annotations); all AI-assisted text and code were reviewed, verified, and adapted by the "
-            "authors, who take full responsibility for the manuscript's content, analyses, and "
-            "conclusions."
+            "The authors thank the reviewers for their constructive comments on earlier versions of this manuscript. "
+            "Generative AI tools were used to improve the grammar and readability of the manuscript text, and an "
+            "AI-assisted coding tool generated initial code snippets during development. Language-model assistants "
+            "also labelled sampled echo and fallback rounds and responses for the lenient-parser validation, and helped "
+            "verify bibliographic entries; these labels are screening aids released for re-checking, not human "
+            "annotations. All AI-assisted text and code were reviewed, verified, and adapted by the authors, who take "
+            "full responsibility for the manuscript's content, analyses, and conclusions."
         )
     )
 

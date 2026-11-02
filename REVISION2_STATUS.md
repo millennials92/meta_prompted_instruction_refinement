@@ -64,3 +64,10 @@ Known limits stated in the manuscript: AI-assistant labels (lenient validation, 
 run of V2F, 8B refiner changed one run per variant, no router access for 235B/Luna reruns, 44 of 45 V2F cells (context limit), 8B judge on a
 150-prompt subset, no criterion ablation. Open decision for the authors: the portal history (Access-2026-44920 initial; Access-2026-54235 reviewed;
 this document as second resubmission) should be checked against what the portal shows.
+
+## Final (after the last proofread)
+
+Final proofread and flow reviews were applied (`manuscript/review_round2_final_*.md`): corrected Table 8 caption, Section 5.9 wording
+(fallbacks return P0, echoes are accepted), the 5.2 denominator, AI-use declaration, removal of review-history phrasing, restructured
+Sections 5.2, 5.3.1, 5.6, 5.10, 6.1 and 7, new reader's guide and roadmap. The upload set is in `submission_revision2/upload_ready/`.
+`submission_revision2/human_spotcheck_sheet.csv` (not for upload) lets the authors re-label 90 items to check the AI-made labels.

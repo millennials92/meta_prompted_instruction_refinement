@@ -1,0 +1,3 @@
+Spot-check of the AI-made labels (not part of the portal upload).
+Rows: 60 lenient-parser responses (label = option the response commits to: A..R, yes, no, none, ambiguous), 15 echo rounds (true_echo / false_positive) and 15 fallback rounds (no_refined_prompt / refined_prompt_without_end / truncated / other).
+Fill the last column independently, then compare. If the agreement is high, add one sentence to Sections 5.1.1 and 5.2 (for example: 'Two of the authors re-labelled a random 60 of the 400 responses and agreed on N of 60'). The gold answers are in results/revision/lenient_sample_key.json; do not look at them while labelling.

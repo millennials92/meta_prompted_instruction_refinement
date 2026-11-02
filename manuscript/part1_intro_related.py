@@ -30,25 +30,13 @@ P("The idea was first evaluated with GPT-4o as the refining model and GPT-3.5-tu
   "tasks of Big-Bench Hard (BBH) ‹27›. That evaluation reported per-task gains over PromptWizard ‹23› but a "
   "pooled gain that was not significant (Appendix D reproduces its numbers). A later audit found that its "
   "validation stage scored candidates on the optimizer's own training examples and that its loop never "
-  "scored the unrefined prompt. An earlier version of this study was submitted elsewhere and was not "
-  "externally reviewed; the first evaluation's numbers are exploratory and are not used as evidence "
+  "scored the unrefined prompt. The first evaluation was written up as a manuscript that was not "
+  "externally reviewed; its numbers are exploratory and are not used as evidence "
   "here. A pilot with Qwen3-1.7B in every role then found no effect, but its seven refinement rounds were "
   "not independent attempts, and its statistics, task choice and answer-extraction harness were open to "
   "criticism. This paper replaces the pilot with a new study.")
 
-P("We ask four research questions. RQ1: with the refinement loop repaired so that rounds are genuinely "
-  "distinct attempts, does gated MPIR improve a base optimizer's prompt over many tasks, optimizers and "
-  "seeds? RQ2: is a failure to improve a property of the candidates or of the coarse validation gate? "
-  "RQ3: does a more capable refining model change the answer? RQ4: does the rubric judge measure "
-  "anything related to accuracy? (Terms such as cell and run are defined in Section 4.2.) "
-  "In brief: with a 1.7B refiner the original treatment changed the prompt in "
-  f"{N['main_grid']['runs_accepting']} of {N['main_grid']['runs']} runs and won in {N['main_grid']['wins']} "
-  f"of {N['main_grid']['n_cells']} cells, because that refiner rarely produces a usable candidate and often drops "
-  "the answer format (RQ1, RQ2); a format-preserving re-run accepts more candidates but does not win under a validated "
-  "lenient metric; a much larger refiner obtained strict-metric gains in several cells, but most "
-  "of them do not hold under lenient scoring and a rubric-free rewrite reaches gains of the same kind (RQ3); and "
-  "the rubric score is only weakly related to accuracy (RQ4). Throughout, the claims are scoped to Qwen3-1.7B, nine "
-  "tasks and base prompts that are often weak, as the title says.")
+P("We ask four research questions. RQ1: with the refinement loop repaired so that rounds are genuinely distinct attempts, does gated MPIR improve a base optimizer's prompt over many tasks, optimizers and seeds? RQ2: is a failure to improve a property of the candidates or of the coarse validation gate? RQ3: does a more capable refining model change the answer? RQ4: does the rubric judge measure anything related to accuracy? (Cell and run are defined in Section 4.2.) The study has three steps, and the first could not answer RQ1 on its own. Step 1: with a 1.7B refiner the original treatment changed the prompt in 1 of 80 runs and won in 0 of 45 cells, but that refiner rarely produced a usable candidate and usually dropped the answer format, so the null did not separate a failed idea from a failed treatment (RQ1, RQ2). Step 2: we re-ran the grid with a treatment that keeps the format and an example, after checking that the gate accepts a known-good candidate; more candidates were accepted, but none won under a validated lenient metric. Step 3: we probed larger refiners (RQ3); strict gains appeared in several cells, most do not hold under lenient scoring, and a rubric-free rewrite reaches gains of the same kind. The rubric score is only weakly related to accuracy (RQ4). Throughout, the claims are scoped to Qwen3-1.7B, nine tasks and base prompts that are often weak, as the title says.")
 
 P("The contributions are:")
 BULLETS([
@@ -59,12 +47,17 @@ BULLETS([
     ("A multi-seed, multi-task evaluation with rules fixed in advance.",
      "45 base prompts (three optimizers, nine tasks, up to three seeds), decision rules fixed in a "
      "time-stamped protocol, and a random, documented choice of six tasks to complement the three pilot tasks."),
+    ("A format-preserving re-run with a positive control and a validated lenient metric.",
+     "These separate 'the treatment failed' from 'the idea failed': the gate is shown to accept a known-good "
+     "candidate, the main grid is re-run with a treatment that keeps the answer format, and the lenient answer "
+     "parser is checked against labelled responses."),
     ("Diagnostics that make the result interpretable.",
      "Oracle scoring of all candidates, acceptance-rule sensitivity, a serving-noise floor and minimum "
      "detectable effect, gated and format-protected controls, strict and lenient answer extraction, a "
      "comparison with the uncorrected algorithm and a judge-validity analysis; defects of the pipeline "
      "and the serving configuration are catalogued (Appendix C)."),
 ])
+P('Section 3 describes the layer under test and Section 4 the design. Section 5 follows the three steps: the scoring harness and what the 1.7B rounds were (5.1, 5.2); the repaired grid, positive control and V2F (5.3); the gate and rubric-free rewriting (5.4, 5.5); stronger refiners (5.6); serving noise and the rubric judge (5.7, 5.8); the original defect, the decision rules and cost (5.9 to 5.11). Section 6 discusses what the evidence supports and its limits.')
 
 # ===========================================================================
 H1("2. Related Work")

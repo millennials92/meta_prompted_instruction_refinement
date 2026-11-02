@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Appendix G (second revision): the kind of every base prompt, so readers can judge how informative a cell is."""
+"""Appendix G: the kind of every base prompt, so readers can judge how informative a cell is."""
 from blocks_api import H1, P, TABLE  # noqa: F401
 from rev2_numbers import OFF
 

@@ -165,9 +165,8 @@ P("The pilot's go/no-go rule was written in the project's planning document (REB
   "2026-09-03) before the pilot ran. That is a time-stamped plan in a version-controlled repository, not an "
   "entry in a public registry, so we say that the protocol was fixed in advance, with listed amendments, and do not call the study pre-registered or pre-specified; several pipeline "
   "fixes were also made while the pilot ran (Appendix C). The chronology is: first evaluation and audit "
-  "(before September 2026); pilot, 2026-09-04 and 05; first submission to this journal, 2026-09-05; decision "
-  "and reviews, 2026-10-19; revision protocol committed 2026-10-19 (commit 8fd1397), before any revised "
-  "experiment; revised experiments, 2026-10-20 and 21; second review and the second-revision experiments, 2026-11-02 (Appendix F, amendment 10). The decision rules below are reproduced from that "
+  "(before September 2026); pilot, 2026-09-04 and 05; revision protocol committed 2026-10-19 (commit 8fd1397), before any revised "
+  "experiment; revised experiments, 2026-10-20 and 21; further controls, audits and probes, 2026-11-02 (Appendix F, amendment 10). The decision rules below are reproduced from that "
   "protocol. Its dated amendments, which include one change of the refiners used for D2 and later "
   "exploratory additions, are listed with their dates in Appendix F.")
 BULLETS([
@@ -186,7 +185,7 @@ BULLETS([
      "protocol named a local 8B refiner; because the shared GPU was too slow for the extra servers, the "
      "strongest-refiner role was reassigned on 2026-10-20 (before any result with these refiners was "
      "inspected) to GPT-6 Luna, with Qwen3-235B-A22B as an intermediate rung (a local 8B refiner was added "
-     "exploratorily in the second revision, Section 5.6.2). Any statement about Qwen3-235B against D2 is therefore post hoc."),
+     "exploratorily, Section 5.6.2). Any statement about Qwen3-235B against D2 is therefore post hoc."),
     ("D3 (RQ2).",
      "The gate is limiting if the best oracle candidate beats P0 on test by at least 3.0 points in at "
      "least 3 of 9 cells although the gated final prompt did not."),
@@ -230,8 +229,7 @@ P("The target model is Qwen3-1.7B ‹68› with thinking disabled and greedy dec
   "resulting noise (Section 5.7). The OpenRouter model slugs are qwen/qwen3-235b-a22b-2507 and "
   "openai/gpt-6-luna; calls were made on 2026-10-20 and 21 through the router, which chooses the serving "
   "provider, and the provider name and system fingerprint were not logged, so the exact backend build cannot be "
-  "recovered and a re-run could differ if the router's models have changed (Section 6.3.1). The runs added in the "
-  "second revision (V2F, the controls and the rescoring of Section 5.7) were produced on 2026-11-02 in a single "
+  "recovered and a re-run could differ if the router's models have changed (Section 6.3.1). The later runs (V2F, the controls and the rescoring of Section 5.7) were produced on 2026-11-02 in a single "
   "serving session, vLLM 0.28.0 with --max-num-seqs 192 and --gpu-memory-utilization 0.86; the intermediate "
   "refiner of Section 5.6.2 is Qwen3-8B-AWQ served locally.")
 
@@ -245,8 +243,7 @@ P("APE and ProTeGi are clean-room implementations of the published algorithms �
   "answer-format line, and the APE prompt for hyperbaton is its own induction template (Appendix A). "
   "PromptWizard is a reduced configuration, because synthetic-example generation was disabled. The base "
   "prompts are therefore a mix of weak and degenerate starting points, which limits what refining them can show. Only the "
-  "expert few-shot condition uses the three BBH-author exemplars ‹27›; the first submission's statement "
-  "that APE and ProTeGi also used them was wrong. Reference conditions are zero-shot CoT ‹8› and expert "
+  "expert few-shot condition uses the three BBH-author exemplars ‹27›. Reference conditions are zero-shot CoT ‹8› and expert "
   "few-shot CoT. The free-rewrite control (Appendix A.3) rewrites P0 with no rubric; V3 adds the gate.")
 
 TABLE("Table 3. Hyperparameters of the base optimizers and of MPIR as actually used.",
@@ -274,7 +271,7 @@ P("Accuracy is the share of test examples whose delimited answer equals the gold
   "offline from the saved raw outputs: the response counts as correct if the delimited span (or, if there "
   "is none, the last 300 characters) names exactly one option and it is the gold one. Both are reported. "
   "Strict extraction remains the metric of the gate, because MPIR's gate uses it, but it largely measures "
-  "formatting (Section 5.1) and the lenient metric had not been checked against labels. In the second revision we "
+  "formatting (Section 5.1) and the lenient metric had not been checked against labels. We "
   "therefore validated the lenient parser on a labelled sample, labelled by an AI assistant (Section 5.1.1), restated the decision "
   "rules D1 to D3 on both metrics, and report both throughout.")
 
