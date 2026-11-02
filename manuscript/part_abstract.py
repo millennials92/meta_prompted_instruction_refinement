@@ -1,29 +1,37 @@
 # -*- coding: utf-8 -*-
 from study_numbers import N
+from rev2_numbers import OFF, NEW, LEN, MID
 
-_MG, _CAP, _CAPL, _NOISE, _LEG = N["main_grid"], N["capability"], N["capability_lenient"], N["noise"], N["legacy"]
-_EX, _EXL = N["exemplar"], N["exemplar_lenient"]
+_MG, _CAP, _NOISE = N["main_grid"], N["capability"], N["noise"]
+_EX, _LO = N["exemplar"], N["lenient_oracle"]
+_G, _CT, _AB, _RV = NEW["grid_v2f"], NEW["controls"], OFF["acceptance_bounds"], OFF["rubric_vs_free"]["qwen235"]
 
 
 def _pp(x, d=0):
     return f"{100 * x:+.{d}f}"
 
 
+_lo = 100 * min(_LO['v1|1.7b']['share_without_tag'], _LO['v2|1.7b']['share_without_tag'])
+_hi = 100 * max(_LO['v1|1.7b']['share_without_tag'], _LO['v2|1.7b']['share_without_tag'])
+
 ABSTRACT = (
-    "Meta-Prompted Instruction Refinement (MPIR) is a post-hoc layer that asks a language model to score an "
-    "automatically optimized prompt against a seven-criterion rubric, rewrite it, and keep the rewrite only if it "
-    "beats the original on held-out questions. An earlier evaluation with a closed refiner reported mixed gains, "
-    "but audits found a validation leak and an unscored baseline, and a small pilot left its refinement rounds, "
-    "statistics and answer-extraction harness open to criticism. We report a re-test whose decision rules were "
-    "fixed in a time-stamped protocol. We repaired the refinement loop, logged every round, and refined 45 base "
-    "prompts (PromptWizard, APE and ProTeGi on nine Big-Bench Hard tasks, up to three seeds) with Qwen3-1.7B as "
-    f"target and refiner. The layer changed the prompt in {_MG['runs_accepting']} of {_MG['runs']} runs and won in "
-    f"{_MG['wins']} of {_MG['n_cells']} cells: the small refiner rarely produced a usable candidate, and "
-    "unprotected candidates often dropped the answer format. Identical prompts disagree on "
-    f"{100 * _NOISE['mean_discordance']:.1f}% of examples between scorings, and one answer-format exemplar raised the "
-    f"strict accuracy of exemplar-free prompts by {_pp(_EX['mean_gain_by_optimizer']['ape'])} and "
-    f"{_pp(_EX['mean_gain_by_optimizer']['protegi'])} points. In an exploratory probe, a 235B-parameter refiner "
-    f"won in {_CAP['v2|qwen235']['wins']} of 9 cells under strict scoring, but under lenient scoring only one "
-    "gain remains and a rubric-free rewrite reaches similar strict gains, so they do not isolate the rubric. "
-    "Conclusions are limited to Qwen3 targets, nine tasks and the optimizers tested."
+    "Meta-Prompted Instruction Refinement (MPIR) asks a language model to score an optimized prompt against a "
+    "seven-criterion rubric, rewrite it, and keep the rewrite only if it beats the original on validation questions. "
+    "We re-test it after an earlier evaluation was found to have a validation leak, using a repaired, fully logged loop "
+    "and decision rules fixed in advance with dated amendments. The scope is narrow: Qwen3-1.7B as target, 45 base "
+    "prompts from three small-model optimizers on nine Big-Bench Hard tasks, many of them weak. "
+    f"With the 1.7B model refining its own prompts, the original treatment changed the prompt in {_MG['runs_accepting']} "
+    f"of {_MG['runs']} runs (exact 95% upper bound {100 * _AB['run_upper_one_sided_95']:.1f}%), because "
+    f"{_lo:.0f}-{_hi:.0f}% of candidates lost the answer format. A format-preserving re-run, after a positive control "
+    f"in which the gate accepted a known-good candidate in {_CT['gate_accepts_exemplar']} of {_CT['n']} cells, had candidates "
+    f"accepted in {_G['accepted_runs']} of {_G['runs']} runs but won in {_G['lenient_wins_vs_start']} cells and lost "
+    f"in {_G['lenient_losses_vs_start']} under a lenient metric validated on 400 labelled responses. In exploratory "
+    f"probes, a 235B refiner won in {_CAP['v2|qwen235']['wins']} of 9 cells under strict scoring, mostly format repairs "
+    f"that a rubric-free rewrite also obtains (paired difference {_pp(_RV['mean_v2_minus_v3'], 1)} points, interval "
+    f"[{_pp(_RV['lo'], 1)}, {_pp(_RV['hi'], 1)}]); an 8B refiner changed the prompt in "
+    f"{MID['v2']['accepted_runs']} of {MID['v2']['runs']} runs. One answer-format exemplar "
+    f"changed strict accuracy by {_pp(_EX['mean_gain_by_optimizer']['ape'])} (APE) and "
+    f"{_pp(_EX['mean_gain_by_optimizer']['protegi'])} (ProTeGi) points on average, almost all of it the tag "
+    f"convention, and identical prompts disagree on {100 * _NOISE['mean_discordance']:.1f}% of examples between "
+    "scorings. Conclusions are limited to Qwen3 targets, nine tasks and the optimizers tested."
 )

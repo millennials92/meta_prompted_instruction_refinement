@@ -20,7 +20,7 @@ P("Two families of approaches address that bottleneck. Manual prompting applies 
   "an LLM to score the optimized prompt against a rubric of manual heuristics, ask it to rewrite the prompt "
   "accordingly, and keep the rewrite only if it scores better on held-out validation questions.")
 
-P("Whether such a layer helps matters in practice. It costs a few model calls and can be added to any APO "
+P("Whether such a layer helps matters in practice. It costs a few model calls (Section 5.11) and can be added to any APO "
   "pipeline, but if it does not help those calls are wasted, and an ungated version can make prompts worse. "
   "A clean test is not trivial: the rewrite is produced by a model that may be no more capable than the "
   "target, the gate uses a small validation set, and benchmark accuracy depends on how answers are "
@@ -41,12 +41,14 @@ P("We ask four research questions. RQ1: with the refinement loop repaired so tha
   "seeds? RQ2: is a failure to improve a property of the candidates or of the coarse validation gate? "
   "RQ3: does a more capable refining model change the answer? RQ4: does the rubric judge measure "
   "anything related to accuracy? (Terms such as cell and run are defined in Section 4.2.) "
-  "In brief: with a 1.7B refiner the layer changed the prompt in "
+  "In brief: with a 1.7B refiner the original treatment changed the prompt in "
   f"{N['main_grid']['runs_accepting']} of {N['main_grid']['runs']} runs and won in {N['main_grid']['wins']} "
   f"of {N['main_grid']['n_cells']} cells, because that refiner rarely produces a usable candidate and often drops "
-  "the answer format (RQ1, RQ2); a much larger refiner obtained strict-metric gains in several cells, but most "
+  "the answer format (RQ1, RQ2); a format-preserving re-run accepts more candidates but does not win under a validated "
+  "lenient metric; a much larger refiner obtained strict-metric gains in several cells, but most "
   "of them do not hold under lenient scoring and a rubric-free rewrite reaches gains of the same kind (RQ3); and "
-  "the rubric score is only weakly related to accuracy (RQ4).")
+  "the rubric score is only weakly related to accuracy (RQ4). Throughout, the claims are scoped to Qwen3-1.7B, nine "
+  "tasks and base prompts that are often weak, as the title says.")
 
 P("The contributions are:")
 BULLETS([

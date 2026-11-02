@@ -267,7 +267,7 @@ def latex_table(b):
     lines = [r"\begin{" + env + r"}[htbp]",
              r"\centering",
              r"\footnotesize" if star else r"\small",
-             caption_command(b["caption"]),
+             (plain_caption if is_letter_numbered(b["caption"]) else caption_command)(b["caption"]),
              r"\resizebox{" + width + r"}{!}{%" if not b.get("colw") else "",
              f"\\begin{{tabular}}{{{colspec}}}",
              r"\toprule"]

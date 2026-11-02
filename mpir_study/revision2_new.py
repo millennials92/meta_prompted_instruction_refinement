@@ -56,10 +56,18 @@ def grid_v2f(runs: list[dict]) -> dict:
     validated = [x for x in rounds if x["outcome"] == "validated"]
     raw = [x["raw_candidate"] for x in rounds if x.get("raw_candidate") and x["outcome"] != "echo"]
     n = len(group)
+    log = REV.parent.parent / "logs" / "g5-fix.log"
+    seconds = []
+    if log.exists():
+        import re
+        seconds = [int(m.group(1)) for m in re.finditer(r"^DONE \S+ (\d+)s", log.read_text(encoding="utf-8"), re.M)
+                   if int(m.group(1)) > 0]
     accepted = sum(c["accepted"] for c in cells.values())
     diffs = [c["vs_start"]["diff"] for c in cells.values()]
     diffs_p0 = [c["vs_true_p0"]["diff"] for c in cells.values()]
     return {
+        "wall_clock_median_s": float(np.median(seconds)) if seconds else None,
+        "wall_clock_total_s_shared_server": float(np.sum(seconds)) if seconds else None,
         "cells": cells, "runs": n, "accepted_runs": accepted,
         "accept_upper_one_sided_95": clopper_pearson_upper(accepted, n) if n else None,
         "rounds": len(rounds), **{k: counts.get(k, 0) for k in ("fallback", "echo", "duplicate", "validated")},

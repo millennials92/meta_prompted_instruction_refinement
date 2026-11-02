@@ -34,3 +34,15 @@ second-revision numbers; do not upload anything from `submission_revision/` unti
 4. Write Sections 5.1.1, 5.3.1, 5.6.2, 5.7 additions, 5.10 summary table, cost section, discussion and conclusion edits; rewrite the abstract.
 5. Rebuild the letter (`build_response.py`), cover letter, highlighted PDF (`highlight_diff.py`), upload package.
 6. Final fact-check pass, then push.
+
+## Update (later the same day)
+
+Done since the first snapshot: V2F grid (44/45 cells; the 45th exceeds the 8192-token context by one token), controls (45 cells),
+single-session rescoring (headline and protected sets), lenient-parser validation (400 responses labelled blind by an LLM
+assistant, merged into `lenient_labels.json`), intermediate Qwen3-8B-AWQ refiner (`g6-8b`, V2 and V3, nine cells;
+`mpir_study/mid_refiner.py`), new Sections 5.1.1, 5.3.1, 5.6.2, 5.10, 5.11, Appendix G, rewritten abstract, discussion and
+conclusion, response-letter builder (`manuscript/build_response_round2.py`), table-numbering fix (new tables are lettered
+R.1-R.5 so the auto-numbered Tables 1-17 stay aligned).
+Reviews (fact-check, simulated reviewer, consistency) are in `manuscript/review_round2_*.md`; their findings are being fixed.
+Still pending: 8B judge pass (`judge_eval --judge 8b --sample 150`), fixes from the reviews, final rebuild, highlighted PDF,
+upload package, cover letter. Do not upload anything before the review reports are resolved.

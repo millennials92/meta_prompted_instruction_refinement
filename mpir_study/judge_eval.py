@@ -37,11 +37,19 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--judge", required=True, choices=list(REFINERS))
     parser.add_argument("--workers", type=int, default=16)
+    parser.add_argument("--sample", type=int, default=0,
+                        help="judge a random subset of this many prompts (fixed seed) instead of all of them")
     args = parser.parse_args()
     endpoint = REFINERS[args.judge]
     store = json.loads(OUT.read_text()) if OUT.exists() else {}
     done = store.setdefault(args.judge, {})
-    todo = {h: t for h, t in prompts_to_judge().items() if h not in done}
+    candidates = prompts_to_judge()
+    if args.sample:
+        import random
+        keys = sorted(candidates)
+        random.Random(20261102).shuffle(keys)
+        candidates = {h: candidates[h] for h in keys[:args.sample]}
+    todo = {h: t for h, t in candidates.items() if h not in done}
     print(f"{args.judge}: {len(todo)} prompts to judge", flush=True)
 
     def judge(item):

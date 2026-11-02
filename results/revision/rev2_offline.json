@@ -104,14 +104,14 @@
    "lost_format_from_prompts_with_examples": 3
   },
   "v2f": {
-   "candidates": 7,
-   "keep_format_line": 0.2857142857142857,
-   "keep_bare_tag_example": 0.5714285714285714,
-   "from_prompts_with_examples": 3,
-   "keep_examples_given_p0_has_examples": 1.0,
-   "lost_format": 5,
-   "lost_format_and_examples_given_p0_has_examples": 0,
-   "lost_format_from_prompts_with_examples": 3
+   "candidates": 160,
+   "keep_format_line": 0.225,
+   "keep_bare_tag_example": 0.3125,
+   "from_prompts_with_examples": 59,
+   "keep_examples_given_p0_has_examples": 0.7966101694915254,
+   "lost_format": 124,
+   "lost_format_and_examples_given_p0_has_examples": 7,
+   "lost_format_from_prompts_with_examples": 41
   }
  },
  "base_prompt_inventory": {
@@ -443,28 +443,28 @@
  },
  "protected_failure_modes": {
   "v1p": {
-   "candidates": 0,
-   "no_tag": 0,
-   "sentence_in_tag": 0,
-   "bare_in_tag": 0,
-   "outputs": 0,
-   "mean_diff_vs_p0": null,
-   "candidates_with_bare_tag_example": 0,
-   "share_no_tag": 0.0,
-   "share_sentence_in_tag": 0.0,
-   "share_bare_in_tag": 0.0
+   "candidates": 5,
+   "no_tag": 200,
+   "sentence_in_tag": 400,
+   "bare_in_tag": 400,
+   "outputs": 1000,
+   "mean_diff_vs_p0": -0.369,
+   "candidates_with_bare_tag_example": 3,
+   "share_no_tag": 0.2,
+   "share_sentence_in_tag": 0.4,
+   "share_bare_in_tag": 0.4
   },
   "v2p": {
-   "candidates": 0,
-   "no_tag": 0,
-   "sentence_in_tag": 0,
-   "bare_in_tag": 0,
-   "outputs": 0,
-   "mean_diff_vs_p0": null,
-   "candidates_with_bare_tag_example": 0,
-   "share_no_tag": 0.0,
-   "share_sentence_in_tag": 0.0,
-   "share_bare_in_tag": 0.0
+   "candidates": 15,
+   "no_tag": 1598,
+   "sentence_in_tag": 836,
+   "bare_in_tag": 254,
+   "outputs": 2688,
+   "mean_diff_vs_p0": -0.20941666666666664,
+   "candidates_with_bare_tag_example": 1,
+   "share_no_tag": 0.5944940476190477,
+   "share_sentence_in_tag": 0.31101190476190477,
+   "share_bare_in_tag": 0.09449404761904762
   }
  },
  "rubric_vs_free": {
@@ -897,8 +897,8 @@
   },
   "near_token_limit": {
    "refine_ge_90pct_of_3000": 2,
-   "judge_ge_90pct_of_1500": 61,
-   "rounds": 1218
+   "judge_ge_90pct_of_1500": 77,
+   "rounds": 1498
   }
  },
  "audit_labels": {
@@ -946,6 +946,13 @@
    "target_validation_calls_per_run": 134.0625,
    "target_test_calls_per_run": 355.8
   },
+  "v2|8b": {
+   "runs": 9,
+   "refiner_calls_per_run": 14.0,
+   "refiner_generated_tokens_per_run": 10830.632008154944,
+   "target_validation_calls_per_run": 358.3333333333333,
+   "target_test_calls_per_run": 330.6666666666667
+  },
   "v2|gpt6luna": {
    "runs": 9,
    "refiner_calls_per_run": 14.0,
@@ -961,11 +968,11 @@
    "target_test_calls_per_run": 330.6666666666667
   },
   "v2f|1.7b": {
-   "runs": 4,
+   "runs": 44,
    "refiner_calls_per_run": 14.0,
-   "refiner_generated_tokens_per_run": 11024.770642201835,
-   "target_validation_calls_per_run": 62.5,
-   "target_test_calls_per_run": 400.0
+   "refiner_generated_tokens_per_run": 10829.748748957463,
+   "target_validation_calls_per_run": 77.27272727272727,
+   "target_test_calls_per_run": 357.45454545454544
   },
   "v2l|1.7b": {
    "runs": 9,
@@ -986,6 +993,13 @@
    "refiner_calls_per_run": 7.0,
    "refiner_generated_tokens_per_run": 3519.01121304791,
    "target_validation_calls_per_run": 308.3333333333333,
+   "target_test_calls_per_run": 330.6666666666667
+  },
+  "v3|8b": {
+   "runs": 9,
+   "refiner_calls_per_run": 7.0,
+   "refiner_generated_tokens_per_run": 1847.7573904179408,
+   "target_validation_calls_per_run": 341.6666666666667,
    "target_test_calls_per_run": 330.6666666666667
   },
   "v3|qwen235": {
