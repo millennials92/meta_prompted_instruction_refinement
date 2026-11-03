@@ -140,7 +140,7 @@ def main():
         r.text = ""
     paras[1].runs[0].text = ("Original Article Title: Does Rubric-Guided Refinement Improve Automatically Optimized "
                              "Prompts? A Pre-Specified Negative-Result Study")
-    paras[15].runs[0].text = "Quang-Vinh Dang et al."
+    paras[15].runs[0].text = "Minh Ngoc Dinh et al."
     for r in paras[15].runs[1:]:
         r.text = ""
     note = paras[59]

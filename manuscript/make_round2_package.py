@@ -100,7 +100,7 @@ November 3, 2026
 \textbf{Manuscript ID:} Access-2026-54235 (initial submission: Access-2026-44920)\\
 \textbf{Revised title:} Does Rubric-Guided Refinement Improve Prompts from Small-Model Optimizers?\\
 \textbf{Manuscript type:} Negative Result\\
-\textbf{Corresponding author:} Quang-Vinh Dang (British University Vietnam), \url{vinh.dq4@buv.edu.vn}
+\textbf{Corresponding author:} Minh Ngoc Dinh (Millenia Education), \url{Minh.dinh@maeducation.com}
 
 \bigskip
 Dear Editor,
@@ -131,7 +131,7 @@ so no byline-change form is enclosed. All code, per-round logs, samples and labe
 
 \bigskip
 On behalf of all authors,\\
-Quang-Vinh Dang
+Minh Ngoc Dinh
 \end{document}
 """ % {"gate": CT["known_good_accepted"], "ncells": CT["known_good_cells"], "runs": G["runs"], "acc": G["accepted_runs"],
        "lw": G["lenient_wins_vs_start"], "lws": "" if G["lenient_wins_vs_start"] == 1 else "s", "ll": G["lenient_losses_vs_start"], "prec": 100 * LC["lenient"]["precision"],

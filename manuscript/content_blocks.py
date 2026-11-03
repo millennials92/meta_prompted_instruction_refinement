@@ -11,8 +11,8 @@ TITLE = ("Does Rubric-Guided Refinement Improve Prompts from Small-Model Optimiz
 
 AUTHORS = [
     {"name": "Linh Nguyen", "affil_idx": [1], "corresponding": False, "email": "s4021009@rmit.edu.vn"},
-    {"name": "Quang-Vinh Dang", "affil_idx": [2], "corresponding": True},
-    {"name": "Minh Ngoc Dinh", "affil_idx": [3], "corresponding": False, "email": "Minh.dinh@maeducation.com"},
+    {"name": "Quang-Vinh Dang", "affil_idx": [2], "corresponding": False},
+    {"name": "Minh Ngoc Dinh", "affil_idx": [3], "corresponding": True, "email": "Minh.dinh@maeducation.com"},
     {"name": "Thuy Nguyen", "affil_idx": [1], "corresponding": False, "email": "thuy.nguyen43@rmit.edu.vn"},
 ]
 AFFILIATIONS = [
@@ -20,9 +20,9 @@ AFFILIATIONS = [
     "British University Vietnam, Hung Yen, Vietnam",
     "Millenia Education, Ho Chi Minh City, Vietnam",
 ]
-CORRESPONDING_AUTHOR_EMAIL = "vinh.dq4@buv.edu.vn"
+CORRESPONDING_AUTHOR_EMAIL = "Minh.dinh@maeducation.com"
 CORRESPONDING_AUTHOR_NOTE = (
-    "*Corresponding author: Quang-Vinh Dang, British University Vietnam, Hung Yen, Vietnam. "
+    "*Corresponding author: Minh Ngoc Dinh, Millenia Education, Ho Chi Minh City, Vietnam. "
     f"Email: {CORRESPONDING_AUTHOR_EMAIL}"
 )
 
