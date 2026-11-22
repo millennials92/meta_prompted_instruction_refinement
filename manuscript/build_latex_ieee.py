@@ -87,7 +87,7 @@ def ieee_acknowledgment():
         + BL.resolve_citations(
             "The authors thank the reviewers for their constructive comments on earlier versions of this manuscript. "
             "Generative AI tools were used to improve the grammar and readability of the manuscript text, and an "
-            "AI-assisted coding tool generated initial code snippets during development. Language-model assistants "
+            "AI-assisted coding tool (Claude Code, Anthropic) generated initial code snippets during development. Language-model assistants (Claude, Anthropic) "
             "also labelled sampled echo and fallback rounds and responses for the lenient-parser validation, and helped "
             "verify bibliographic entries; these labels are screening aids released for re-checking, not human "
             "annotations. All AI-assisted text and code were reviewed, verified, and adapted by the authors, who take "
@@ -172,9 +172,17 @@ IEEE_ABSTRACT = (
 )
 
 
+LUNA_FOOTNOTE = (
+    r"\footnote{GPT-6 Luna (OpenAI; model slug openai/gpt-6-luna) is documented only through its OpenRouter "
+    r"model listing, \url{https://openrouter.ai/openai/gpt-6-luna}, accessed on Oct. 20 and Nov. 2, 2026. No technical "
+    r"report or snapshot identifier was available to us and the router chooses the serving provider, so exact "
+    r"re-runs may not be possible.}"
+)
+
+
 def build():
     os.makedirs(LATEX_IEEE_DIR, exist_ok=True)
-    body = latex_body_ieee()
+    body = latex_body_ieee().replace("@@LUNAFN@@", LUNA_FOOTNOTE)
     authors = author_block_ieee()
     keywords = ", ".join(sorted(k.strip() for k in C.KEYWORDS.split(",")))
     acknowledgment = ieee_acknowledgment()

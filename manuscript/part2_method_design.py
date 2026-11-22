@@ -226,7 +226,7 @@ H2("4.3. Models and Serving")
 P("The target model is Qwen3-1.7B ‹68› with thinking disabled and greedy decoding, at most 1024 new "
   "tokens. The refining model is the same model in the main grid. In the capability experiment the refiner is "
   "Qwen3-235B-A22B (the 2507 instruct release, a mixture-of-experts model from the target's family) or GPT-6 "
-  "Luna ‹127›, both reached through the OpenRouter API on 2026-10-20 and 21 (and again on 2026-11-02 for the protected variants V2F and V3F) with temperature 0.7, a 3000-token "
+  "Luna ‹127›@@LUNAFN@@, both reached through the OpenRouter API on 2026-10-20 and 21 (and again on 2026-11-02 for the protected variants V2F and V3F) with temperature 0.7, a 3000-token "
   "limit and, for GPT-6 Luna, minimal reasoning effort; the 2507 instruct release of Qwen3-235B-A22B does not think, the local Qwen3-8B-AWQ refiner of Section 5.6.2 was served with thinking disabled like the target, so the target's thinking mode was off throughout. Meta-prompt calls allow 1500 (evaluation) and 3000 "
   "(refinement) new tokens. The target and the 1.7B refiner are served with vLLM ‹123› 0.28.0 under WSL2 on one "
   "16 GB RTX 5000 Ada GPU, bf16 weights, a maximum context of 8192 tokens (Appendix C). Greedy decoding is not bit-reproducible under continuous batching, so we measure the "

@@ -149,9 +149,9 @@ P("Linh Nguyen: Conceptualization, Methodology, Software, Investigation, Formal 
 
 H1("Declaration of Generative AI and AI-Assisted Technologies in the Writing Process")
 P("Generative AI tools were used solely to improve the grammar and readability of the text. All ideas, "
-  "analyses, and conclusions are solely those of the authors. An AI-assisted coding tool was used to "
+  "analyses, and conclusions are solely those of the authors. An AI-assisted coding tool (Claude Code, Anthropic) was used to "
   "generate initial code snippets during development; all code was reviewed, verified, and adapted by "
-  "the authors. Language-model assistants were also used to label sampled echo and fallback "
+  "the authors. Language-model assistants (Claude, Anthropic) were also used to label sampled echo and fallback "
   "rounds and to label responses for the lenient-parser validation (Sections 5.1.1 and 5.2), to verify "
   "bibliographic entries, and to help edit the analysis code; these labels are screening aids released for "
   "re-checking, not human annotations, and all analyses, claims and conclusions are the authors' responsibility.")
