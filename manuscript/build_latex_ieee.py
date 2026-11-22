@@ -103,8 +103,8 @@ def author_bio_placeholders():
     than expanded with invented degree history, dates, or research-interest
     claims."""
     bios = {
-        "Linh Nguyen": "is a Master's student in the Master of Artificial Intelligence program at "
-                       "RMIT University Vietnam, Ho Chi Minh City, Vietnam.",
+        "Linh Nguyen": "is a Ph.D. student at RMIT University Vietnam, Ho Chi Minh City, Vietnam. "
+                       "This work began while Linh Nguyen was a Master's student at the same university.",
         "Quang-Vinh Dang": "is a Senior Lecturer at British University Vietnam, Hung Yen, Vietnam.",
         "Minh Ngoc Dinh": "is Dean of the School of Information Technology and Data Science, "
                           "Millenia Education, Ho Chi Minh City, Vietnam.",
