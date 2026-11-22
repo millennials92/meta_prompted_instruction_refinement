@@ -139,7 +139,8 @@ P("The authors declare that they have no conflicts of interest.")
 H1("Data Availability Statement")
 P("The datasets used in this study are drawn from the publicly available Big-Bench Hard benchmark. Code, "
   "prompts, the revision protocol, per-round logs, generations, and analysis outputs are openly available at "
-  "https://github.com/millennials92/meta_prompted_instruction_refinement.")
+  "https://github.com/millennials92/meta_prompted_instruction_refinement. An archival snapshot of the repository as "
+  "submitted (commit 7c918c9) is deposited on Zenodo, https://doi.org/10.5281/zenodo.24442216.")
 
 H1("Author Contribution Statement")
 P("Linh Nguyen: Conceptualization, Methodology, Software, Investigation, Formal analysis, Data curation, "
