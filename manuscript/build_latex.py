@@ -253,9 +253,12 @@ def latex_table(b):
         unit = "\\textwidth" if wide else "\\linewidth"
         # Column padding (2 * \tabcolsep per column) is added on top of the p-column widths, so the nominal
         # fractions are scaled down to keep the whole table inside the text block.
-        scale = 0.94 if wide else 0.86
+        # Exact fit: the p-column widths share what is left of the unit width after the column padding.
+        total = sum(float(w) for w in b["colw"])
+        pad = 2 * ncols
         colspec = "".join(
-            f">{{\\raggedright\\arraybackslash}}p{{{float(w) * scale:.3f}{unit}}}" for w in b["colw"]
+            f">{{\\raggedright\\arraybackslash}}p{{\\dimexpr({unit}-{pad}\\tabcolsep)*{round(9950 * float(w) / total)}/10000\\relax}}"
+            for w in b["colw"]
         )
     else:
         colspec = "l" + "c" * (ncols - 1)

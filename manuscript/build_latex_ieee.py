@@ -115,7 +115,7 @@ def author_bio_placeholders():
     for a in C.AUTHORS:
         bio = bios.get(a["name"], "")
         lines.append(f"\\begin{{IEEEbiographynophoto}}{{{BL.esc(a['name'])}}}")
-        lines.append(f"{BL.esc(a['name'])} {BL.esc(bio)}")
+        lines.append(BL.esc(bio))
         lines.append(r"\end{IEEEbiographynophoto}")
         lines.append("")
     return "\n".join(lines)
@@ -214,7 +214,7 @@ TEMPLATE = r"""\documentclass{{ieeeaccess}}
 \usepackage{{textcomp}}
 \usepackage{{caption}}
 \usepackage{{array}}
-\usepackage{{url}}
+\usepackage{{xurl}}
 
 \begin{{document}}
 \renewcommand{{\thesection}}{{\arabic{{section}}}}
@@ -259,6 +259,8 @@ commercial, or not-for-profit sectors.}}
 \bibliography{{cas-refs}}
 
 {bios}
+
+\vfill
 
 \EOD
 

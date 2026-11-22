@@ -8,7 +8,7 @@
 \usepackage{textcomp}
 \usepackage{caption}
 \usepackage{array}
-\usepackage{url}
+\usepackage{xurl}
 
 \begin{document}
 \renewcommand{\thesection}{\arabic{section}}
@@ -100,7 +100,7 @@ Table 1 contrasts how the methods above propose and select candidates. It states
 \centering
 \small
 \caption{Design comparison of MPIR with representative methods. The table describes design differences only; it reports no empirical comparison.}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.155\linewidth}>{\raggedright\arraybackslash}p{0.258\linewidth}>{\raggedright\arraybackslash}p{0.258\linewidth}>{\raggedright\arraybackslash}p{0.189\linewidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-8\tabcolsep)*1791/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-8\tabcolsep)*2985/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-8\tabcolsep)*2985/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-8\tabcolsep)*2189/10000\relax}}
 \toprule
 \textbf{Method} & \textbf{Candidate generation} & \textbf{Selection} & \textbf{Role relative to an APO run} \\
 \midrule
@@ -167,7 +167,7 @@ The pilot ran what we call the legacy loop: Psrc = P0 in every round, H empty an
 \centering
 \small
 \caption{Refinement variants studied. All use the same gate (strict improvement over the incumbent on 25 validation questions) and N = 7 rounds. V3 candidates, and those of V1P, V2P and V2F, carry the answer-format line (V2F also keeps the worked example); V1 and V2 candidates are scored as the refiner wrote them.}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.232\linewidth}>{\raggedright\arraybackslash}p{0.146\linewidth}>{\raggedright\arraybackslash}p{0.189\linewidth}>{\raggedright\arraybackslash}p{0.103\linewidth}>{\raggedright\arraybackslash}p{0.189\linewidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-10\tabcolsep)*2686/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-10\tabcolsep)*1692/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-10\tabcolsep)*2189/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-10\tabcolsep)*1194/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-10\tabcolsep)*2189/10000\relax}}
 \toprule
 \textbf{Variant} & \textbf{Refines} & \textbf{History} & \textbf{Sampling} & \textbf{Rubric text} \\
 \midrule
@@ -270,7 +270,7 @@ APE and ProTeGi are clean-room implementations of the published algorithms \cite
 \centering
 \small
 \caption{Hyperparameters of the base optimizers and of MPIR as actually used.}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.129\linewidth}>{\raggedright\arraybackslash}p{0.232\linewidth}>{\raggedright\arraybackslash}p{0.344\linewidth}>{\raggedright\arraybackslash}p{0.155\linewidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-8\tabcolsep)*1492/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-8\tabcolsep)*2686/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-8\tabcolsep)*3980/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-8\tabcolsep)*1791/10000\relax}}
 \toprule
 \textbf{Component} & \textbf{Parameter} & \textbf{Description} & \textbf{Value used} \\
 \midrule
@@ -317,7 +317,7 @@ Table 4 gives the strict and lenient test accuracy of the nine pilot base prompt
 \centering
 \footnotesize
 \caption{Test accuracy (\%) of the nine pilot base prompts (seed 42, Qwen3-1.7B, greedy, one scoring pass). Strict is the primary metric with a 95\% Wilson interval; lenient is the secondary metric. Chance is 1 over the number of distinct gold labels. Delims is the share of responses containing both tags.}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.254\textwidth}>{\raggedright\arraybackslash}p{0.141\textwidth}>{\raggedright\arraybackslash}p{0.226\textwidth}>{\raggedright\arraybackslash}p{0.113\textwidth}>{\raggedright\arraybackslash}p{0.094\textwidth}>{\raggedright\arraybackslash}p{0.113\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*2686/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*1492/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*2388/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*1194/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*995/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*1194/10000\relax}}
 \toprule
 \textbf{Task} & \textbf{Optimizer} & \textbf{Strict [95\% CI]} & \textbf{Lenient} & \textbf{Chance} & \textbf{Delims \%} \\
 \midrule
@@ -338,7 +338,7 @@ penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table & ProTeGi & 1.0 [0
 \centering
 \small
 \caption{Reference conditions, strict (lenient) test accuracy \%, seed 42. Free rewrite is the ungated rubric-free rewrite of the PromptWizard prompt from the pilot.}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.292\linewidth}>{\raggedright\arraybackslash}p{0.189\linewidth}>{\raggedright\arraybackslash}p{0.189\linewidth}>{\raggedright\arraybackslash}p{0.189\linewidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-8\tabcolsep)*3383/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-8\tabcolsep)*2189/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-8\tabcolsep)*2189/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-8\tabcolsep)*2189/10000\relax}}
 \toprule
 \textbf{Task} & \textbf{Zero-shot CoT} & \textbf{Expert few-shot CoT} & \textbf{Free rewrite (ungated)} \\
 \midrule
@@ -359,7 +359,7 @@ Neither metric is ground truth, and the lenient parser has to be checked against
 \centering
 \footnotesize
 \caption{Agreement of the strict and the lenient parser with labelled truth on 400 sampled test responses (half of each task group strict-accepted, half strict-rejected, so recall and precision describe this sample, not the population). Precision is the share of accepted responses that are truly correct and recall the share of truly correct responses that are accepted; fp and fn are counts.}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.207\textwidth}>{\raggedright\arraybackslash}p{0.113\textwidth}>{\raggedright\arraybackslash}p{0.075\textwidth}>{\raggedright\arraybackslash}p{0.132\textwidth}>{\raggedright\arraybackslash}p{0.113\textwidth}>{\raggedright\arraybackslash}p{0.132\textwidth}>{\raggedright\arraybackslash}p{0.085\textwidth}>{\raggedright\arraybackslash}p{0.085\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-16\tabcolsep)*2189/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-16\tabcolsep)*1194/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-16\tabcolsep)*796/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-16\tabcolsep)*1393/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-16\tabcolsep)*1194/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-16\tabcolsep)*1393/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-16\tabcolsep)*896/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-16\tabcolsep)*896/10000\relax}}
 \toprule
 \textbf{Tasks} & \textbf{Parser} & \textbf{n} & \textbf{Precision \%} & \textbf{Recall \%} & \textbf{Agreement \%} & \textbf{fp} & \textbf{fn} \\
 \midrule
@@ -419,7 +419,7 @@ With the 1.7B model refining its own prompts through the chained variant, the fi
 \centering
 \small
 \caption{Per task and optimizer, chained variant, 1.7B refiner: the only task-optimizer combinations in which any run's final prompt differs from P0 (runs changed out of all MPIR runs, and the mean paired test-accuracy difference in points). The other 26 of the 27 combinations are identical to P0 in every run, with a difference of exactly zero.}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.344\linewidth}>{\raggedright\arraybackslash}p{0.189\linewidth}>{\raggedright\arraybackslash}p{0.172\linewidth}>{\raggedright\arraybackslash}p{0.155\linewidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-8\tabcolsep)*3980/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-8\tabcolsep)*2189/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-8\tabcolsep)*1990/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-8\tabcolsep)*1791/10000\relax}}
 \toprule
 \textbf{Task} & \textbf{Optimizer} & \textbf{Runs changed} & \textbf{Mean difference} \\
 \midrule
@@ -454,7 +454,7 @@ To separate the candidates from the gate, every validated candidate of MPIR seed
 \centering
 \small
 \caption{Acceptance-rule sensitivity on the oracle-scored candidates (MPIR seed 1, Tier-1 seed-42 cells). Cells accepting: cells in which the rule accepts some candidate, out of the cells with at least one validated candidate. Mean delta is the mean change in strict test accuracy of the selected prompt versus P0, in points, over all cells with at least one validated candidate (a cell in which the rule accepts nothing counts as zero; for the larger gate, measured on the held-out half of the test split). Better/worse is the number of cells with a positive or negative delta.}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.172\linewidth}>{\raggedright\arraybackslash}p{0.310\linewidth}>{\raggedright\arraybackslash}p{0.138\linewidth}>{\raggedright\arraybackslash}p{0.103\linewidth}>{\raggedright\arraybackslash}p{0.138\linewidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-10\tabcolsep)*1990/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-10\tabcolsep)*3582/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-10\tabcolsep)*1592/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-10\tabcolsep)*1194/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-10\tabcolsep)*1592/10000\relax}}
 \toprule
 \textbf{Variant} & \textbf{Acceptance rule} & \textbf{Cells accepting} & \textbf{Mean delta} & \textbf{Better/worse cells} \\
 \midrule
@@ -520,7 +520,7 @@ Because the strong-refiner signal appeared after the analysis fixed in advance, 
 \centering
 \small
 \caption{Paired comparison of the rubric-guided (V2) and rubric-free (V3) variants with the same Qwen3-235B refiner on the nine Tier-1 seed-42 cells, MPIR seed 1 for both. Differences are in test-accuracy points of the final prompt, paired over the 200 test examples (96 for penguins\_\allowbreak{}in\_\allowbreak{}a\_\allowbreak{}table); the last column is V2 minus V3 with a 95\% paired-bootstrap interval. One run per condition and cell; the minimum detectable effect is 5.0 points (Section 5.7).}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.258\linewidth}>{\raggedright\arraybackslash}p{0.103\linewidth}>{\raggedright\arraybackslash}p{0.120\linewidth}>{\raggedright\arraybackslash}p{0.120\linewidth}>{\raggedright\arraybackslash}p{0.258\linewidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-10\tabcolsep)*2985/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-10\tabcolsep)*1194/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-10\tabcolsep)*1393/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-10\tabcolsep)*1393/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-10\tabcolsep)*2985/10000\relax}}
 \toprule
 \textbf{Cell} & \textbf{P0 strict \%} & \textbf{V3 - P0} & \textbf{V2 - P0} & \textbf{V2 - V3 [95\% CI]} \\
 \midrule
@@ -579,7 +579,7 @@ Mixed serving settings. The inference server was restarted several times during 
 \centering
 \footnotesize
 \caption{Rubric totals (out of 35) assigned at temperature 0 to the base prompts and oracle-scored candidates (223 distinct prompts). Spearman correlations of the total with validation and with test accuracy are computed within each of the nine cells over the 275 oracle-scored candidates (median shown); the two judges' totals correlate at 0.38.}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.291\textwidth}>{\raggedright\arraybackslash}p{0.132\textwidth}>{\raggedright\arraybackslash}p{0.122\textwidth}>{\raggedright\arraybackslash}p{0.094\textwidth}>{\raggedright\arraybackslash}p{0.150\textwidth}>{\raggedright\arraybackslash}p{0.150\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*3084/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*1393/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*1294/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*995/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*1592/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*1592/10000\relax}}
 \toprule
 \textbf{Judge} & \textbf{Totals parsed} & \textbf{Mean total} & \textbf{SD} & \textbf{Spearman, val.} & \textbf{Spearman, test} \\
 \midrule
@@ -595,7 +595,7 @@ The 1.7B judge gives a parseable total for 93\% of prompts and scores them 7.2 p
 \centering
 \footnotesize
 \caption{Within-cell median Spearman correlation of the rubric total with test accuracy over all oracle-scored candidates and after excluding candidates whose strict test accuracy is exactly zero (format loss). The 8B judge is the local Qwen3-8B-AWQ model, which is also the intermediate refiner of Section 5.6.2; it is not the refiner of the 1.7B, Qwen3-235B or GPT-6 Luna candidates, but its scores of its own candidates are not independent.}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.320\textwidth}>{\raggedright\arraybackslash}p{0.113\textwidth}>{\raggedright\arraybackslash}p{0.113\textwidth}>{\raggedright\arraybackslash}p{0.132\textwidth}>{\raggedright\arraybackslash}p{0.132\textwidth}>{\raggedright\arraybackslash}p{0.132\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*3383/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*1194/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*1194/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*1393/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*1393/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*1393/10000\relax}}
 \toprule
 \textbf{Judge} & \textbf{Candidates} & \textbf{Zero accuracy} & \textbf{Spearman (all)} & \textbf{Candidates > 0} & \textbf{Spearman (> 0)} \\
 \midrule
@@ -620,7 +620,7 @@ Table 16 gives the outcome of each decision rule. D1 (RQ1) is null for the unpro
 \centering
 \small
 \caption{Summary of the variants: refiner, cells, what each tests and its outcome (strict scoring unless stated; cells are Tier-1 seed-42 cells unless a count is given).}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.172\linewidth}>{\raggedright\arraybackslash}p{0.129\linewidth}>{\raggedright\arraybackslash}p{0.103\linewidth}>{\raggedright\arraybackslash}p{0.206\linewidth}>{\raggedright\arraybackslash}p{0.249\linewidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-10\tabcolsep)*1990/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-10\tabcolsep)*1492/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-10\tabcolsep)*1194/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-10\tabcolsep)*2388/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-10\tabcolsep)*2886/10000\relax}}
 \toprule
 \textbf{Variant} & \textbf{Refiner} & \textbf{Cells} & \textbf{What it tests} & \textbf{Outcome} \\
 \midrule
@@ -644,7 +644,7 @@ V2 chained & GPT-6 Luna & 9 & strong closed refiner (exploratory) & 1 strict win
 \centering
 \small
 \caption{Outcome of the decision rules (Section 4.1).}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.129\linewidth}>{\raggedright\arraybackslash}p{0.318\linewidth}>{\raggedright\arraybackslash}p{0.258\linewidth}>{\raggedright\arraybackslash}p{0.155\linewidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-8\tabcolsep)*1492/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-8\tabcolsep)*3682/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-8\tabcolsep)*2985/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-8\tabcolsep)*1791/10000\relax}}
 \toprule
 \textbf{Rule} & \textbf{Criterion} & \textbf{Observed} & \textbf{Outcome} \\
 \midrule
@@ -667,7 +667,7 @@ D3 & Best oracle candidate at least +3 pts in at least 3 of 9 cells although the
 \centering
 \footnotesize
 \caption{Cost of one run (seven rounds), averaged over the runs of each variant. Refiner calls: evaluation plus refinement (one call per round for V3). Refiner tokens are generated tokens, estimated from the logged texts at 4.36 characters per token (measured with the Qwen3 tokenizer on 1,500 generations). Target calls are the validation questions answered for the baseline and every validated candidate (25 per scoring) and the two test scorings of P0 and the final prompt; the oracle scoring of every candidate used for analysis is not included.}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.263\textwidth}>{\raggedright\arraybackslash}p{0.075\textwidth}>{\raggedright\arraybackslash}p{0.132\textwidth}>{\raggedright\arraybackslash}p{0.150\textwidth}>{\raggedright\arraybackslash}p{0.169\textwidth}>{\raggedright\arraybackslash}p{0.150\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*2786/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*796/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*1393/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*1592/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*1791/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*1592/10000\relax}}
 \toprule
 \textbf{Variant} & \textbf{Runs} & \textbf{Refiner calls} & \textbf{Refiner tokens} & \textbf{Target val. calls} & \textbf{Target test calls} \\
 \midrule
@@ -840,7 +840,7 @@ Defects found while running the pipeline against a live model. Magnitudes are th
 \centering
 \footnotesize
 \caption{Defects found in the pipeline, their observed symptom and the fix.}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.038\textwidth}>{\raggedright\arraybackslash}p{0.244\textwidth}>{\raggedright\arraybackslash}p{0.376\textwidth}>{\raggedright\arraybackslash}p{0.282\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-8\tabcolsep)*398/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-8\tabcolsep)*2587/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-8\tabcolsep)*3980/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-8\tabcolsep)*2985/10000\relax}}
 \toprule
 \textbf{\#} & \textbf{Defect} & \textbf{Observed symptom} & \textbf{Fix} \\
 \midrule
@@ -867,7 +867,7 @@ Earlier pre-pilot fixes (a per-seed data-split collision, an unseeded random gen
 \centering
 \small
 \caption{Serving configuration.}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.224\linewidth}>{\raggedright\arraybackslash}p{0.636\linewidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-4\tabcolsep)*2587/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-4\tabcolsep)*7363/10000\relax}}
 \toprule
 \textbf{Item} & \textbf{Value} \\
 \midrule
@@ -1004,7 +1004,7 @@ Table 23 lists the kind of every base prompt so that readers can judge how infor
 \centering
 \footnotesize
 \caption{Kind of each base prompt P0 (Qwen3-1.7B-driven optimizers). Chars is the prompt length; bare-tag example means that the prompt contains a worked example whose answer is a bare option inside the answer tags.}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.244\textwidth}>{\raggedright\arraybackslash}p{0.132\textwidth}>{\raggedright\arraybackslash}p{0.085\textwidth}>{\raggedright\arraybackslash}p{0.085\textwidth}>{\raggedright\arraybackslash}p{0.282\textwidth}>{\raggedright\arraybackslash}p{0.113\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*2587/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*1393/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*896/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*896/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*2985/10000\relax}>{\raggedright\arraybackslash}p{\dimexpr(\textwidth-12\tabcolsep)*1194/10000\relax}}
 \toprule
 \textbf{Task} & \textbf{Optimizer} & \textbf{Split seed} & \textbf{Chars} & \textbf{Kind} & \textbf{Bare-tag example} \\
 \midrule
@@ -1065,21 +1065,23 @@ The authors thank the reviewers for their constructive comments on earlier versi
 \bibliography{cas-refs}
 
 \begin{IEEEbiographynophoto}{Linh Nguyen}
-Linh Nguyen is a Master's student in the Master of Artificial Intelligence program at RMIT University Vietnam, Ho Chi Minh City, Vietnam.
+is a Master's student in the Master of Artificial Intelligence program at RMIT University Vietnam, Ho Chi Minh City, Vietnam.
 \end{IEEEbiographynophoto}
 
 \begin{IEEEbiographynophoto}{Quang-Vinh Dang}
-Quang-Vinh Dang is a Senior Lecturer at British University Vietnam, Hung Yen, Vietnam.
+is a Senior Lecturer at British University Vietnam, Hung Yen, Vietnam.
 \end{IEEEbiographynophoto}
 
 \begin{IEEEbiographynophoto}{Minh Ngoc Dinh}
-Minh Ngoc Dinh is Dean of the School of Information Technology and Data Science, Millenia Education, Ho Chi Minh City, Vietnam.
+is Dean of the School of Information Technology and Data Science, Millenia Education, Ho Chi Minh City, Vietnam.
 \end{IEEEbiographynophoto}
 
 \begin{IEEEbiographynophoto}{Thuy Nguyen}
-Thuy Nguyen is a Senior Lecturer at RMIT University Vietnam, Ho Chi Minh City, Vietnam.
+is a Senior Lecturer at RMIT University Vietnam, Ho Chi Minh City, Vietnam.
 \end{IEEEbiographynophoto}
 
+
+\vfill
 
 \EOD
 
