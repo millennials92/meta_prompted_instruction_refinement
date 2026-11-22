@@ -121,7 +121,10 @@ P("Neither metric is ground truth, and the lenient parser has to be checked agai
   "four groups: binary tasks (hyperbaton, sports_understanding) and multi-option tasks, each split into responses that "
   "strict extraction accepts and responses that it rejects, since the lenient parser matters only for the latter. "
   "Each response was shown without the gold answer and without either parser's verdict, as its first 500 and last 900 "
-  "characters, to a language-model assistant that named the option the response commits to (or 'none'). The "
+  "characters, to a general-purpose commercial language-model assistant that named the option the response commits to (or 'none'). The "
+  "assistant is not one of the target, refiner or judge models of the study, but it is a model of the same broad kind, so shared "
+  "biases cannot be excluded; its exact version was not recorded, and it received only the instruction to name the option the "
+  "response commits to, without the gold answer. The "
   "labelling was therefore done by an AI assistant, not by human raters, and for the longest responses it saw "
   "mainly the end of the text; we release the sample, the key and the labels for re-checking. The labelled option was "
   "compared with the gold answer to give a truth value for every response.")
@@ -154,6 +157,16 @@ P(f"Among the {_c['strict_rejected']['n']} sampled responses that strict extract
   "human re-labelling of a subsample, which we did not do, would be needed to confirm the labels. From here on the "
   "decision rules are restated on the lenient metric as well, and both are reported; the gate itself still uses the "
   "strict metric, which is how MPIR is defined.")
+_wil = lambda k, n, z=1.96: ((k + z * z / 2) / (n + z * z) - z / (n + z * z) * ((k * (n - k) / n + z * z / 4) ** 0.5),
+                               (k + z * z / 2) / (n + z * z) + z / (n + z * z) * ((k * (n - k) / n + z * z / 4) ** 0.5))
+_pl, _ph = _wil(_c["lenient"]["tp"], _c["lenient"]["tp"] + _c["lenient"]["fp"])
+_rl, _rh = _wil(_c["lenient"]["tp"], _c["lenient"]["tp"] + _c["lenient"]["fn"])
+P(f"The 95% Wilson intervals for the overall lenient figures are [{pct(_pl)}, {pct(_ph)}]% for precision and "
+  f"[{pct(_rl)}, {pct(_rh)}]% for recall. The binary and multi-option subgroups both have {_a['lenient']['fp']} false "
+  f"positives and {_a['lenient']['fn']} false negatives; this is a coincidence of the counts, since their true positives "
+  f"({_a['lenient']['tp']} and {_b['lenient']['tp']}) and true negatives ({_a['lenient']['tn']} and {_b['lenient']['tn']}) differ, "
+  "so the precision and recall agree only to the rounding shown. The sample was drawn from one serving session, and a human "
+  "relabelling of the strict-lenient disagreement cases remains to be done.")
 
 # ===========================================================================
 H2("5.2. What the Rounds Were")
@@ -196,7 +209,7 @@ FA, AL, AS_, PFM, RT = (OFF["candidate_format_audit"], OFF["audit_labels"], OFF[
                         OFF["protected_failure_modes"], OFF["round_typology"])
 BP = OFF["base_prompt_inventory"]
 P('What the candidates keep. Among the 120 V1 and 223 V2 rounds that returned delimiters and were not echoes, none keeps the exact answer-format sentence (the 93-95% above counts oracle-scored candidates that lack the answer tag altogether), and only 8% and 7% contain a bare-tag worked example. Only 15 of the 45 base prompts (the PromptWizard prompts) contain such an example, so the exemplar-free APE and ProTeGi prompts gave the refiner nothing to keep; where the base prompt did have worked examples, 48 of 67 V2 candidates (V1: 19 of 32) lost the format line and also dropped at least half of the examples. Appending the format line (V1P, V2P) restores an instruction but not a demonstration of it. We re-scored 5 V1P and 15 V2P candidates in one session: in 40% (V1P) and 31% (V2P) of responses the model wraps a whole sentence (more than 12 characters) inside the tags, which strict extraction rejects, in 20% and 59% it writes no tags at all, and only 40% and 9% contain a bare option inside the tags. Only 3 of 5 V1P and 1 of 15 V2P candidates contain a bare-tag example. The instruction line alone therefore does not teach the 1.7B target the tag convention, which the one-exemplar intervention of Section 5.1 does; this is why V2F (Section 5.3.1) re-attaches an example and not only the line.')
-P('Audit of the round classification. The echo guard (five marker phrases) and the missing-delimiter rule decide 406 of the 749 V1 and V2 rounds. A language-model assistant, not a human rater, labelled a random sample of 40 echo and 40 fallback rounds (1.7B refiner, V1, V2, V1P, V2P) from the head and tail of each logged text, so this is a screening audit; the sample and labels are released for re-checking. 4 of 40 sampled echoes were false positives (rate 10%, one-sided 95% upper bound 21%). Of the sampled fallbacks, 25 never presented a refined prompt, 10 presented one without a closing tag, none was cut off by a length limit, and 6 of 40 (15%) were recoverable by a tolerant parser. Truncation does not explain the fallbacks: the median fallback response is 631 tokens long against the 3000-token limit (90th percentile 986), and only 2 of 1498 refinement responses come within 10% of it (the judge call is closer to its 1500-token limit, 77 of 1498, which can cut a critique but not the rewrite that follows). The guards are therefore mostly right (about 90% precision for echoes), the dominant failure is a refiner that critiques instead of rewriting, and a tolerant parser would recover only a small minority of the lost rounds.')
+P('Audit of the round classification. The echo guard (five marker phrases) and the missing-delimiter rule decide 406 of the 749 V1 and V2 rounds. A language-model assistant, not a human rater, labelled a random sample of 40 echo and 40 fallback rounds (1.7B refiner, V1, V2, V1P, V2P) from the head and tail of each logged text, so this is a screening audit; the sample and labels are released for re-checking. 4 of 40 sampled echoes were false positives (rate 10%, one-sided 95% upper bound 21%). Of the sampled fallbacks, 25 never presented a refined prompt, 10 presented one without a closing tag, none was cut off by a length limit, and 6 of 40 (15%) were recoverable by a tolerant parser. Truncation does not explain the fallbacks: the median fallback response is 631 tokens long against the 3000-token limit (90th percentile 986), and only 2 of 1813 refinement responses come within 10% of it (the judge call is closer to its 1500-token limit, 77 of 1813, which can cut a critique but not the rewrite that follows). The guards are therefore mostly right (about 90% precision for echoes), the dominant failure is a refiner that critiques instead of rewriting, and a tolerant parser would recover only a small minority of the lost rounds.')
 
 # ===========================================================================
 H2("5.3. The Repaired Layer on 45 Cells (RQ1, D1)")
@@ -239,7 +252,7 @@ CTO = CT["by_optimizer"]
 P("Two things are needed to interpret the V2 null: a re-run of the main grid with a treatment that preserves the "
   "answer format, and evidence that the gate and the harness can accept a known-good candidate. We report the positive "
   "control first, because it says what a null result could mean.")
-P("Positive control. For each of the 45 base prompts we offered the gate a candidate known to be good under strict scoring, P0 plus the first worked example of the BBH authors' prompt (the intervention of Section 5.1), and applied the usual rule, strict improvement of the 25-question validation score over P0. The gate accepted it in 29 of 45 cells overall: 15 of 15 ProTeGi cells, 9 of 15 APE cells and 5 of 15 PromptWizard cells; the PromptWizard prompts already contain bare-tag examples, so those acceptances do not test a known-good candidate. Of the 26 APE and ProTeGi cells in which the exemplar raises strict test accuracy, the gate accepted 24, and it never accepted the exemplar where the exemplar did not help on test (0 cases). Those 26 cells are defined by the test outcome, so 24 of 26 is a check on sensitivity to a large effect, not an acceptance rate for unknown candidates. The gate and harness can therefore detect a large strict-metric effect when one is offered, and the null of V2 is not an artefact of a gate that accepts nothing.")
+P("Positive control. For each of the 45 base prompts we offered the gate a candidate known to be good under strict scoring, P0 plus the first worked example of the BBH authors' prompt (the intervention of Section 5.1), and applied the usual rule, strict improvement of the 25-question validation score over P0. The gate accepted it in 29 of 45 cells overall: 15 of 15 ProTeGi cells, 9 of 15 APE cells and 5 of 15 PromptWizard cells; the PromptWizard prompts already contain bare-tag examples, so those acceptances do not test a known-good candidate. Of the 26 APE and ProTeGi cells in which the exemplar raises strict test accuracy, the gate accepted 24, and it never accepted the exemplar where the exemplar did not help on test (0 cases). Those 26 cells are defined by the test outcome, so 24 of 26 is a check on sensitivity to a large effect, not an acceptance rate for unknown candidates. The gate and harness can therefore detect a large strict-metric effect when one is offered, and the null of V2 is not an artefact of a gate that accepts nothing. It does not show that the gate has power at realistic effect sizes: validation scores move in steps of 4 points, re-scoring the same prompt changes 6.5-7.1% of outcomes (Section 5.7), and no random-acceptance baseline (acceptance at the observed rate, simulated from the logged candidates) was computed, so acceptances cannot be separated into selection and noise.")
 P('Bare-tag control. The exemplar adds a worked chain of thought as well as the tag. Replacing it by one sentence that shows only the final-answer tag raises strict test accuracy by +19.4 points for APE and +34.2 points for ProTeGi, against +20.0 and +42.8 points for the full exemplar (the paired interval excludes zero in 10 of 15 APE and 15 of 15 ProTeGi cells for the bare tag). Most of the effect is therefore the tag convention, and the worked reasoning adds about 1 point for APE and 9 for ProTeGi. The effect is heterogeneous: it ranges from losses of up to 45 points on two APE prompts to gains of more than 70 points on ProTeGi prompts. These values were rescored in a later session; Section 5.1 reports +19.5 and +42.3 from the earlier session.')
 
 _ver = ("reproduces" if (G["wins_vs_start"] >= G["runs"] / 3 and G["mean_diff_vs_start"] >= 0.02) else
@@ -265,7 +278,7 @@ P("V2F. The format-preserving variant (Section 3.2, Table 2) was run with the 1.
   f"which the positive control already shows, and the lenient wins against P0 number {G['lenient_wins_vs_p0']}. "
   f"Applying decision rule D1 to V2F against its own baseline gives '{_ver}' on strict scoring and '{_len_ver}' on "
   "lenient scoring (the rule scaled to the number of cells run).")
-P("What this shows. Giving the 1.7B refiner a treatment that can succeed raises the acceptance rate far above that of V2 (15 of 44 runs against 1 of 80), so the V2 null was in part a property of the unprotected treatment. It does not, however, produce reliable gains: against its own baseline the accepted candidates win in 4 cells under strict scoring and in 1 under lenient scoring, with 3 significant lenient losses; its rubric-free control, which does improve the prompts, is reported in Section 5.3.2. One reading is that a 1.7B model refining its own prompt behaves like a noisy search on a 25-question gate; we did not test this against a random-acceptance baseline. Three limits apply. First, V2F is a hybrid treatment: it changes the gate's baseline and re-attaches the format and the example in code, and its rubric-free counterpart under the same protection (V3F) is reported in Section 5.3.2. Second, V2F was run with the 1.7B refiner on 44 cells and one seed (strong refiners are in Section 5.6.3), and its decision rule was scaled post hoc to that number of cells. Third, the positive control shows that the gate accepts a hand-built candidate, not that a refiner can produce one. Finally, ProTeGi returned the seed instruction plus the format line in 15 of its 15 cells (Appendix G), which is why its exemplar effect is the largest; for ProTeGi the experiments test the refinement of a seed prompt, not of an optimized one.")
+P("What this shows. Giving the 1.7B refiner a treatment that can succeed raises the acceptance rate far above that of V2 (15 of 44 runs against 1 of 80), so the V2 null was in part a property of the unprotected treatment. It does not, however, produce reliable gains: against its own baseline the accepted candidates win in 4 cells under strict scoring and in 1 under lenient scoring, with 3 significant lenient losses; its rubric-free control, which does improve the prompts, is reported in Section 5.3.2. One reading is that a 1.7B model refining its own prompt behaves like a noisy search on a 25-question gate; we did not test this against a random-acceptance baseline, and a net lenient mean near zero despite 15 acceptances is consistent with near-random acceptance. Three limits apply. First, V2F is a hybrid treatment: it changes the gate's baseline and re-attaches the format and the example in code, and its rubric-free counterpart under the same protection (V3F) is reported in Section 5.3.2. Second, V2F was run with the 1.7B refiner on 44 cells and one seed (strong refiners are in Section 5.6.3), and its decision rule was scaled post hoc to that number of cells. Third, the positive control shows that the gate accepts a hand-built candidate, not that a refiner can produce one. Finally, ProTeGi returned the seed instruction plus the format line in 15 of its 15 cells (Appendix G), which is why its exemplar effect is the largest; for ProTeGi the experiments test the refinement of a seed prompt, not of an optimized one.")
 
 H3("5.3.2. A Rubric-Free Control Under the Same Protection (V3F)")
 _P1, _P2, _PR = PP["v3f_1.7b"], PP["v2f_1.7b"], PP["paired_1.7b_all"]
@@ -297,8 +310,8 @@ P(f"Over the {_PR['n']} cells that both variants completed, the paired differenc
   "worse than the rubric-free one by a paired interval that excludes zero over the 44 cells (over the nine Tier-1 cells alone "
   "the interval includes zero). A possible reason, which we did not test, is the length of the rubric meta-prompt: the 1.7B "
   "model answers it with critiques instead of rewrites (the fallbacks and echoes above); a shortened rubric would test it. "
-  "Because the two variants also differ in chaining and in the evaluation call, the comparison shows that the rubric-guided "
-  "variant does worse than a plain rewrite, and not that the rubric criteria are the cause. The caveats are those of every probe here: one MPIR seed, a "
+  f"Because the two variants also differ in chaining, in the evaluation call and in the score history, and because more V3F candidates reached the gate ({_P1['validated']} of {_P1['rounds']} rounds validated against {_P2['validated']} of {_P2['rounds']} for V2F; accepted in {_P1['accepted_runs']} of {_P1['runs']} runs against {_P2['accepted_runs']} of {_P2['runs']}), which on a noisy 25-question gate raises the chance of a favourable selection whatever the rubric says, "
+  "the comparison shows that the rubric-guided variant did worse than a plain rewrite in this configuration, and not that the rubric criteria are the cause. We did not match the number of validated candidates per run, nor run an ablation that puts the rubric criteria into the free-rewrite request, and V3F was added after V2F's results were known (post hoc). The caveats are those of every probe here: one MPIR seed, a "
   "25-question gate, no correction for multiple comparisons, and a gain measured against a baseline that already "
   "contains the bare-tag example.")
 
@@ -479,20 +492,20 @@ TABLE("Table R.6. The protected treatment (start prompt P0 plus a bare-tag examp
 _Q, _L = PP["paired_qwen235"], PP["paired_gpt6luna"]
 P("The second probe repeats the protected comparison with the strong refiners, Qwen3-235B-A22B and GPT-6 Luna, through the "
   "router on 2026-11-02 (same model slugs as in Section 4.3; the provider and fingerprint were again not logged), on the "
-  "nine Tier-1 seed-42 cells with oracle scoring. With the format and example protected, these refiners produce gains that "
-  f"hold under lenient scoring: Qwen3-235B {pp(PP['v2f_qwen235']['lenient_mean'])} points with {PP['v2f_qwen235']['lenient_wins']} "
+  "nine Tier-1 seed-42 cells with oracle scoring. With the format and example protected, these refiners reach higher mean lenient accuracy "
+  f"than the start prompt in these nine single-run cells (no interval is given for these means, and the GPT-6 Luna mean is below the {pct(NOISE['mde_noise_only'])}-point minimum detectable effect): Qwen3-235B {pp(PP['v2f_qwen235']['lenient_mean'])} points with {PP['v2f_qwen235']['lenient_wins']} "
   f"winning cells and {PP['v2f_qwen235']['lenient_losses']} losses, GPT-6 Luna {pp(PP['v2f_gpt6luna']['lenient_mean'])} points with "
   f"{PP['v2f_gpt6luna']['lenient_wins']} wins and {PP['v2f_gpt6luna']['lenient_losses']} loss, against {pp(_tier_mean('v2f_1.7b'))} points "
-  "for the 1.7B refiner on the same cells. This is the capability dependence that the unprotected probes could not show "
+  "for the 1.7B refiner on the same cells. This is suggestive of the capability dependence that the unprotected probes could not show "
   "(rule D2 applied to lenient scoring and post hoc: for Qwen3-235B the mean exceeds that of the 1.7B refiner by more than 2.0 "
   "points and at least 3 cells win). The rubric is not shown to produce it: the rubric-free V3F gives "
   f"{pp(PP['v3f_qwen235']['lenient_mean'])} points with Qwen3-235B and {pp(PP['v3f_gpt6luna']['lenient_mean'])} with GPT-6 Luna, and "
   f"the paired V2F minus V3F difference is {pp(_Q['lenient']['mean'])} points [{pp(_Q['lenient']['lo'])}, {pp(_Q['lenient']['hi'])}] "
   f"for Qwen3-235B and {pp(_L['lenient']['mean'])} [{pp(_L['lenient']['lo'])}, {pp(_L['lenient']['hi'])}] for GPT-6 Luna, each over nine "
   "cells with one run per condition. The data therefore support three statements and no more: a capable refiner that keeps the answer "
-  "format can improve these prompts under a validated lenient metric; a rubric-free rewrite reaches similar gains (the paired differences include zero, and with GPT-6 Luna the rubric-guided variant is ahead by a point or two), "
+  "format was followed by higher mean lenient accuracy in these cells; no reliable difference between the rubric-guided and the rubric-free rewrite could be established (the paired differences include zero, and with GPT-6 Luna the rubric-guided variant is ahead by a point or two), "
   "so the rubric is not shown to help, and with the 1.7B refiner the rubric-guided variant does worse than the rubric-free one (Section 5.3.2); and nine cells with "
-  "single runs cannot exclude a modest rubric benefit with a strong refiner.")
+  "single runs cannot exclude a modest rubric benefit with a strong refiner. Three caveats accompany the headline numbers: the Tier-1 tasks are those on which the rubric was developed and were chosen through a statistic of the leaked first evaluation (Sections 3.3 and 4.2); the provider and fingerprint of the router-served models were not logged, so exact re-runs may not be possible; and 'no reliable improvement or difference could be established' is the accurate summary, since neither the means nor the paired differences are estimated precisely enough to claim more.")
 
 # ===========================================================================
 H2("5.7. Serving Noise and Minimum Detectable Effect")
@@ -548,7 +561,7 @@ TABLE("Table 10. Rubric totals (out of 35) assigned at temperature 0 to the base
 P(f"The 1.7B judge gives a parseable total for {pct(J1['parse_rate'], 0)}% of prompts and scores them "
   f"{J1['mean_total'] - J2['mean_total']:.1f} points higher than the reference judge on average; its "
   f"totals for the same unchanged P0 vary with a standard deviation of {N['judge_repeat']['mean_sd_across_rounds']:.1f} points "
-  "across sampled rounds. Both judges' totals correlate only weakly with accuracy "
+  "across sampled rounds. The reference judge, GPT-6 Luna, is also one of the refiners of Section 5.6.3, so judge and refiner are not independent. Both judges' totals correlate only weakly with accuracy "
   f"(median within-cell Spearman {J1['median_spearman_test_within_cell']:.2f} and "
   f"{J2['median_spearman_test_within_cell']:.2f} with test accuracy), and the two judges agree with each other "
   f"at {N['judge_validity']['agreement']['spearman']:.2f}. The rubric score is therefore at best a weak signal "
@@ -615,7 +628,7 @@ P("Table 11 gives the outcome of each decision rule. D1 (RQ1) is null for the un
   f"null), while its rubric-free control V3F gives {PP['v3f_1.7b']['lenient_wins']} lenient wins and a lenient mean of "
   f"{pp(PP['v3f_1.7b']['lenient_mean'])} points (mixed). D2 (RQ3) is not met with GPT-6 Luna or the 8B refiner under the "
   "unprotected treatment and is met for Qwen3-235B under strict scoring only and post hoc; under the protected treatment and "
-  "lenient scoring it is met for Qwen3-235B and GPT-6 Luna (post hoc), but the rubric-free control reaches similar gains. D3 (RQ2) is not met for the "
+  "lenient scoring it is met for Qwen3-235B and GPT-6 Luna (post hoc), but no reliable difference from the rubric-free control could be established. D3 (RQ2) is not met for the "
   "1.7B refiner: the candidates, not the gate, limit the result. The rubric score is weakly related to accuracy (RQ4).")
 
 _VR = []
@@ -656,7 +669,7 @@ TABLE("Table 11. Outcome of the decision rules (Section 4.1).",
       header=["Rule", "Criterion", "Observed", "Outcome"],
       rows=[
           ["D1", "At least 15 of 45 cells win and mean at least +2.0 pts; null if at most 2 wins and |mean| at most 1.0",
-           f"{MG['wins']} wins, mean {pp(MG['mean_diff'], 2)}", MG["verdict"].capitalize()],
+           f"{MG['wins']} wins, mean {pp(MG['mean_diff'], 2)}", MG["verdict"].capitalize() + " (treatment uninformative)"],
           ["D1, V2F (own baseline)", "Same rule, scaled to the cells run",
            f"strict wins {_G2['wins_vs_start']}, mean {pp(_G2['mean_diff_vs_start'])}; lenient wins {_G2['lenient_wins_vs_start']}, "
            f"losses {_G2['lenient_losses_vs_start']}, mean {pp(_G2['lenient_mean_diff_vs_start'])}", "Strict mixed; lenient null"],
@@ -666,10 +679,10 @@ TABLE("Table 11. Outcome of the decision rules (Section 4.1).",
            "Mixed (more than 2 wins, fewer than a third)"],
           ["D2, protected V2F, Qwen3-235B (post hoc, lenient)", "Mean +2.0 over the 1.7B refiner (same nine cells) and at least 3 of 9 wins",
            f"{pp(PP['v2f_qwen235']['lenient_mean'] - _tier_mean('v2f_1.7b'))} over the 1.7B refiner; {PP['v2f_qwen235']['lenient_wins']} wins",
-           "Met, but V3F reaches similar gains"],
+           "Met, but no reliable difference from V3F"],
           ["D2, protected V2F, GPT-6 Luna (post hoc, lenient)", "Same",
            f"{pp(PP['v2f_gpt6luna']['lenient_mean'] - _tier_mean('v2f_1.7b'))} over the 1.7B refiner; {PP['v2f_gpt6luna']['lenient_wins']} wins",
-           "Met, but V3F reaches similar gains"],
+           "Met, but no reliable difference from V3F"],
           ["D2, GPT-6 Luna", "Mean +2.0 over 1.7B and at least 3 of 9 wins",
            f"{pp(CAP['v2|gpt6luna']['mean_diff'])}; {CAP['v2|gpt6luna']['wins']} win", "Not met"],
           ["D2, Qwen3-8B-AWQ (exploratory)", "Same",
@@ -702,4 +715,4 @@ TABLE("Table R.5. Cost of one run (seven rounds), averaged over the runs of each
       "scorings of P0 and the final prompt; the oracle scoring of every candidate used for analysis is not included.",
       header=["Variant", "Runs", "Refiner calls", "Refiner tokens", "Target val. calls", "Target test calls"],
       rows=_rows, full=True, colw=[0.28, 0.08, 0.14, 0.16, 0.18, 0.16])
-P("A run issues 14 refiner calls (7 for V3) and generates about 12 thousand refiner tokens, plus about 134 target calls for validation and 356 for the two test scorings that any evaluation needs anyway; in absolute terms this is small next to the base optimizers, which score many candidates on minibatches. Wall-clock time was not logged for the earlier runs; a V2F run took a median of 9 minutes on the shared local GPU while other jobs were running, which is not a stand-alone figure. Because 66% of the V2 rounds never reached validation, the effective cost per validated candidate is about three times the nominal cost of a round. The 'cheap layer' argument of the Introduction therefore holds only if the layer works: in our data none of the 80 V2 runs improved accuracy, so the cost bought nothing, and it argues for caution rather than for use.")
+P("A run issues 14 refiner calls (7 for V3) and generates about 12 thousand refiner tokens, plus about 134 target calls for validation and 356 for the two test scorings that any evaluation needs anyway; in absolute terms this is small next to the base optimizers, which score many candidates on minibatches. Wall-clock time was not logged for the earlier runs; a V2F run took a median of 9 minutes on the shared local GPU while other jobs were running, which is not a stand-alone figure. Because 66% of the V2 rounds never reached validation, the effective cost per validated candidate is about three times the nominal cost of a round. The 'cheap layer' argument of the Introduction therefore holds only if the layer works: in our data none of the 80 V2 runs improved accuracy, so with this weak refiner the cost bought nothing, and it argues for caution rather than for use; with a strong refiner the cost-benefit question is open, since the Qwen3-235B and GPT-6 Luna gains of Section 5.6.3 were not separated from those of a rubric-free rewrite.")

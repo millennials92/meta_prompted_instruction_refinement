@@ -41,3 +41,43 @@ import part3_results  # noqa: E402,F401
 import part4_discussion_back  # noqa: E402,F401
 import part5_appendix  # noqa: E402,F401
 import part5b_appendix_g  # noqa: E402,F401
+
+
+# ---------------------------------------------------------------------------
+# Final table numbering (accepted version): the tables added in the revision rounds carry hand-made
+# labels R.1-R.6 and are interleaved with auto-numbered Tables 1-17. Renumber every table in reading
+# order and rewrite all in-text references so the labels are consecutive.
+import re as _re  # noqa: E402
+
+
+def _renumber_tables(blocks):
+    cap_re = _re.compile(r"^Table ((?:R\.)?\d+)\.")
+    mapping, seq = {}, 0
+    for b in blocks:
+        if b["type"] == "table":
+            m = cap_re.match(b["caption"])
+            if m:
+                seq += 1
+                mapping[m.group(1)] = str(seq)
+    single = _re.compile(r"Table ((?:R\.)?\d+)(?![\d.]*\d)")
+    pair = _re.compile(r"Tables (\d+) and (\d+)")
+
+    def fix(s):
+        s = pair.sub(lambda m: f"Tables {mapping.get(m.group(1), m.group(1))} and {mapping.get(m.group(2), m.group(2))}", s)
+        return single.sub(lambda m: f"Table {mapping.get(m.group(1), m.group(1))}", s)
+
+    def walk(x):
+        if isinstance(x, str):
+            return fix(x)
+        if isinstance(x, (list, tuple)):
+            return type(x)(walk(i) for i in x)
+        if isinstance(x, dict):
+            return {k: (walk(v) if k != "type" else v) for k, v in x.items()}
+        return x
+
+    blocks[:] = [walk(b) for b in blocks]
+    return mapping
+
+
+TABLE_MAP = _renumber_tables(BLOCKS)
+ABSTRACT = _re.sub(r"Table ((?:R\.)?\d+)", lambda m: f"Table {TABLE_MAP.get(m.group(1), m.group(1))}", ABSTRACT)

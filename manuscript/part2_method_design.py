@@ -170,14 +170,14 @@ P("The pilot's go/no-go rule was written in the project's planning document (REB
   "entry in a public registry, so we say that the protocol was fixed in advance, with listed amendments, and do not call the study pre-registered or pre-specified; several pipeline "
   "fixes were also made while the pilot ran (Appendix C). The chronology is: first evaluation and audit "
   "(before September 2026); pilot, 2026-09-04 and 05; revision protocol committed 2026-10-19 (commit 8fd1397), before any revised "
-  "experiment; revised experiments, 2026-10-20 and 21; further controls, audits and probes, 2026-11-02 (Appendix F, amendment 10). The decision rules below are reproduced from that "
+  "experiment; revised experiments, 2026-10-20 and 21; further controls, audits and probes, 2026-11-02 (Appendix F, amendments 10 and 11). The decision rules below are reproduced from that "
   "protocol. Its dated amendments, which include one change of the refiners used for D2 and later "
   "exploratory additions, are listed with their dates in Appendix F.")
 BULLETS([
     ("D1 (RQ1).",
      "Primary outcome per cell: paired difference in test accuracy between the final MPIR prompt and P0 "
      "(10,000-resample paired bootstrap, 95% percentile interval); a cell is a win if the difference is "
-     "positive and the interval excludes zero. The effect 'reproduces' if at least 15 of 45 cells are wins "
+     "positive and the interval excludes zero. Throughout, 'win' and 'loss' mean this paired-bootstrap-significant improvement or deterioration of a cell; the interval reflects the sampling of test examples only and does not apply the minimum detectable effect of Section 5.7. The effect 'reproduces' if at least 15 of 45 cells are wins "
      "and the mean cell difference is at least +2.0 points; it is 'null' if at most 2 of 45 are wins and the "
      "mean lies within ±1.0 point; otherwise 'mixed'. The protocol did not say how the up to three MPIR seeds "
      "of a cell are combined: we pool them by averaging the per-example outcomes of the final prompts over "
@@ -209,7 +209,7 @@ P("BBH has 23 tasks in 27 task files, about 6,511 examples ‹27›. Each task i
   "(hyperbaton, ruin_names, penguins_in_a_table) at seeds 42, 43 and 44. They were chosen because the "
   "leaked first evaluation showed the largest gains there, so they are a biased sample and may be "
   "subject to winner's-curse effects. Tier 2 is six tasks drawn uniformly at random, without replacement, "
-  "from the other 24 task files with random.Random(20261019): temporal_sequences, movie_recommendation, "
+  "from the other 24 task files (the draw is over files, and none of the drawn tasks is a multi-file task) with random.Random(20261019): temporal_sequences, movie_recommendation, "
   "disambiguation_qa, geometric_shapes, salient_translation_error_detection and sports_understanding, at "
   "seed 42. In total there are 45 cells, each with its own base prompt P0.")
 BULLETS([
@@ -227,7 +227,7 @@ P("The target model is Qwen3-1.7B ‹68› with thinking disabled and greedy dec
   "tokens. The refining model is the same model in the main grid. In the capability experiment the refiner is "
   "Qwen3-235B-A22B (the 2507 instruct release, a mixture-of-experts model from the target's family) or GPT-6 "
   "Luna ‹127›, both reached through the OpenRouter API on 2026-10-20 and 21 (and again on 2026-11-02 for the protected variants V2F and V3F) with temperature 0.7, a 3000-token "
-  "limit and, for GPT-6 Luna, minimal reasoning effort. Meta-prompt calls allow 1500 (evaluation) and 3000 "
+  "limit and, for GPT-6 Luna, minimal reasoning effort; the 2507 instruct release of Qwen3-235B-A22B does not think, the local Qwen3-8B-AWQ refiner of Section 5.6.2 was served with thinking disabled like the target, so the target's thinking mode was off throughout. Meta-prompt calls allow 1500 (evaluation) and 3000 "
   "(refinement) new tokens. The target and the 1.7B refiner are served with vLLM ‹123› 0.28.0 under WSL2 on one "
   "16 GB RTX 5000 Ada GPU, bf16 weights, a maximum context of 8192 tokens (Appendix C). Greedy decoding is not bit-reproducible under continuous batching, so we measure the "
   "resulting noise (Section 5.7). The OpenRouter model slugs are qwen/qwen3-235b-a22b-2507 and "

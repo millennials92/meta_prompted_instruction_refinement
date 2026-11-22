@@ -35,13 +35,13 @@ P(f"With Qwen3-1.7B as target and refiner, the rubric-guided layer as originally
   f"{pp(PP['v3f_1.7b']['lenient_mean'])} points and {PP['v3f_1.7b']['lenient_wins']} winning cells in 45, and the paired difference "
   f"in favour of V3F is {pp(-PP['paired_1.7b_all']['lenient']['mean'])} points (interval "
   f"[{pp(-PP['paired_1.7b_all']['lenient']['hi'])}, {pp(-PP['paired_1.7b_all']['lenient']['lo'])}]; Section 5.3.2). So for a 1.7B "
-  "refiner the rubric-guided variant does worse than a plain rewrite request with a protected format and a validation gate, which "
-  "gives a modest gain; the variants also differ in chaining and in the evaluation call, and we did not test whether the length of "
+  "refiner the rubric-guided variant did worse than a plain rewrite request with a protected format and a validation gate, which "
+  "gave a modest gain, in this configuration and one post hoc seed. The variants also differ in chaining, in the evaluation call, in the score history and in the number of candidates that reached the gate (92 validated rounds against 191), and we did not test whether the length of "
   "the rubric is the reason.")
-P(f"With strong refiners the gains are larger and the two variants are not separated (exploratory: nine cells, one run per "
-  f"condition). Under the protected treatment Qwen3-235B and GPT-6 Luna improve the prompts under lenient scoring "
-  f"({pp(PP['v2f_qwen235']['lenient_mean'])} and {pp(PP['v2f_gpt6luna']['lenient_mean'])} points), which is the capability "
-  f"dependence the first-round design asked for, but the rubric-free variant does as well ({pp(PP['v3f_qwen235']['lenient_mean'])} and "
+P(f"With strong refiners the mean differences are larger and the two variants are not separated (exploratory: nine cells, one run per "
+  f"condition). Under the protected treatment Qwen3-235B and GPT-6 Luna reached higher mean lenient accuracy in these cells "
+  f"({pp(PP['v2f_qwen235']['lenient_mean'])} and {pp(PP['v2f_gpt6luna']['lenient_mean'])} points), which is suggestive of the capability "
+  f"dependence the first-round design asked for (no interval is available for these means, the Luna mean is below the minimum detectable effect, the Tier-1 tasks were chosen through a leaked statistic and the router's provider was not logged), but the rubric-free variant is not distinguishable from it ({pp(PP['v3f_qwen235']['lenient_mean'])} and "
   f"{pp(PP['v3f_gpt6luna']['lenient_mean'])} points) and the paired differences between the two variants include zero "
   "(Section 5.6.3). The earlier, unprotected probes gave strict gains that mostly repaired the answer tag and reversed or "
   "vanished under lenient scoring (Section 5.6). The one gain that survives both metrics there, hyperbaton with PromptWizard, "
@@ -68,8 +68,7 @@ P("The following points follow from these experiments, with Qwen3 models, nine B
   "points on a few hundred questions are noise. (iv) When the refining model is as small as the target, expect "
   "most rewrites to be unusable (echoes, missing delimiters, a dropped answer format) and monitor that rate; "
   "protect the answer-format line and show one worked example of the bare tag, since the line alone did not restore "
-  "accuracy (Section 5.2). (v) With a small refiner, a short rewrite request did better than the long rubric in our runs (Section 5.3.2, one seed, "
-  "with other differences between the variants); whatever is used, keep the format line and one worked example and validate on held-out data.")
+  "accuracy (Section 5.2). (v) With a small refiner, and in one post hoc seed with other differences between the variants (chaining, evaluation call, candidate throughput), a short rewrite request did better than the long rubric (Section 5.3.2); whatever is used, keep the format line and one worked example and validate on held-out data.")
 
 H2("6.3. Threats to Validity")
 H3("6.3.1. Internal Validity")
@@ -111,14 +110,14 @@ P("We re-tested a rubric-guided refinement layer on prompts from small-model opt
   f"the rubric-guided variant was accepted in {NEW['grid_v2f']['accepted_runs']} of {NEW['grid_v2f']['runs']} runs but won in "
   f"{NEW['grid_v2f']['lenient_wins_vs_start']} cell and lost significantly in {NEW['grid_v2f']['lenient_losses_vs_start']} under a "
   f"lenient metric that we validated on labelled responses, whereas its rubric-free control gained {pp(PP['v3f_1.7b']['lenient_mean'])} "
-  f"points on average and won in {PP['v3f_1.7b']['lenient_wins']} cells, so for a 1.7B refiner the rubric-guided variant does worse than a plain rewrite. Third, strong refiners "
-  f"(Qwen3-235B, GPT-6 Luna) improve the prompts under the protected treatment ({pp(PP['v2f_qwen235']['lenient_mean'])} and "
-  f"{pp(PP['v2f_gpt6luna']['lenient_mean'])} points under lenient scoring, nine cells, one run each), but a rubric-free rewrite reaches "
-  "similar gains, so the rubric is not shown to be what helps. Fourth, two measurement lessons accompany these findings: strict answer "
+  f"points on average and won in {PP['v3f_1.7b']['lenient_wins']} cells, so for a 1.7B refiner the rubric-guided variant did worse than a plain rewrite, although the variants also differ in chaining, evaluation call, score history and candidate throughput and the comparison is post hoc with one seed. Third, strong refiners "
+  f"(Qwen3-235B, GPT-6 Luna) reached higher mean lenient accuracy under the protected treatment ({pp(PP['v2f_qwen235']['lenient_mean'])} and "
+  f"{pp(PP['v2f_gpt6luna']['lenient_mean'])} points under lenient scoring, nine cells, one run each, without intervals, on Tier-1 tasks chosen through a leaked statistic and with an unlogged router provider), but no reliable difference from a rubric-free rewrite "
+  "could be established, so the rubric is not shown to be what helps. Fourth, two measurement lessons accompany these findings: strict answer "
   "extraction accounts for most of the apparent weakness of exemplar-free baselines, and identical prompts do not score identically "
   "on this serving stack.")
 P("These conclusions are limited to Qwen3-1.7B as target and as the small refiner, nine BBH tasks, three re-implemented "
-  "optimizers whose base prompts are often weak, one MPIR seed per cell in the protected comparisons, and labels made by an AI assistant; the original "
+  "optimizers whose base prompts are often weak (21 of 45 are the seed plus the format line, 4 an induction template, 5 short and 15 substantive), one MPIR seed per cell in the protected comparisons, and labels made by an AI assistant; the original "
   "GPT-4o results remain unverified. Future work: a criterion-level ablation and a shorter rubric, a human-rated validation of the "
   "lenient parser, and replication on other model families and on well-tuned optimizers. Code, per-round logs and generations are public.")
 
