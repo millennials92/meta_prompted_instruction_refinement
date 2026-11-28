@@ -68,7 +68,7 @@ def build_supplementary(dest: str) -> None:
         r"\]\((?!https?://)([^)]+)\)",
         lambda m: "](" + base + ("tree/main/" if m.group(1).endswith("/") else "blob/main/") + m.group(1) + ")",
         readme)
-    archived_notes = {"REBUILD.md", "REVISION2_STATUS.md", "HANDOFF-GPU.md"}
+    archived_notes = {"REBUILD.md", "REVISION2_STATUS.md", "HANDOFF-GPU.md", "REVISION_PROTOCOL.md"}
     with zipfile.ZipFile(PREV_SUPP) as old, zipfile.ZipFile(dest, "w", zipfile.ZIP_DEFLATED) as new:
         for member in old.infolist():
             name = member.filename

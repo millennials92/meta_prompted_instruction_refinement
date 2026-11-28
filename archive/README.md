@@ -3,6 +3,7 @@
 Earlier manuscripts, submission packages, and development records are preserved here.
 Current publication files are in [submission_final](../submission_final/).
 
+- [Revision protocol](development/REVISION_PROTOCOL.md): dated experimental design and decision rules.
 - manuscripts/submission_revision/: first revision and upload package.
 - manuscripts/submission_revision2/: second revision and original supplementary archive.
 - manuscripts/pre_sync_final/: final-file package before the abstract and DOI update.
