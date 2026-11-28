@@ -1,8 +1,6 @@
 # Does Rubric-Guided Refinement Improve Prompts from Small-Model Optimizers?
 
-Accepted in **IEEE Access**. [Read the paper](https://doi.org/10.1109/ACCESS.2026.3757210).
-
-Code and results for Meta-Prompted Instruction Refinement (MPIR).
+[Read the paper](https://doi.org/10.1109/ACCESS.2026.3757210)
 
 ## Abstract
 
