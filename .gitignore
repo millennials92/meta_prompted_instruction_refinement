@@ -58,3 +58,4 @@ results/revision/score_cache/
 logs_search/
 logs_study/
 results/revision/judge_scores_gpt6luna.backup.json
+submission_final/_main_pkg/

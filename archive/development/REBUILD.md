@@ -1,6 +1,6 @@
 # MPIR Rebuild — rejection diagnosis and plan
 
-> **Historical record — publication status updated 2026-11-28:** The subsequent study, *Does Rubric-Guided Refinement Improve Prompts from Small-Model Optimizers?*, has been accepted in **IEEE Access** ([DOI: 10.1109/ACCESS.2026.3757210](https://doi.org/10.1109/ACCESS.2026.3757210)). The rejection diagnosis and rebuild plans below describe the earlier manuscript and evaluation, not the current publication status. They are retained for provenance. See the [README](README.md) for the accepted abstract and current study entry points.
+> **Historical record — publication status updated 2026-11-28:** The subsequent study, *Does Rubric-Guided Refinement Improve Prompts from Small-Model Optimizers?*, has been accepted in **IEEE Access** ([DOI: 10.1109/ACCESS.2026.3757210](https://doi.org/10.1109/ACCESS.2026.3757210)). The rejection diagnosis and rebuild plans below describe the earlier manuscript and evaluation, not the current publication status. They are retained for provenance. See the [README](../../README.md) for the accepted abstract and current study entry points.
 
 **Status:** AIOPEN-D-26-00563 desk-rejected by *AI Open* on 2026-09-03. Not sent to
 external review. Editor's stated grounds: "insufficient novelty, lack of experimental

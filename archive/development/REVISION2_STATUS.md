@@ -1,6 +1,6 @@
 # Second revision (IEEE Access, Access-2026-54235): historical progress log
 
-> **Historical progress log — publication status updated 2026-11-28:** *Does Rubric-Guided Refinement Improve Prompts from Small-Model Optimizers?* has been accepted in **IEEE Access** ([DOI: 10.1109/ACCESS.2026.3757210](https://doi.org/10.1109/ACCESS.2026.3757210)). The unfinished-work notes below are earlier snapshots followed by later completion updates. They are retained as a development record, not the current publication status. See the [README](README.md) for the accepted abstract and study overview.
+> **Historical progress log — publication status updated 2026-11-28:** *Does Rubric-Guided Refinement Improve Prompts from Small-Model Optimizers?* has been accepted in **IEEE Access** ([DOI: 10.1109/ACCESS.2026.3757210](https://doi.org/10.1109/ACCESS.2026.3757210)). The unfinished-work notes below are earlier snapshots followed by later completion updates. They are retained as a development record, not the current publication status. See the [README](../../README.md) for the accepted abstract and study overview.
 
 Snapshot of an unfinished revision. The manuscript in `manuscript/` does not yet build to a final PDF with the
 second-revision numbers; do not upload anything from `submission_revision/` until this file says the revision is complete.

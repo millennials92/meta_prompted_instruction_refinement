@@ -21,7 +21,7 @@
 \vol{14}
 \year{2026}
 \history{Manuscript received September 5, 2026; revised November 3, 2026; accepted November 22, 2026.}
-\doi{to be assigned by IEEE upon acceptance}
+\doi{10.1109/ACCESS.2026.3757210}
 
 \title{Does Rubric-Guided Refinement Improve Prompts from Small-Model Optimizers?}
 
@@ -40,7 +40,7 @@ commercial, or not-for-profit sectors.}
 {Nguyen \headeretal: Does Rubric-Guided Refinement Improve Optimized Prompts?}
 
 \begin{abstract}
-Meta-Prompted Instruction Refinement (MPIR) asks a language model to score an optimized prompt against a rubric, rewrite it, and keep it only if it beats the original on validation questions. We re-test it with a repaired, logged loop and decision rules fixed in advance, after an earlier evaluation leaked validation data. Scope: Qwen3-1.7B target, nine Big-Bench Hard tasks. Of the 45 base prompts from three small-model optimizers, 21 are the seed plus a format line, 4 an induction template, 5 short and 15 substantive. With a 1.7B refiner, the original treatment changed the prompt in 1 of 80 runs, but 93-95\% of candidates had lost the answer format, so the test could not separate idea from treatment. With the format protected (a positive control, passed in 24 of 26 cells, shows sensitivity to large strict-metric effects only), the rubric-guided variant won in 1 cell and lost in 3 under a lenient metric validated on 400 AI-labelled responses; a rubric-free rewrite gained +3.8 points on average (11 winning cells of 45). The paired difference is +3.7 points [+1.1, +6.8], but the variants also differ in chaining, evaluation call and candidate throughput (one post hoc seed). With Qwen3-235B and GPT-6 Luna, nine single-run cells gave higher mean lenient accuracy (+7.3 and +3.4 points), with no reliable difference from a rubric-free rewrite. One format exemplar changed strict accuracy by +19.5 (APE) and +42.3 (ProTeGi) points; identical prompts disagree on 6.5\% of examples. The rubric is not shown to help.
+Meta-Prompted Instruction Refinement (MPIR) asks a language model to score an optimized prompt against a rubric, rewrite it, and keep the rewrite only if it beats the original on validation questions. We re-test it after an earlier evaluation was found to have a validation leak, with a repaired, logged loop and decision rules fixed in advance. The scope is narrow: Qwen3-1.7B as target, 45 base prompts from three small-model optimizers, nine Big-Bench Hard tasks. With the 1.7B model refining its own prompts, the original treatment changed the prompt in 1 of 80 runs, but 93-95\% of its candidates had lost the answer format, so the test could not separate a failed idea from a failed treatment. With the format protected (positive control: the gate accepted a known-good candidate in 24 of 26 cells), the rubric-guided variant won in 1 cell and lost in 3 under a lenient metric validated on 400 AI-labelled responses, whereas a rubric-free rewrite with the same protection gained +3.8 points on average (11 winning cells of 45); the paired difference is +3.7 points [+1.1, +6.8] in its favour. Qwen3-235B and GPT-6 Luna improved the prompts under protection (+7.3 and +3.4 points, nine cells, one run each), but a rubric-free rewrite reached similar gains. One answer-format exemplar changed strict accuracy by +19.5 (APE) and +42.3 (ProTeGi) points, mostly tag format, and identical prompts disagree on 6.5\% of examples. The rubric is not shown to help; conclusions are limited to Qwen3 targets, nine tasks and these optimizers.
 \end{abstract}
 
 \begin{keywords}

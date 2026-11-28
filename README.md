@@ -10,6 +10,7 @@ Meta-Prompted Instruction Refinement (MPIR) asks a language model to score an op
 
 ## Code and data
 
+- [Supplementary material](submission_final/Supplementary_Material.zip): code, experiment records, and protocol.
 - [`mpir_study/`](mpir_study/): refinement methods, evaluation, and analysis.
 - [`results/revision/`](results/revision/): experiment results.
 - [`demos/data/`](demos/data/) and [`demos/results/`](demos/results/): data splits and saved prompts.

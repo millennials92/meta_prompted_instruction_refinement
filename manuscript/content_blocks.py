@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Manuscript content for the IEEE Access revision (Access-2026-44920). The first submission's text is
-# preserved in content_blocks_v1_submitted.py. Block-building helpers live in blocks_api.py; the body is
+# preserved in archive/development/manuscript/content_blocks_v1_submitted.py. Block-building helpers live in blocks_api.py; the body is
 # split into part modules that append to the same BLOCKS list, in reading order.
 # Citation tokens use unicode guillemets, e.g. ‹9› or ‹9,10›, naming the numeric suffix of the
 # reference_N keys in manuscript/latex/refkey_to_bibkey.json; build_latex_ieee.py turns them into \cite{}.

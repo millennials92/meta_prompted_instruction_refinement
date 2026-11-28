@@ -6,9 +6,11 @@ supplementary archive reviewed with the earlier rounds.
 Run after build_latex_ieee.py. Output: submission_final/.
 """
 import os
+import re
 import shutil
 import subprocess
 import zipfile
+from pathlib import Path
 
 from docx import Document
 from PIL import Image
@@ -18,7 +20,7 @@ ROOT = os.path.dirname(HERE)
 OUT = os.path.join(ROOT, "submission_final")
 PKG = os.path.join(OUT, "_main_pkg")
 LATEX = os.path.join(HERE, "latex_ieee")
-PREV_SUPP = os.path.join(ROOT, "submission_revision2", "upload_ready", "6_Supplementary_Material.zip")
+PREV_SUPP = os.path.join(ROOT, "archive", "manuscripts", "submission_revision2", "upload_ready", "6_Supplementary_Material.zip")
 KEEP_EXT = (".png", ".bib", ".cls", ".bst", ".sty", ".pfb", ".tfm", ".map", ".bbl", ".tex")
 GA_NAME = "Graphical_Abstract.jpg"
 GA_SIZE = (660, 295)
@@ -30,10 +32,15 @@ GA_CAPTION_MAX_WORDS = 60
 
 
 def run(cmd, cwd):
-    subprocess.run(cmd, cwd=cwd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    result = subprocess.run(cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    if result.returncode:
+        raise RuntimeError(f"{cmd[0]} failed:\n{result.stdout[-12000:]}")
 
 
 def build_source_package() -> None:
+    # Only remove this builder's own staging directory, never a resolved external path.
+    if Path(PKG).resolve() != Path(OUT).resolve() / "_main_pkg":
+        raise ValueError("Unsafe package staging path")
     shutil.rmtree(PKG, ignore_errors=True)
     os.makedirs(os.path.join(PKG, "figures"))
     for name in os.listdir(LATEX):
@@ -46,10 +53,38 @@ def build_source_package() -> None:
     with open(path, "w", encoding="utf-8") as fh:
         fh.write(tex)
     for _ in range(2):
-        run(["pdflatex", "-interaction=nonstopmode", "manuscript.tex"], PKG)
+        run(["pdflatex", "-interaction=nonstopmode", "-halt-on-error", "-no-shell-escape", "manuscript.tex"], PKG)
     run(["bibtex", "manuscript"], PKG)
     for _ in range(2):
-        run(["pdflatex", "-interaction=nonstopmode", "manuscript.tex"], PKG)
+        run(["pdflatex", "-interaction=nonstopmode", "-halt-on-error", "-no-shell-escape", "manuscript.tex"], PKG)
+
+
+def build_supplementary(dest: str) -> None:
+    """Refresh documentation while preserving the reviewed code and result bytes."""
+    readme = Path(ROOT, "README.md").read_text(encoding="utf-8")
+    # Repository links also work when the supplementary archive is opened by itself.
+    base = "https://github.com/millennials92/meta_prompted_instruction_refinement/"
+    readme = re.sub(
+        r"\]\((?!https?://)([^)]+)\)",
+        lambda m: "](" + base + ("tree/main/" if m.group(1).endswith("/") else "blob/main/") + m.group(1) + ")",
+        readme)
+    archived_notes = {"REBUILD.md", "REVISION2_STATUS.md", "HANDOFF-GPU.md"}
+    with zipfile.ZipFile(PREV_SUPP) as old, zipfile.ZipFile(dest, "w", zipfile.ZIP_DEFLATED) as new:
+        for member in old.infolist():
+            name = member.filename
+            relative = name.removeprefix("supplementary/")
+            if relative == "README.md":
+                continue
+            if relative in archived_notes:
+                name = "supplementary/archive/development/" + relative
+            elif relative.startswith("manuscript/") and relative.endswith((".md", ".txt")):
+                name = "supplementary/archive/development/" + relative
+            new.writestr(name, old.read(member))
+        new.writestr("supplementary/README.md", readme)
+        new.writestr(
+            "supplementary/archive/README.md",
+            "# Archive\n\nEarlier development notes and reviews are preserved here as historical records.\n"
+            "The current paper title, abstract, and DOI are in [README](../README.md).\n")
 
 
 def make_graphical_abstract(dest: str) -> int:
@@ -81,6 +116,7 @@ def main() -> None:
     os.makedirs(OUT, exist_ok=True)
     build_source_package()
     shutil.copy(os.path.join(PKG, "manuscript.pdf"), os.path.join(OUT, "FINAL Article.pdf"))
+    shutil.copy(os.path.join(PKG, "manuscript.pdf"), os.path.join(LATEX, "manuscript.pdf"))
     with zipfile.ZipFile(os.path.join(OUT, "LaTeX_source.zip"), "w", zipfile.ZIP_DEFLATED) as z:
         for root, _, files in os.walk(PKG):
             for name in files:
@@ -90,8 +126,7 @@ def main() -> None:
                 z.write(full, os.path.relpath(full, PKG))
     quality = make_graphical_abstract(os.path.join(OUT, GA_NAME))
     make_ga_word_file(os.path.join(OUT, "Graphical_Abstract_Info.docx"))
-    if os.path.exists(PREV_SUPP):
-        shutil.copy(PREV_SUPP, os.path.join(OUT, "Supplementary_Material.zip"))
+    build_supplementary(os.path.join(OUT, "Supplementary_Material.zip"))
     print(f"GA jpeg quality {quality}, {os.path.getsize(os.path.join(OUT, GA_NAME))} bytes")
     for name in sorted(os.listdir(OUT)):
         if name != "_main_pkg":

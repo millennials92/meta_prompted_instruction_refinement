@@ -1,6 +1,6 @@
 # GPU machine handoff
 
-> **Historical handoff — publication status updated 2026-11-28:** The subsequent study has been accepted in **IEEE Access** ([DOI: 10.1109/ACCESS.2026.3757210](https://doi.org/10.1109/ACCESS.2026.3757210)). The "unstarted work" and operational plans below describe the original rebuild stage and are not current status or setup instructions for the accepted study. See the [README](README.md) and [study protocol](REVISION_PROTOCOL.md) for the revised study.
+> **Historical handoff — publication status updated 2026-11-28:** The subsequent study has been accepted in **IEEE Access** ([DOI: 10.1109/ACCESS.2026.3757210](https://doi.org/10.1109/ACCESS.2026.3757210)). The "unstarted work" and operational plans below describe the original rebuild stage and are not current status or setup instructions for the accepted study. See the [README](../../README.md) and [study protocol](../../REVISION_PROTOCOL.md) for the revised study.
 
 Operational companion to `REBUILD.md`. That file says *why*; this one says *what to run*.
 

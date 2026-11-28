@@ -145,31 +145,7 @@ def author_block_ieee():
     return "\n".join(lines)
 
 
-# IEEE Access requires a 150-250 word, single-paragraph, citation-free
-# abstract -- the master ABSTRACT in content_blocks.py (written for the
-# Elsevier/AI Open submission, no strict word cap there) runs longer, so this
-# build uses its own trimmed version rather than shortening the shared master
-# copy and affecting the other build.
-IEEE_ABSTRACT = (
-    "Large language models remain critically dependent on prompt quality, and automatic prompt "
-    "optimization (APO) methods often produce output lacking the structured guidance human-crafted "
-    "prompts provide. This paper reports a pre-registered go/no-go pilot testing Meta-Prompted "
-    "Instruction Refinement (MPIR), a lightweight rubric-guided layer that refines an APO-generated "
-    "prompt through meta-prompted evaluation, refinement, and empirical validation. An initial "
-    "evaluation using GPT-4o to judge and refine prompts targeting GPT-3.5-turbo reported per-task "
-    "gains on Big-Bench Hard (BBH) but a pooled improvement that did not reach significance, and a "
-    "later audit found its validation stage had leaked training data into scoring. To isolate whether "
-    "the apparent gains reflected the refinement mechanism or the meta-model's capability advantage "
-    "over its target, we reran the pilot with a single small open-weight model (Qwen3-1.7B) as target, "
-    "optimizer, and refinement judge simultaneously, across three APO backbones on the three BBH "
-    "tasks where the original gains were largest. The effect did not reproduce: MPIR's refined prompt "
-    "was byte-identical to its base optimizer's prompt in all nine tested configurations, and pooled "
-    "McNemar and GEE tests returned accuracy differences of 0.0000. Tracing the cause, we identify and "
-    "fix a general defect in the refinement algorithm -- it never scored the pre-refinement prompt as "
-    "a baseline -- plus six further correctness bugs found live. We report this as a boundary-condition "
-    "finding: a cheap, post-hoc rubric-refinement layer of this kind appears to depend on the refining "
-    "model's own capability, and its benefit is smaller than the original per-task deltas suggest."
-)
+# The accepted abstract has one source: part_abstract.py via C.ABSTRACT.
 
 
 LUNA_FOOTNOTE = (
@@ -227,7 +203,7 @@ TEMPLATE = r"""\documentclass{{ieeeaccess}}
 \vol{{14}}
 \year{{2026}}
 \history{{Manuscript received September 5, 2026; revised November 3, 2026; accepted November 22, 2026.}}
-\doi{{to be assigned by IEEE upon acceptance}}
+\doi{{10.1109/ACCESS.2026.3757210}}
 
 \title{{{title}}}
 
