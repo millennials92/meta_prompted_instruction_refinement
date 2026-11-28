@@ -22,7 +22,7 @@ The `g7-api` group requires `OPENROUTER_API_KEY` in `demos/.env` and a running l
 
 The README uses refinement seed 4 for new trials. These are not the paper's reported runs. Completed runs are skipped, so commands using saved seeds may report `0 runs to do`.
 
-To rerun published seeds, follow the [protocol](../archive/development/REVISION_PROTOCOL.md) in a separate working copy. Move the corresponding saved runs and generation/scoring caches aside first to avoid reusing them.
+To rerun published seeds, follow the [protocol](REVISION_PROTOCOL.md) in a separate working copy. Move the corresponding saved runs and generation/scoring caches aside first to avoid reusing them.
 
 The study used vLLM 0.28.0 under WSL2. The recorded server settings include:
 
