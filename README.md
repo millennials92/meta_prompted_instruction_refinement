@@ -16,13 +16,11 @@ Meta-Prompted Instruction Refinement (MPIR) asks a language model to score an op
 - [`demos/data/`](demos/data/) and [`demos/results/`](demos/results/): data splits and saved prompts.
 - [`BIG-Bench-Hard/`](BIG-Bench-Hard/): benchmark materials.
 
-See [`run_study.py`](mpir_study/run_study.py) for experiment groups and [`client.py`](mpir_study/client.py) for model endpoint configuration.
-
 ## How to run
 
-Use Linux or WSL2, Python 3.12, and a CUDA GPU supported by [vLLM](https://docs.vllm.ai/en/latest/getting_started/installation/gpu/). The examples use the paper's vLLM 0.28.0 serving version and the saved base prompts and data splits.
+Requires Linux or WSL2, Python 3.12, and a CUDA GPU supported by [vLLM](https://docs.vllm.ai/en/latest/getting_started/installation/gpu/).
 
-**1. Install the study runner.**
+**1. Install**
 
 ```bash
 git clone https://github.com/millennials92/meta_prompted_instruction_refinement.git
@@ -32,33 +30,22 @@ source .venv/bin/activate
 python -m pip install "vllm==0.28.0" openai python-dotenv tenacity PyYAML numpy scipy
 ```
 
-These dependencies cover refinement from saved prompts; the older demo notebooks use the broader requirements.txt environment.
-
-**2. Start the target/refiner server and leave it running.**
+**2. Start the model** (leave this terminal open)
 
 ```bash
-vllm serve Qwen/Qwen3-1.7B --host 127.0.0.1 --port 8000 \
-  --dtype bfloat16 --max-model-len 8192 \
-  --max-num-seqs 192 --gpu-memory-utilization 0.86
+vllm serve Qwen/Qwen3-1.7B --host 127.0.0.1 --dtype bfloat16 --max-model-len 8192
 ```
 
-**3. In a second terminal, enter the repository, activate the same environment, and run:**
+**3. Run the experiment** in a second terminal, from the repository folder:
 
 ```bash
 source .venv/bin/activate
-export TARGET_URL=http://127.0.0.1:8000/v1
-python -m mpir_study.run_study --help
 python -m mpir_study.run_study --group g5-fix --mseeds 4 --workers 1
-python -m mpir_study.run_study --group g7-v3f --mseeds 4 --workers 1
 ```
 
-The groups run protected rubric-guided refinement (V2F) and its rubric-free control (V3F). Seed 4 starts new refinement trials; it does not reproduce the paper's reported seeds.
+This runs protected rubric-guided refinement using a new refinement seed (4). Results are saved in `results/revision/rounds/`.
 
-Completed runs are skipped. To rerun published seeds, use the seeds specified in the [protocol](archive/development/REVISION_PROTOCOL.md) in a separate working copy, with the corresponding saved runs and generation/scoring caches moved aside first. At the paper's 8192-token limit, one V2F cell exceeded the context window; increasing that limit changes the experimental setting.
-
-Run records are saved in `results/revision/rounds/`, with generation and scoring caches in `gen_cache/` and `score_cache/` under the same directory. Inspect these JSON records for new runs. Published summaries are also in `results/revision/`; recomputing lenient analyses requires raw-output caches that are not all tracked in Git.
-
-Other groups are listed in [run_study.py](mpir_study/run_study.py). The `g7-api` group additionally requires `OPENROUTER_API_KEY` in `demos/.env` and a running local target server.
+See [run details](docs/RUNNING.md) for other experiments and reproducing the published runs.
 
 ## License
 

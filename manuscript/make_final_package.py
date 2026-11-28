@@ -81,6 +81,7 @@ def build_supplementary(dest: str) -> None:
                 name = "supplementary/archive/development/" + relative
             new.writestr(name, old.read(member))
         new.writestr("supplementary/README.md", readme)
+        new.writestr("supplementary/docs/RUNNING.md", Path(ROOT, "docs", "RUNNING.md").read_text(encoding="utf-8"))
         new.writestr(
             "supplementary/archive/README.md",
             "# Archive\n\nEarlier development notes and reviews are preserved here as historical records.\n"
